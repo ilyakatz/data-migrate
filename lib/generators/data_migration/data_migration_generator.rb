@@ -1,11 +1,14 @@
+require 'rails/generators'
 require 'rails/generators/migration'
+
 module DataMigration
   class DataMigrationGenerator < Rails::Generators::NamedBase
     namespace "data_migration"
-    argument :attributes, :type => :array, :default => [], :banner => "field:type field:type"
 
-    source_root File.expand_path('../templates', __FILE__)
     include Rails::Generators::Migration
+    source_root File.expand_path('../templates', __FILE__)
+
+    argument :attributes, :type => :array, :default => [], :banner => "field:type field:type"
 
     class_option :skip_migration, :desc => 'Dont generate database migration file.', :type => :boolean
 
@@ -21,7 +24,11 @@ module DataMigration
     attr_reader :migration_action
 
     def self.next_migration_number(dirname)
-      Time.now.utc.strftime("%Y%m%d%H%M%S")
+      if ActiveRecord::Base.timestamped_migrations
+        Time.new.utc.strftime("%Y%m%d%H%M%S")
+      else
+        "%.3d" % (current_migration_number(dirname) + 1)
+      end
     end
 
     def set_local_assigns!
