@@ -12,3 +12,15 @@ module DataMigration
     end
   end
 end
+
+module ActiveRecord
+  class MigrationProxy
+    def is_data?
+      !(self.filename =~ /db\/data\//).nil?
+    end
+
+    def is_schema?
+      !(self.filename =~ /db\/migrate\//).nil?
+    end
+  end
+end
