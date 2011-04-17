@@ -2,6 +2,28 @@ require 'data_migrator'
 
 namespace :db do
   namespace :migrate do
+    namespace :up do
+      desc 'Runs the "up" for a given migration VERSION.'
+      task :with_data => :environment do
+        version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
+        raise "VERSION is required" unless version
+        config = connect_to_database
+        migrations = past_migrations.keep_if{|m| m[:version] == version}
+
+        if migrations.size > 1
+          raise "Ambiguous migration name. Use 'db:migrate:up' or 'data:migrate:up' instead"
+        elsif migrations.size == 1
+          if migrations.first[:kind] == :data
+            ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
+            DataMigration::DataMigrator.run(:up, "db/data/", version)
+          else
+            ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
+            ActiveRecord::Migrator.run(:up, "db/migrate/", version)
+          end
+        end
+      end
+    end
+
     namespace :down do
       desc 'Runs the "down" for a given migration VERSION.'
       task :with_data => :environment do
