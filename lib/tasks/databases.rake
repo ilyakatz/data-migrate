@@ -8,10 +8,19 @@ namespace :db do
         version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
         raise "VERSION is required" unless version
         config = connect_to_database
-
         migrations = past_migrations.keep_if{|m| m[:version] == version}
-        DataMigration::DataMigrator.run(:down, "db/data/", version)
-        ActiveRecord::Migrator.run(:down, "db/migrate/", version)
+
+        if migrations.size > 1
+          raise "Ambiguous migration name. Use 'db:migrate:down' or 'data:migrate:down' instead"
+        elsif migrations.size == 1
+          if migrations.first[:kind] == :data
+            ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
+            DataMigration::DataMigrator.run(:down, "db/data/", version)
+          else
+            ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
+            ActiveRecord::Migrator.run(:down, "db/migrate/", version)
+          end
+        end
       end
     end
 
@@ -88,8 +97,10 @@ namespace :db do
       migrations = pending_migrations.reverse.pop(step).reverse
       migrations.each do | pending_migration |
         if pending_migration.is_data?
+          ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
           DataMigration::DataMigrator.run(:up, "db/data/", pending_migration.version)
         elsif pending_migration.is_schema?
+          ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
           ActiveRecord::Migrator.run(:up, "db/migrate/", pending_migration.version)
         end
       end
@@ -228,11 +239,12 @@ def connect_to_database
 end
 
 def past_migrations sort=nil
+  sort = sort.downcase if sort
   db_list_data = ActiveRecord::Base.connection.select_values("SELECT version FROM #{DataMigration::DataMigrator.schema_migrations_table_name}").sort
   db_list_schema = ActiveRecord::Base.connection.select_values("SELECT version FROM #{ActiveRecord::Migrator.schema_migrations_table_name}").sort
   migrations = db_list_data.map{|d| {:version => d.to_i, :kind => :data }} + db_list_schema.map{|d| {:version => d.to_i, :kind => :schema }}
 
-  if sort.downcase == 'desc'
+  if sort == 'desc'
     migrations.sort!{|a, b| "#{b[:version]}_#{b[:kind] == :data ? 1 :0}" <=>  "#{a[:version]}_#{a[:kind] == :data ? 1 :0}" }
   else
     migrations.sort!{|a, b| "#{b[:version]}_#{a[:kind] == :data ? 1 :0}" <=>  "#{b[:version]}_#{b[:kind] == :data ? 1 :0}" }
