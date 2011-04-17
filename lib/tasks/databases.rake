@@ -2,6 +2,19 @@ require 'data_migrator'
 
 namespace :db do
   namespace :migrate do
+
+    namespace :redo do
+      desc 'Rollbacks the database one migration and re migrate up (options: STEP=x, VERSION=x).'
+      task :with_data => :environment do
+        if ENV["VERSION"]
+          Rake::Task["db:migrate:down:with_data"].invoke
+          Rake::Task["db:migrate:up:with_data"].invoke
+        else
+          Rake::Task["db:rollback:with_data"].invoke
+          Rake::Task["db:migrate:with_data"].invoke
+        end
+      end
+
     namespace :up do
       desc 'Runs the "up" for a given migration VERSION.'
       task :with_data => :environment do
