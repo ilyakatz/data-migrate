@@ -1,22 +1,25 @@
 require 'data_migrator'
 
 namespace :db do
-
-
   namespace :migrate do
+    namespace :down do
+      desc 'Runs the "down" for a given migration VERSION.'
+      task :with_data => :environment do
+        version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
+        raise "VERSION is required" unless version
+        config = connect_to_database
+
+        migrations = past_migrations.keep_if{|m| m[:version] == version}
+        DataMigration::DataMigrator.run(:down, "db/data/", version)
+        ActiveRecord::Migrator.run(:down, "db/migrate/", version)
+      end
+    end
+
     namespace :status do
       desc "Display status of data and schema migrations"
       task :with_data => :environment do
-        config = ActiveRecord::Base.configurations[Rails.env || 'development']
-        ActiveRecord::Base.establish_connection(config)
-        unless ActiveRecord::Base.connection.table_exists?(DataMigration::DataMigrator.schema_migrations_table_name)
-          puts 'Data migrations table does not exist yet.'
-          next  # means "return" for rake task
-        end
-        unless ActiveRecord::Base.connection.table_exists?(ActiveRecord::Migrator.schema_migrations_table_name)
-          puts 'Schema migrations table does not exist yet.'
-          next  # means "return" for rake task
-        end
+        config = connect_to_database
+        next unless config
 
         db_list_data = ActiveRecord::Base.connection.select_values("SELECT version FROM #{DataMigration::DataMigrator.schema_migrations_table_name}")
         db_list_schema = ActiveRecord::Base.connection.select_values("SELECT version FROM #{ActiveRecord::Migrator.schema_migrations_table_name}")
@@ -38,7 +41,7 @@ namespace :db do
           end
         end
 
-        file_list.sort!{|a,b| "#{a[1]}_#{a[4] == 'data' ? 1 : 0}" <=> "#{b[1]}_#{b[4] == 'data' ? 1 : 0}" }
+        file_list.sort!{|a,b| "#{a[1]}_#{a[3] == 'data' ? 1 : 0}" <=> "#{b[1]}_#{b[3] == 'data' ? 1 : 0}" }
 
         # output
         puts "\ndatabase: #{config['database']}\n\n"
@@ -57,6 +60,24 @@ namespace :db do
       end
     end
   end # END OF MIGRATE NAME SPACE
+
+  namespace :rollback do
+    desc 'Rolls the schema back to the previous version (specify steps w/ STEP=n).'
+    task :with_data => :environment do
+      step = ENV['STEP'] ? ENV['STEP'].to_i : 1
+      config = connect_to_database
+      next unless config
+      past_migrations('desc')[0..(step - 1)].each do | past_migration |
+        if past_migration[:kind] == :data
+          ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
+          DataMigration::DataMigrator.run(:down, "db/data/", past_migration[:version])
+        elsif past_migration[:kind] == :schema
+          ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
+          ActiveRecord::Migrator.run(:down, "db/migrate/", past_migration[:version])
+        end
+      end
+    end
+  end
 
   namespace :forward do
     desc 'Pushes the schema to the next version (specify steps w/ STEP=n).'
@@ -79,25 +100,6 @@ namespace :db do
     desc "Retrieves the current schema version number"
     task :with_data => :environment do
       puts "Current version: #{[DataMigration::DataMigrator.current_version, ActiveRecord::Migrator.current_version].max}"
-    end
-  end
-
-  namespace :abort_if_pending_migrations do
-    desc "Raises an error if there are pending migrations"
-    task :with_data => :environment do
-      if defined? ActiveRecord
-        if pending_data_migrations.any? || pending_schema_migrations.any?
-          puts "You have #{pending_schema_migrations.size} pending schema migrations:"
-          pending_schema_migrations.each do |pending_migration|
-            puts '  %4d %s' % [pending_migration.version, pending_migration.name]
-          end
-          puts "You have #{pending_data_migrations.size} pending data migrations:"
-          pending_data_migrations.each do |pending_migration|
-            puts '  %4d %s' % [pending_migration.version, pending_migration.name]
-          end
-          abort %{Run "rake data:migrate:with_data" to update your database then try again.}
-        end
-      end
     end
   end
 end
@@ -191,19 +193,6 @@ namespace :data do
   task :version => :environment do
     puts "Current data version: #{DataMigration::DataMigrator.current_version}"
   end
-
-  desc "Raises an error if there are pending migrations"
-  task :abort_if_pending_migrations => :environment do
-    if defined? ActiveRecord
-      if pending_data_migrations.any?
-        puts "You have #{pending_migrations.size} pending migrations:"
-        pending_data_migrations.each do |pending_migration|
-          puts '  %4d %s' % [pending_migration.version, pending_migration.name]
-        end
-        abort %{Run "rake data:migrate" to update your database then try again.}
-      end
-    end
-  end
 end
 
 def pending_migrations
@@ -225,4 +214,31 @@ end
 
 def sort_string migration
   "#{migration.version}_#{migration.is_data? ? 1 : 0}"
+end
+
+def connect_to_database
+  config = ActiveRecord::Base.configurations[Rails.env || 'development']
+  ActiveRecord::Base.establish_connection(config)
+
+  unless ActiveRecord::Base.connection.table_exists?(DataMigration::DataMigrator.schema_migrations_table_name)
+    puts 'Data migrations table does not exist yet.'
+    config = nil
+  end
+  unless ActiveRecord::Base.connection.table_exists?(ActiveRecord::Migrator.schema_migrations_table_name)
+    puts 'Schema migrations table does not exist yet.'
+    config = nil
+  end
+  config
+end
+
+def past_migrations sort=nil
+  db_list_data = ActiveRecord::Base.connection.select_values("SELECT version FROM #{DataMigration::DataMigrator.schema_migrations_table_name}").sort
+  db_list_schema = ActiveRecord::Base.connection.select_values("SELECT version FROM #{ActiveRecord::Migrator.schema_migrations_table_name}").sort
+  migrations = db_list_data.map{|d| {:version => d.to_i, :kind => :data }} + db_list_schema.map{|d| {:version => d.to_i, :kind => :schema }}
+
+  if sort.downcase == 'desc'
+    migrations.sort!{|a, b| "#{b[:version]}_#{b[:kind] == :data ? 1 :0}" <=>  "#{a[:version]}_#{a[:kind] == :data ? 1 :0}" }
+  else
+    migrations.sort!{|a, b| "#{b[:version]}_#{a[:kind] == :data ? 1 :0}" <=>  "#{b[:version]}_#{b[:kind] == :data ? 1 :0}" }
+  end
 end
