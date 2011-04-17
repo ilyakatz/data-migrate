@@ -3,5 +3,6 @@ class <%= migration_class_name %> < ActiveRecord::Migration
   end
 
   def self.down
+    raise IrreversibleMigration
   end
 end
