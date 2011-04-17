@@ -97,19 +97,15 @@ namespace :db do
   end
 
   namespace :version do
-    desc "Retrieves the current schema version number"
+    desc "Retrieves the current schema version numbers for data and schema migrations"
     task :with_data => :environment do
-      puts "Current version: #{[DataMigration::DataMigrator.current_version, ActiveRecord::Migrator.current_version].max}"
+      puts "Current Schema version: #{ActiveRecord::Migrator.current_version}"
+      puts "Current Data version: #{DataMigration::DataMigrator.current_version}"
     end
   end
 end
 
 namespace :data do
-  task :load_config => :rails_env do
-    require 'active_record'
-    ActiveRecord::Base.configurations = Rails.application.config.database_configuration
-  end
-
   task :migrate => :environment do
     ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
     DataMigration::DataMigrator.migrate("db/data/", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
@@ -189,7 +185,7 @@ namespace :data do
     end
   end
 
-  desc "Retrieves the current schema version number"
+  desc "Retrieves the current schema version number for data migrations"
   task :version => :environment do
     puts "Current data version: #{DataMigration::DataMigrator.current_version}"
   end
