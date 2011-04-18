@@ -1,5 +1,3 @@
-require 'data_migrator'
-
 namespace :db do
   namespace :migrate do
     desc "Migrate the database data and schema (options: VERSION=x, VERBOSE=false)."
