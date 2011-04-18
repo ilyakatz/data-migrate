@@ -1,7 +1,7 @@
 require 'rails/generators'
 require 'rails/generators/migration'
 
-module DataMigration
+module DataMigrate
   class DataMigrationGenerator < Rails::Generators::NamedBase
     namespace "data_migration"
 

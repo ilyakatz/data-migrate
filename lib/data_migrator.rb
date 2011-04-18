@@ -1,5 +1,5 @@
 require 'active_record'
-module DataMigration
+module DataMigrate
   class DataMigrator < ActiveRecord::Migrator
     class << self
       def schema_migrations_table_name
