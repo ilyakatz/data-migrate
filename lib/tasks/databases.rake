@@ -2,6 +2,62 @@ require 'data_migrator'
 
 namespace :db do
   namespace :migrate do
+    desc "Migrate the database data and schema (options: VERSION=x, VERBOSE=false)."
+    task :with_data => :environment do
+      config = connect_to_database
+      next unless config
+
+      ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
+      target_version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
+      migrations = []
+
+      if target_version.nil?
+        migrations = pending_migrations.map{ |m| m.merge(:direction =>:up) }
+      else
+        current_schema_version = ActiveRecord::Migrator.current_version
+        schema_migrations = if target_version > current_schema_version
+                              pending_schema_migrations.keep_if{ |m| m[:version] <= target_version }.map{ |m| m.merge(:direction =>:up) }
+                            elsif target_version < current_schema_version
+                              past_migrations.keep_if{ |m| m[:version] > target_version }.map{ |m| m.merge(:direction =>:down) }
+                            else # ==
+                              []
+                            end
+
+        current_data_version = ActiveRecord::Migrator.current_version
+        data_migrations = if target_version > current_data_version
+                            pending_data_migrations.keep_if{ |m| m[:version] <= target_version }.map{ |m| m.merge(:direction =>:up) }
+                          elsif target_version < current_data_version
+                            past_migrations.keep_if{ |m| m[:version] > target_version }.map{ |m| m.merge(:direction =>:down) }
+                          else # ==
+                            []
+                          end
+        migrations = if schema_migrations.empty?
+                       data_migrations
+                     elsif data_migrations.empty?
+                       schema_migrations
+                     elsif target_version > current_data_version && target_version > current_schema_version
+                       sort_migrations data_migrations, schema_migrations
+                     elsif target_version < current_data_version && target_version < current_schema_version
+                       sort_migrations(data_migrations, schema_migrations).reverse
+                     elsif target_version > current_data_version && target_version < current_schema_version
+                       schema_migrations + data_migrations
+                     elsif target_version < current_data_version && target_version > current_schema_version
+                       schema_migrations + data_migrations
+                     end
+      end
+
+      migrations.each do |migration|
+        if migration[:kind] == :data
+          ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
+          DataMigration::DataMigrator.run(migration[:direction], "db/data/", migration[:version])
+        else
+          ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
+          ActiveRecord::Migrator.run(migration[:direction], "db/migrate/", migration[:version])
+        end
+      end
+
+      Rake::Task["db:schema:dump"].invoke if ActiveRecord::Base.schema_format == :ruby
+    end
 
     namespace :redo do
       desc 'Rollbacks the database one migration and re migrate up (options: STEP=x, VERSION=x).'
@@ -14,6 +70,7 @@ namespace :db do
           Rake::Task["db:migrate:with_data"].invoke
         end
       end
+    end
 
     namespace :up do
       desc 'Runs the "up" for a given migration VERSION.'
@@ -131,12 +188,12 @@ namespace :db do
       # DataMigration::DataMigrator.forward('db/data/', step)
       migrations = pending_migrations.reverse.pop(step).reverse
       migrations.each do | pending_migration |
-        if pending_migration.is_data?
+        if pending_migration[:kind] == :data
           ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
-          DataMigration::DataMigrator.run(:up, "db/data/", pending_migration.version)
-        elsif pending_migration.is_schema?
+          DataMigration::DataMigrator.run(:up, "db/data/", pending_migration[:version])
+        elsif pending_migration[:kind] == :schema
           ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-          ActiveRecord::Migrator.run(:up, "db/migrate/", pending_migration.version)
+          ActiveRecord::Migrator.run(:up, "db/migrate/", pending_migration[:version])
         end
       end
     end
@@ -227,7 +284,7 @@ namespace :data do
     # DataMigration::DataMigrator.forward('db/data/', step)
     migrations = pending_data_migrations.reverse.pop(step).reverse
     migrations.each do | pending_migration |
-      DataMigration::DataMigrator.run(:up, "db/data/", pending_migration.version)
+      DataMigration::DataMigrator.run(:up, "db/data/", pending_migration[:version])
     end
   end
 
@@ -242,11 +299,11 @@ def pending_migrations
 end
 
 def pending_data_migrations
-  DataMigration::DataMigrator.new(:up, 'db/data').pending_migrations
+  DataMigration::DataMigrator.new(:up, 'db/data').pending_migrations.map{|m| { :version => m.version, :kind => :data }}
 end
 
 def pending_schema_migrations
-  ActiveRecord::Migrator.new(:up, 'db/migrate').pending_migrations
+  ActiveRecord::Migrator.new(:up, 'db/migrate').pending_migrations.map{|m| { :version => m.version, :kind => :schema }}
 end
 
 def sort_migrations set_1, set_2=nil
@@ -255,7 +312,7 @@ def sort_migrations set_1, set_2=nil
 end
 
 def sort_string migration
-  "#{migration.version}_#{migration.is_data? ? 1 : 0}"
+  "#{migration[:version]}_#{migration[:kind] == :data ? 1 : 0}"
 end
 
 def connect_to_database
