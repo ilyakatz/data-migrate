@@ -73,44 +73,50 @@ namespace :db do
     end
 
     namespace :up do
-      desc 'Runs the "up" for a given migration VERSION.'
+      desc 'Runs the "up" for a given migration VERSION. (options both=false)'
       task :with_data => :environment do
         version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
         raise "VERSION is required" unless version
         config = connect_to_database
-        migrations = past_migrations.keep_if{|m| m[:version] == version}
+        run_both = ENV["BOTH"] == "true"
+        migrations = pending_migrations.keep_if{|m| m[:version] == version}
 
-        if migrations.size > 1
-          raise "Ambiguous migration name. Use 'db:migrate:up' or 'data:migrate:up' instead"
-        elsif migrations.size == 1
-          if migrations.first[:kind] == :data
+        unless run_both || migrations.size < 2
+          migrations = migrations.slice(0,1)
+        end
+
+        migrations.each do |migration|
+          if migration[:kind] == :data
             ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
-            DataMigration::DataMigrator.run(:up, "db/data/", version)
+            DataMigration::DataMigrator.run(:up, "db/data/", migration[:version])
           else
             ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-            ActiveRecord::Migrator.run(:up, "db/migrate/", version)
+            ActiveRecord::Migrator.run(:up, "db/migrate/", migration[:version])
           end
         end
       end
     end
 
     namespace :down do
-      desc 'Runs the "down" for a given migration VERSION.'
+      desc 'Runs the "down" for a given migration VERSION. (option BOTH=false)'
       task :with_data => :environment do
         version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
         raise "VERSION is required" unless version
         config = connect_to_database
+        run_both = ENV["BOTH"] == "true"
         migrations = past_migrations.keep_if{|m| m[:version] == version}
 
-        if migrations.size > 1
-          raise "Ambiguous migration name. Use 'db:migrate:down' or 'data:migrate:down' instead"
-        elsif migrations.size == 1
-          if migrations.first[:kind] == :data
+        unless run_both || migrations.size < 2
+          migrations = migrations.slice(0,1)
+        end
+
+        migrations.each do |migration|
+          if migration[:kind] == :data
             ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
-            DataMigration::DataMigrator.run(:down, "db/data/", version)
+            DataMigration::DataMigrator.run(:down, "db/data/", migration[:version])
           else
             ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-            ActiveRecord::Migrator.run(:down, "db/migrate/", version)
+            ActiveRecord::Migrator.run(:down, "db/migrate/", migration[:version])
           end
         end
       end
@@ -168,7 +174,7 @@ namespace :db do
       step = ENV['STEP'] ? ENV['STEP'].to_i : 1
       config = connect_to_database
       next unless config
-      past_migrations('desc')[0..(step - 1)].each do | past_migration |
+      past_migrations[0..(step - 1)].each do | past_migration |
         if past_migration[:kind] == :data
           ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
           DataMigration::DataMigrator.run(:down, "db/data/", past_migration[:version])
@@ -299,11 +305,11 @@ def pending_migrations
 end
 
 def pending_data_migrations
-  DataMigration::DataMigrator.new(:up, 'db/data').pending_migrations.map{|m| { :version => m.version, :kind => :data }}
+  sort_migrations DataMigration::DataMigrator.new(:up, 'db/data').pending_migrations.map{|m| { :version => m.version, :kind => :data }}
 end
 
 def pending_schema_migrations
-  ActiveRecord::Migrator.new(:up, 'db/migrate').pending_migrations.map{|m| { :version => m.version, :kind => :schema }}
+  sort_migrations ActiveRecord::Migrator.new(:up, 'db/migrate').pending_migrations.map{|m| { :version => m.version, :kind => :schema }}
 end
 
 def sort_migrations set_1, set_2=nil
@@ -336,9 +342,5 @@ def past_migrations sort=nil
   db_list_schema = ActiveRecord::Base.connection.select_values("SELECT version FROM #{ActiveRecord::Migrator.schema_migrations_table_name}").sort
   migrations = db_list_data.map{|d| {:version => d.to_i, :kind => :data }} + db_list_schema.map{|d| {:version => d.to_i, :kind => :schema }}
 
-  if sort == 'desc'
-    migrations.sort!{|a, b| "#{b[:version]}_#{b[:kind] == :data ? 1 :0}" <=>  "#{a[:version]}_#{a[:kind] == :data ? 1 :0}" }
-  else
-    migrations.sort!{|a, b| "#{b[:version]}_#{a[:kind] == :data ? 1 :0}" <=>  "#{b[:version]}_#{b[:kind] == :data ? 1 :0}" }
-  end
+  sort == 'asc' ? sort_migrations(migrations) : sort_migrations(migrations).reverse
 end
