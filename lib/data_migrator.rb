@@ -1,4 +1,5 @@
 require 'active_record'
+
 module DataMigrate
   class DataMigrator < ActiveRecord::Migrator
     class << self
