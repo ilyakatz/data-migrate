@@ -12,7 +12,7 @@ Note: If a data and schema migration share the same version number, schema gets 
 Rails 3 and Ruby 1.9
 --------------------
 
-Data Migrate is Rails 3 and Ruby 1.9 compatible
+Data Migrate is Rails 3.0.0 - 3.0.7,  and Ruby 1.9 compatible
 
 Installation
 ------------

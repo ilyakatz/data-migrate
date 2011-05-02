@@ -8,11 +8,13 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Andrew J Vargo"]
   s.email       = ["ajvargo@computer.org"]
-  s.homepage    = ""
+  s.homepage    = "http://ajvargo.com"
   s.summary     = %q{Rake tasks to migrate data alongside schema changes.}
   s.description = %q{Rake tasks to migrate data alongside schema changes.}
 
   s.rubyforge_project = "data_migrate"
+
+  s.add_dependency('rails', '>= 3.0.0', '<= 3.0.7')
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
