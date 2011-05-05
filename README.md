@@ -53,12 +53,12 @@ test your migration, so you have the choice of `db:migrate:with_data` or
 What's it do?
 -------------
 
-Data migrations are stored in
-db/data. They act like schema migrations, except they should be
-reserved for data migrations. For instance, if you realize you need to
-titleize all yours titles, this is the place to do it. The install
-creates a migration for a data_schema table used to track all the
-goodness.
+Data migrations are stored in db/data. They act like schema
+migrations, except they should be reserved for data migrations. For
+instance, if you realize you need to titleize all yours titles, this
+is the place to do it. Running any of the provided rake tasks also
+creates a data schema table to mirror the usual schema migrations
+table to track all the goodness.
 
 Data migrations can be created at the same time as schema migrations,
 or independently.  Database (db:) tasks have been added and extended
@@ -75,14 +75,18 @@ Data Migrate is Rails 3.0.0 - 3.0.7, and Ruby 1.9 compatible
 
 Installation
 ------------
-After adding Data Migrate to your project,
+Add the gem to your project
 
-    rails g data_migrate:install
-    rake db:migrate
+    # Gemfile
+    gem 'data_migrate'
 
-This creates a migrate for the data schema table, and then migrates it
-into existence. _You will not be able to use Data Migrate for your
-migrations until this table exists_.
+Then `bundle install` and you are ready to go.
+
+So you know, when you use one of the provide rake tasks, a table
+called 'data_migrations' will be created in your database. This
+is to mirror the way the standard 'db' rake tasks work. If you've
+installed previous to v1.1.0, you'll want to delete the
+'create\_data\_migrations_table' migration.
 
 Usage
 -----
