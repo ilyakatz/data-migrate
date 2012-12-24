@@ -14,7 +14,7 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = "data_migrate"
 
-  s.add_dependency('rails', '>= 3.0.0', '<= 3.0.10')
+  s.add_dependency('rails', '>= 3.0.0', '<= 3.0.11')
 
   s.files         = `git ls-files`.split("\n")
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
