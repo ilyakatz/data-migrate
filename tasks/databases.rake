@@ -204,8 +204,8 @@ namespace :db do
   end
 
   namespace :version do
-    desc "Retrieves the current schema version numbers for data and schema migrations"
     task :with_data => :environment do
+    desc "Retrieves the current schema version numbers for data and schema migrations"
       assure_data_schema_table
       puts "Current Schema version: #{ActiveRecord::Migrator.current_version}"
       puts "Current Data version: #{DataMigrate::DataMigrator.current_version}"
@@ -214,6 +214,7 @@ namespace :db do
 end
 
 namespace :data do
+  desc 'Migrate the database through scripts in db/data'
   task :migrate => :environment do
     assure_data_schema_table
     ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
