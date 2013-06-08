@@ -111,6 +111,7 @@ If you need a data only migration, either run it as such, with the skip-schema-m
 
     $> rake -T data
     rake data:forward                 # Pushes the schema to the next version (specify steps w/ STEP=n).
+    rake data:migrate                 # Migrate the database through scripts in db/data.
     rake data:migrate:down            # Runs the "down" for a given migration VERSION.
     rake data:migrate:redo            # Rollbacks the database one migration and re migrate up (options: STEP=x, VERSION=x).
     rake data:migrate:status          # Display status of data migrations
