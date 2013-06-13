@@ -25,7 +25,7 @@ For instance, lets take an absurd example, to illustrate: You have
 your infamous [Rails blog](http://media.rubyonrails.org/video/rails-0-5.mov)
 that has posts with many comments.  After some use, you decide you are
 going to be a trend setter, and want only one comment per post, and
-just the text. "Frist!" rules the day. Given that you:
+just the text. "First!" rules the day. Given that you:
 - write a migration to add a comment column to Post
 - write a migration to move the contents of the first comments to the Post
 - drop the column_id column from Post
