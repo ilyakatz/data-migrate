@@ -352,7 +352,7 @@ def past_migrations sort=nil
 end
 
 def assure_data_schema_table
-  config = ActiveRecord::Base.configurations[Rails.env || 'development']
+  config = ActiveRecord::Base.configurations[Rails.env || 'development'] || ENV["DATABASE_URL"]
   ActiveRecord::Base.establish_connection(config)
   sm_table = DataMigrate::DataMigrator.schema_migrations_table_name
 
