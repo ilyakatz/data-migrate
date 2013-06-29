@@ -5,7 +5,7 @@ Run data migrations alongside schema migrations.
 
 Data migrations are stored in db/data. They act like schema
 migrations, except they should be reserved for data migrations. For
-instance, if you realize you need to titleize all yours titles, this
+instance, if you realize you need to titleize all your titles, this
 is the place to do it.
 
 Why should I use this?
@@ -25,7 +25,7 @@ For instance, lets take an absurd example, to illustrate: You have
 your infamous [Rails blog](http://media.rubyonrails.org/video/rails-0-5.mov)
 that has posts with many comments.  After some use, you decide you are
 going to be a trend setter, and want only one comment per post, and
-just the text. "Frist!" rules the day. Given that you:
+just the text. "Frist!!1!1" rules the day. Given that you:
 - write a migration to add a comment column to Post
 - write a migration to move the contents of the first comments to the Post
 - drop the column_id column from Post
@@ -71,7 +71,7 @@ Note: If a data and schema migration share the same version number, schema gets 
 Rails 3 and Ruby 1.9
 --------------------
 
-Data Migrate is Rails 3.0.0 - 3.0.7, and Ruby 1.9 compatible
+Data Migrate is Rails 3 and Ruby 1.9 compatible.
 
 Installation
 ------------
@@ -110,22 +110,22 @@ If you need a data only migration, either run it as such, with the skip-schema-m
 ### Rake Tasks
 
     $> rake -T data
-    rake data:forward                 # Pushes the schema to the next version (specify steps w/ STEP=n).
-    rake data:migrate:down            # Runs the "down" for a given migration VERSION.
-    rake data:migrate:redo            # Rollbacks the database one migration and re migrate up (options: STEP=x, VERSION=x).
+    rake data:forward                 # Pushes the schema to the next version (specify steps w/ STEP=n)
+    rake data:migrate                 # Migrate data migrations (options: VERSION=x, VERBOSE=false)
+    rake data:migrate:down            # Runs the "down" for a given migration VERSION
+    rake data:migrate:redo            # Rollbacks the database one migration and re migrate up (options: STEP=x, VERSIO...
     rake data:migrate:status          # Display status of data migrations
-    rake data:migrate:up              # Runs the "up" for a given migration VERSION.
-    rake data:rollback                # Rolls the schema back to the previous version (specify steps w/ STEP=n).
+    rake data:migrate:up              # Runs the "up" for a given migration VERSION
+    rake data:rollback                # Rolls the schema back to the previous version (specify steps w/ STEP=n)
     rake data:version                 # Retrieves the current schema version number for data migrations
-    rake db:forward:with_data         # Pushes the schema to the next version (specify steps w/ STEP=n).
-    rake db:migrate:data              # Migrate the database through scripts in db/data/migrate.
-    rake db:migrate:down:with_data    # Runs the "down" for a given migration VERSION.
-    rake db:migrate:redo:with_data    # Rollbacks the database one migration and re migrate up (options: STEP=x, VERSION=x).
+    rake db:forward:with_data         # Pushes the schema to the next version (specify steps w/ STEP=n)
+    rake db:migrate:down:with_data    # Runs the "down" for a given migration VERSION
+    rake db:migrate:redo:with_data    # Rollbacks the database one migration and re migrate up (options: STEP=x, VERSIO...
     rake db:migrate:status:with_data  # Display status of data and schema migrations
-    rake db:migrate:up:with_data      # Runs the "up" for a given migration VERSION.
-    rake db:migrate:with_data         # Migrate the database data and schema (options: VERSION=x, VERBOSE=false).
-    rake db:rollback:with_data        # Rolls the schema back to the previous version (specify steps w/ STEP=n).
-    rake db:version:with_data         # Retrieves the current schema version numbers for data and schema migrations `
+    rake db:migrate:up:with_data      # Runs the "up" for a given migration VERSION
+    rake db:migrate:with_data         # Migrate the database data and schema (options: VERSION=x, VERBOSE=false)
+    rake db:rollback:with_data        # Rolls the schema back to the previous version (specify steps w/ STEP=n)
+    rake db:version:with_data         # Retrieves the current schema version numbers for data and schema migrations
 
 Tasks work as they would with the 'vanilla' db version.  The 'with_data' addition to the 'db' tasks will run the task in the context of both the data and schema migrations.  That is, `rake db:rollback:with_data` will check to see if it was a schema or data migration invoked last, and do that.  Tasks invoked in that space also have an additional line of output, indicating if the action is performed on data or schema.
 

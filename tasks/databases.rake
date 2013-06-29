@@ -214,6 +214,7 @@ namespace :db do
 end
 
 namespace :data do
+  desc 'Migrate data migrations (options: VERSION=x, VERBOSE=false)'
   task :migrate => :environment do
     assure_data_schema_table
     ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
