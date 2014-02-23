@@ -16,7 +16,7 @@ module DataMigrate
         unless  options.skip_schema_migration?
           migration_template "migration.rb", "db/migrate/#{file_name}.rb"
         end
-        migration_template "data_migration.rb", "db/data/#{file_name}.rb"
+        migration_template "data_migration.rb", "db/data/#{file_name}_data_migration.rb"
       end
 
       protected
