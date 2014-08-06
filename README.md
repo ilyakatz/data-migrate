@@ -106,6 +106,12 @@ If you need a data only migration, either run it as such, with the skip-schema-m
 
     rails g data_migration add_this_to_that --skip-schema-migration
 
+To ensure backwards compatibility, you should inform data-migrate which classes will be used
+in the migration. data-migrate will create a secondary file recording the current
+state of those model classes and will ensure that whenever the migration is run,
+the classes will be correct.
+
+    rails g data_migration add_this_to_that --classes=User Credential Email
 
 ### Rake Tasks
 

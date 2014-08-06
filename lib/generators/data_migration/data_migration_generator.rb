@@ -10,13 +10,20 @@ module DataMigrate
 
       argument :attributes, :type => :array, :default => [], :banner => "field:type field:type"
       class_option :skip_schema_migration, :desc => 'Dont generate database schema migration file.', :type => :boolean
+      class_option :classes,
+                   :desc => 'Classes that will be used in the data migration',
+                   :type => :array
 
       def create_data_migration
         set_local_assigns!
-        unless  options.skip_schema_migration?
+        unless options.skip_schema_migration?
           migration_template "migration.rb", "db/migrate/#{file_name}.rb"
         end
         migration_template "data_migration.rb", "db/data/#{file_name}.rb"
+        if options.classes
+          migration_template "migration_include.rb",
+                             "db/data/includes/#{file_name}.rb"
+        end
       end
 
       protected
