@@ -9,7 +9,9 @@ module DataMigrate
       include Rails::Generators::Migration
 
       argument :attributes, :type => :array, :default => [], :banner => "field:type field:type"
-      class_option :skip_schema_migration, :desc => 'Dont generate database schema migration file.', :type => :boolean
+      class_option :skip_schema_migration,
+                   :aliases => '-m',
+                   :desc => 'Dont generate database schema migration file.', :type => :boolean
       class_option :classes,
                    :desc => 'Classes that will be used in the data migration',
                    :type => :array
