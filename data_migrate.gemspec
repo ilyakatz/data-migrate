@@ -6,8 +6,8 @@ Gem::Specification.new do |s|
   s.name        = "data_migrate"
   s.version     = DataMigrate::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Andrew J Vargo"]
-  s.email       = ["ajvargo@computer.org"]
+  s.authors     = ["Andrew J Vargo", "Daniel Orner"]
+  s.email       = ["ajvargo@computer.org", "daniel.orner@wishabi.com"]
   s.homepage    = "http://ajvargo.com"
   s.summary     = %q{Rake tasks to migrate data alongside schema changes.}
   s.description = %q{Rake tasks to migrate data alongside schema changes.}
