@@ -364,3 +364,27 @@ def assure_data_schema_table
     ActiveRecord::Base.connection.add_index sm_table, :version, :unique => true, :name => "#{ActiveRecord::Base.table_name_prefix}unique_data_migrations#{ActiveRecord::Base.table_name_suffix}"
   end
 end
+
+# Similar to the how the schema migrations table is populated after a db:schema:load,
+# data migrations need to be pre-populated to avoid running unnecessary data migrations.
+def assume_data_migrated_upto_schema_version
+  past_schema_ids = past_migrations.inject(Set.new) { |memo, (k,v)|
+    memo << k[:version] if k[:kind] == :schema
+    memo
+  }
+  
+  latest_schema_version = past_schema_ids.max
+  
+  pending_data_migrations.each { |k,v|
+    if k[:kind] == :data && k[:version] < latest_schema_version
+      ActiveRecord::Base.connection.execute "INSERT INTO #{DataMigrate::DataMigrator.schema_migrations_table_name} (version) VALUES ('#{k[:version]}')"
+    end
+  }
+end
+
+Rake::Task['db:schema:load'].enhance do
+  # create data_migrations if needed
+  assure_data_schema_table
+  # insert data migration versions up to the latest schema_migrations
+  assume_data_migrated_upto_schema_version
+end
