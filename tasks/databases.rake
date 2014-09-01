@@ -1,3 +1,5 @@
+ActiveRecord::SchemaDumper.ignore_tables << DataMigrate::DataMigrator.schema_migrations_table_name
+
 namespace :db do
   namespace :migrate do
     desc "Migrate the database data and schema (options: VERSION=x, VERBOSE=false)."
