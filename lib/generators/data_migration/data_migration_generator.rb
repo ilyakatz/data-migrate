@@ -23,6 +23,15 @@ module DataMigrate
         end
         migration_template "data_migration.rb", "db/data/#{file_name}.rb"
         if options.classes
+          options.classes.each do |class_name|
+            klass = class_name.constantize
+            while klass.superclass != ActiveRecord::Base
+              klass = klass.superclass
+              unless options.classes.include?(klass.name)
+                options.classes.unshift(klass.name)
+              end
+            end
+          end
           migration_template "migration_include.rb",
                              "db/data/includes/#{file_name}.rb"
         end
