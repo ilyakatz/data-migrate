@@ -216,12 +216,36 @@ end
 namespace :data do
   desc 'Migrate data migrations (options: VERSION=x, VERBOSE=false)'
   task :migrate => :environment do
+    ENV['REQUIRED_DATA_MIGRATIONS'] = nil
     assure_data_schema_table
     ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
     DataMigrate::DataMigrator.migrate(DataMigrate::DataMigrator.migrations_path, ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
   end
 
   namespace :migrate do
+
+    desc 'Migrate required data migrations.'
+    task :required => :environment do
+      ENV['REQUIRED_DATA_MIGRATIONS'] = 'true'
+      assure_data_schema_table
+      ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
+      DataMigrate::DataMigrator.migrate(DataMigrate::DataMigrator.migrations_path, ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
+    end
+
+    desc 'Migrate both required and non-required data migrations.'
+    task :all => :environment do
+
+      ENV['REQUIRED_DATA_MIGRATIONS'] = 'true'
+      assure_data_schema_table
+      ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
+      DataMigrate::DataMigrator.migrate(DataMigrate::DataMigrator.migrations_path, ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
+
+      ENV['REQUIRED_DATA_MIGRATIONS'] = nil
+      assure_data_schema_table
+      ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
+      DataMigrate::DataMigrator.migrate(DataMigrate::DataMigrator.migrations_path, ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
+    end
+
     desc  'Rollbacks the database one migration and re migrate up (options: STEP=x, VERSION=x).'
     task :redo => :environment do
       assure_data_schema_table
