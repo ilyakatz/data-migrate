@@ -8,7 +8,7 @@ module DataMigrate
       end
 
       def migrations_path
-        'db/data'
+        ENV['REQUIRED_DATA_MIGRATIONS'] ? 'db/required_data' : 'db/data'
       end
     end
   end

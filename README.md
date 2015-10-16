@@ -106,16 +106,41 @@ If you need a data only migration, either run it as such, with the skip-schema-m
 
     rails g data_migration add_this_to_that --skip-schema-migration
 
+A shorter alias for this is -m:
+
+    rails g data_migration add_this_to_that -m
+
+To ensure backwards compatibility, you should inform data-migrate which classes will be used
+in the migration. data-migrate will create a secondary file recording the current
+state of those model classes and will ensure that whenever the migration is run,
+the classes will be correct.
+
+    rails g data_migration add_this_to_that --classes=User Credential Email
+
+### Required Migrations
+
+You can specify certain migrations as being "required" - the idea is that these
+need to run before the app can come up, while normal migrations can run
+once the deploy is finished. These will show up
+in db/required_data instead of in db/data, though the version will still be
+stored in the same data_migrations table. Running rake data:migrate normally
+will only run *non-required* migrations (this seems backwards but this is done
+because required migrations are rare.
+
+There is no real difference between required and non/required - it's just an
+easy way to differentiate two different types of data migrations.
 
 ### Rake Tasks
 
     $> rake -T data
     rake data:forward                 # Pushes the schema to the next version (specify steps w/ STEP=n)
-    rake data:migrate                 # Migrate data migrations (options: VERSION=x, VERBOSE=false)
+    rake data:migrate                 # Migrate non-required data migrations (options: VERSION=x, VERBOSE=false)
     rake data:migrate:down            # Runs the "down" for a given migration VERSION
     rake data:migrate:redo            # Rollbacks the database one migration and re migrate up (options: STEP=x, VERSIO...
     rake data:migrate:status          # Display status of data migrations
     rake data:migrate:up              # Runs the "up" for a given migration VERSION
+    rake data:migrate:required        # Run "required" migrations
+    rake data:migrate:all             # Run both required and normal migrations
     rake data:rollback                # Rolls the schema back to the previous version (specify steps w/ STEP=n)
     rake data:version                 # Retrieves the current schema version number for data migrations
     rake db:forward:with_data         # Pushes the schema to the next version (specify steps w/ STEP=n)
