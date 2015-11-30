@@ -40,5 +40,10 @@ module DataMigrate
         'db/data'
       end
     end
+
+    # NEVER use a transaction because data migrations may be long running operations
+    def ddl_transaction(&block)
+      block.call
+    end
   end
 end
