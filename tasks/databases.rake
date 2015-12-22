@@ -358,14 +358,5 @@ def past_migrations sort=nil
 end
 
 def assure_data_schema_table
-  config = ActiveRecord::Base.configurations[Rails.env || 'development'] || ENV["DATABASE_URL"]
-  ActiveRecord::Base.establish_connection(config)
-  sm_table = DataMigrate::DataMigrator.schema_migrations_table_name
-
-  unless ActiveRecord::Base.connection.table_exists?(sm_table)
-    ActiveRecord::Base.connection.create_table(sm_table, :id => false) do |schema_migrations_table|
-      schema_migrations_table.column :version, :string, :null => false
-    end
-    ActiveRecord::Base.connection.add_index sm_table, :version, :unique => true, :name => "#{ActiveRecord::Base.table_name_prefix}unique_data_migrations#{ActiveRecord::Base.table_name_suffix}"
-  end
+  DataMigrate::DataMigrator.assure_data_schema_table
 end
