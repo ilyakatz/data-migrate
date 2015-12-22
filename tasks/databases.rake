@@ -49,7 +49,11 @@ namespace :db do
           DataMigrate::DataMigrator.run(migration[:direction], "db/data/", migration[:version])
         else
           ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-          ActiveRecord::Migrator.run(migration[:direction], "db/migrate/", migration[:version])
+          ActiveRecord::Migrator.run(
+            migration[:direction],
+            Rails.application.config.paths["db/migrate"],
+            migration[:version]
+          )
         end
       end
 
@@ -319,7 +323,8 @@ end
 
 def pending_schema_migrations
   all_migrations = ActiveRecord::Migrator.migrations(Rails.application.config.paths["db/migrate"])
-  sort_migrations(ActiveRecord::Migrator.new(:up, all_migrations ).
+  sort_migrations(
+    ActiveRecord::Migrator.new(:up, all_migrations).
     pending_migrations.
     map{|m| { :version => m.version, :kind => :schema }})
 end
