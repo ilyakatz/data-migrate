@@ -312,11 +312,11 @@ def pending_migrations
 end
 
 def pending_data_migrations
-  sort_migrations DataMigrate::DataMigrator.new(:up, 'db/data').pending_migrations.map{|m| { :version => m.version, :kind => :data }}
+  sort_migrations DataMigrate::DataMigrator.new(:up, DataMigrate::DataMigrator.migrations('db/data')).pending_migrations.map{|m| { :version => m.version, :kind => :data }}
 end
 
 def pending_schema_migrations
-  sort_migrations ActiveRecord::Migrator.new(:up, 'db/migrate').pending_migrations.map{|m| { :version => m.version, :kind => :schema }}
+  sort_migrations ActiveRecord::Migrator.new(:up, DataMigrate::DataMigrator.migrations('db/data')).pending_migrations.map{|m| { :version => m.version, :kind => :schema }}
 end
 
 def sort_migrations set_1, set_2=nil
