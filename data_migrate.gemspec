@@ -11,6 +11,7 @@ Gem::Specification.new do |s|
   s.homepage    = "http://ajvargo.com"
   s.summary     = %q{Rake tasks to migrate data alongside schema changes.}
   s.description = %q{Rake tasks to migrate data alongside schema changes.}
+  s.license     = "MIT"
 
   s.rubyforge_project = "data_migrate"
 
