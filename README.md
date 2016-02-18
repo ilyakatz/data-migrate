@@ -156,7 +156,7 @@ Going down instead of up would be the opposite.
 
 Thanks
 ------
-[Andrew J Vargo](github.com/ajvargo) Andrew was the original creator and maintainer of this project!
+[Andrew J Vargo](http://github.com/ajvargo) Andrew was the original creator and maintainer of this project!
 
 [Jeremy Durham](http://jeremydurham.com/) for fleshing out the idea with me, and providing guidance.
 
