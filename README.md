@@ -68,10 +68,23 @@ schema and data migrations in the proper order.
 
 Note: If a data and schema migration share the same version number, schema gets precedence when migrating up. Data does down.
 
-Rails 3 and Ruby 1.9
+Rails Support
 --------------------
 
-Data Migrate is Rails 3 and Ruby 1.9 compatible.
+Rails 3.1: Version 1.2 supports Rails 3.1.0 and higher **but** is not longer maintained.
+
+Rails 4: Version 2.0 supports Rails 4.0 and higher
+
+Rails 5: Not tested
+
+### Important note
+
+If you upgraded to Rails 4 while using `data_migrate` prior to version 2,
+the gem wrote data migration versions into
+`schema_migrations` table. After the fix, it was corrected to write into
+`data_migrations`.
+
+This may cause some unintended consequences. See [#22](https://github.com/ilyakatz/data-migrate/issues/22)
 
 Installation
 ------------
@@ -105,7 +118,6 @@ This allows you to do things like:
 If you need a data only migration, either run it as such, with the skip-schema-migration flag:
 
     rails g data_migration add_this_to_that --skip-schema-migration
-
 
 ### Rake Tasks
 
@@ -144,5 +156,8 @@ Going down instead of up would be the opposite.
 
 Thanks
 ------
+[Andrew J Vargo](http://github.com/ajvargo) Andrew was the original creator and maintainer of this project!
+
 [Jeremy Durham](http://jeremydurham.com/) for fleshing out the idea with me, and providing guidance.
+
 You!  Yes, you. Thanks for checking it out.
