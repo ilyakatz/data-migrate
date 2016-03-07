@@ -3,7 +3,6 @@ module DataMigrate
 
     class << self
       def check_pending!(connection = ::ActiveRecord::Base.connection)
-        binding.pry
         raise ActiveRecord::PendingMigrationError if DataMigrator::Migrator.needs_migration?(connection)
       end
 
@@ -12,7 +11,6 @@ module DataMigrate
       end
 
       def table_name
-        binding.pry
         ActiveRecord::Base.table_name_prefix + 'data_migrations' + ActiveRecord::Base.table_name_suffix
       end
 
