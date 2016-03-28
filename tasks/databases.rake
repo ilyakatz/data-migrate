@@ -49,7 +49,11 @@ namespace :db do
           DataMigrate::DataMigrator.run(migration[:direction], "db/data/", migration[:version])
         else
           ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-          ActiveRecord::Migrator.run(migration[:direction], "db/migrate/", migration[:version])
+          ActiveRecord::Migrator.run(
+            migration[:direction],
+            Rails.application.config.paths["db/migrate"],
+            migration[:version]
+          )
         end
       end
 
@@ -312,11 +316,17 @@ def pending_migrations
 end
 
 def pending_data_migrations
-  sort_migrations DataMigrate::DataMigrator.new(:up, 'db/data').pending_migrations.map{|m| { :version => m.version, :kind => :data }}
+  data_migrations = DataMigrate::DataMigrator.migrations('db/data')
+  sort_migrations DataMigrate::DataMigrator.new(:up, data_migrations ).
+    pending_migrations.map{|m| { :version => m.version, :kind => :data }}
 end
 
 def pending_schema_migrations
-  sort_migrations ActiveRecord::Migrator.new(:up, 'db/migrate').pending_migrations.map{|m| { :version => m.version, :kind => :schema }}
+  all_migrations = ActiveRecord::Migrator.migrations(Rails.application.config.paths["db/migrate"])
+  sort_migrations(
+    ActiveRecord::Migrator.new(:up, all_migrations).
+    pending_migrations.
+    map{|m| { :version => m.version, :kind => :schema }})
 end
 
 def sort_migrations set_1, set_2=nil
@@ -353,14 +363,5 @@ def past_migrations sort=nil
 end
 
 def assure_data_schema_table
-  config = ActiveRecord::Base.configurations[Rails.env || 'development'] || ENV["DATABASE_URL"]
-  ActiveRecord::Base.establish_connection(config)
-  sm_table = DataMigrate::DataMigrator.schema_migrations_table_name
-
-  unless ActiveRecord::Base.connection.table_exists?(sm_table)
-    ActiveRecord::Base.connection.create_table(sm_table, :id => false) do |schema_migrations_table|
-      schema_migrations_table.column :version, :string, :null => false
-    end
-    ActiveRecord::Base.connection.add_index sm_table, :version, :unique => true, :name => "#{ActiveRecord::Base.table_name_prefix}unique_data_migrations#{ActiveRecord::Base.table_name_suffix}"
-  end
+  DataMigrate::DataMigrator.assure_data_schema_table
 end
