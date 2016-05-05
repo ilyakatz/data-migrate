@@ -1,8 +1,8 @@
 class <%= migration_class_name %> < ActiveRecord::Migration
-  def self.up
+  def up
   end
 
-  def self.down
+  def down
     raise ActiveRecord::IrreversibleMigration
   end
 end
