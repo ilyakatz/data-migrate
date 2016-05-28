@@ -154,6 +154,20 @@ Going down instead of up would be the opposite.
 
 `rake db:migrate:status:with_data` provides and additional column to indicate which type of migration.
 
+Capistrano Support
+------------------
+
+The gem comes with a capistrano task that can be used instead of `capistrano/rails/migrations`.
+
+Just add this line to your Capfile:
+
+```ruby
+require 'capistrano/data_migrate'
+```
+
+From now on capistrano will run `rake db:migrate:with_data` in every deploy.
+
+
 Thanks
 ------
 [Andrew J Vargo](http://github.com/ajvargo) Andrew was the original creator and maintainer of this project!
