@@ -115,7 +115,7 @@ This allows you to do things like:
 
     rails g data_migration add_this_to_that this:string
 
-If you need a data only migration, either run it as such, with the skip-schema-migration flag:
+If you need a data only migration, run it with the skip-schema-migration flag:
 
     rails g data_migration add_this_to_that --skip-schema-migration
 
