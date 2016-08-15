@@ -1,6 +1,9 @@
 Data Migrate
 ====
 
+- [![Version](http://img.shields.io/gem/v/data_migrate.svg?style=flat-square)](https://rubygems.org/gems/data_migrate)
+- [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](http://opensource.org/licenses/MIT)
+
 Run data migrations alongside schema migrations.
 
 Data migrations are stored in db/data. They act like schema
