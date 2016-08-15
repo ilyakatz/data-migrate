@@ -71,7 +71,7 @@ Note: If a data and schema migration share the same version number, schema gets 
 Rails Support
 --------------------
 
-Rails 3.1: Version 1.2 supports Rails 3.1.0 and higher **but** is not longer maintained.
+Rails 3.1: Version 1.2 supports Rails 3.1.0 and higher **but** is no longer maintained.
 
 Rails 4: Version 2.0 supports Rails 4.0 and higher
 
@@ -109,15 +109,6 @@ Usage
 You can generate a data migration as you would a schema migration:
 
     rails g data_migration add_this_to_that
-
-By default, the migration also generates a schema migration by the same name.
-This allows you to do things like:
-
-    rails g data_migration add_this_to_that this:string
-
-If you need a data only migration, either run it as such, with the skip-schema-migration flag:
-
-    rails g data_migration add_this_to_that --skip-schema-migration
 
 ### Rake Tasks
 
