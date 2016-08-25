@@ -150,7 +150,7 @@ For more example, assume you have the 2 files:
   db/migrate/20110419021211_add_x_to_y.rb
   db/data/20110419021211_add_x_to_y.rb
 
-Running `rake db:migrate:up:with_data VERSION=20110419021211` would execute the 'db/migrate' version.
+Running `rake db:migrate:up VERSION=20110419021211` would execute the 'db/migrate' version.
 Running `rake db:migrate:up:with_data VERSION=20110419021211` would execute the 'db/migrate' version, followed by the 'db/data' version.
 
 Going down instead of up would be the opposite.
