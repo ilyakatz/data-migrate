@@ -6,7 +6,7 @@ Data Migrate
 
 Run data migrations alongside schema migrations.
 
-Data migrations are stored in db/data. They act like schema
+Data migrations are stored in `db/data`. They act like schema
 migrations, except they should be reserved for data migrations. For
 instance, if you realize you need to titleize all your titles, this
 is the place to do it.
@@ -35,7 +35,7 @@ just the text. "Frist!!1!1" rules the day. Given that you:
 - drop the Comment model
 - fix all your test/controller/view mojo.
 
-You've just got bit.  When you rake setup:development, the mess gets
+You've just got bit.  When you `rake setup:development`, the mess gets
 mad at you after it creates your database, and starts cranking through
 migrations.  It gets to the part where you iterate over the comments
 and it blows up.  You don't have a comment model anymore for it to
@@ -56,20 +56,12 @@ test your migration, so you have the choice of `db:migrate:with_data` or
 What's it do?
 -------------
 
-Data migrations are stored in db/data. They act like schema
+Data migrations are stored in `db/data`. They act like schema
 migrations, except they should be reserved for data migrations. For
 instance, if you realize you need to titleize all yours titles, this
 is the place to do it. Running any of the provided rake tasks also
 creates a data schema table to mirror the usual schema migrations
 table to track all the goodness.
-
-Data migrations can be created at the same time as schema migrations,
-or independently.  Database (db:) tasks have been added and extended
-to run on data migrations only, or in conjunction with the schema
-migration.  For instance, `rake db:migrate:with_data` will run both
-schema and data migrations in the proper order.
-
-Note: If a data and schema migration share the same version number, schema gets precedence when migrating up. Data does down.
 
 Rails Support
 --------------------

@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## 3.0.0
+
+`--skip-schema-migration` removed deprecated. This gem will no longer generate schema
+migrations. It still supports running schema/data migrations with one command.<<<<<<< Updated upstream
+
 ## 2.2.0
 
 ([bilby91](https://github.com/bilby91)) Capistrano support
