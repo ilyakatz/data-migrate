@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Andrew J Vargo", "Ilya Katz"]
   s.email       = ["ajvargo@computer.org", "ilyakatz@gmail.com"]
-  s.homepage    = "http://ajvargo.com"
+  s.homepage    = "https://github.com/ilyakatz/data-migrate"
   s.summary     = %q{Rake tasks to migrate data alongside schema changes.}
   s.description = %q{Rake tasks to migrate data alongside schema changes.}
   s.license     = "MIT"
