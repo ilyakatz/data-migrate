@@ -129,15 +129,6 @@ Tasks work as they would with the 'vanilla' db version.  The 'with_data' additio
 
 With 'up' and 'down', you can specify the option 'BOTH', which defaults to false. Using true, will migrate both the data and schema (in the desired direction) if they both match the version provided.  Again, going up, schema is given precedence. Down its data.
 
-For more example, assume you have the 2 files:
-  db/migrate/20110419021211_add_x_to_y.rb
-  db/data/20110419021211_add_x_to_y.rb
-
-Running `rake db:migrate:up:with_data VERSION=20110419021211` would execute the 'db/migrate' version.
-Running `rake db:migrate:up:with_data VERSION=20110419021211` would execute the 'db/migrate' version, followed by the 'db/data' version.
-
-Going down instead of up would be the opposite.
-
 `rake db:migrate:status:with_data` provides and additional column to indicate which type of migration.
 
 Capistrano Support
