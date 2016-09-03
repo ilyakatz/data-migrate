@@ -4,7 +4,7 @@ Changelog
 ## 3.0.0
 
 `--skip-schema-migration` removed deprecated. This gem will no longer generate schema
-migrations. It still supports running schema/data migrations with one command.<<<<<<< Updated upstream
+migrations. It still supports running schema/data migrations with one command.
 
 ## 2.2.0
 
