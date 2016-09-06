@@ -1,6 +1,7 @@
 namespace :deploy do
 
   desc 'Runs rake data:migrate if migrations are set'
+  Rake::Task['deploy:migrate'].clear_actions
   task :migrate => [:set_rails_env] do
     on fetch(:migration_servers) do
       conditionally_migrate = fetch(:conditionally_migrate)
