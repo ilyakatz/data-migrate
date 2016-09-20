@@ -21,4 +21,8 @@ Gem::Specification.new do |s|
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
+
+  s.post_install_message = %q{
+Note: --skip-schema-migration option is no longer available as of version 3.0.0
+}
 end
