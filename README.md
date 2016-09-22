@@ -6,7 +6,7 @@ Data Migrate
 
 Run data migrations alongside schema migrations.
 
-Data migrations are stored in db/data. They act like schema
+Data migrations are stored in `db/data`. They act like schema
 migrations, except they should be reserved for data migrations. For
 instance, if you realize you need to titleize all your titles, this
 is the place to do it.
@@ -35,7 +35,7 @@ just the text. "Frist!!1!1" rules the day. Given that you:
 - drop the Comment model
 - fix all your test/controller/view mojo.
 
-You've just got bit.  When you rake setup:development, the mess gets
+You've just got bit.  When you `rake setup:development`, the mess gets
 mad at you after it creates your database, and starts cranking through
 migrations.  It gets to the part where you iterate over the comments
 and it blows up.  You don't have a comment model anymore for it to
@@ -56,25 +56,17 @@ test your migration, so you have the choice of `db:migrate:with_data` or
 What's it do?
 -------------
 
-Data migrations are stored in db/data. They act like schema
+Data migrations are stored in `db/data`. They act like schema
 migrations, except they should be reserved for data migrations. For
 instance, if you realize you need to titleize all yours titles, this
 is the place to do it. Running any of the provided rake tasks also
 creates a data schema table to mirror the usual schema migrations
 table to track all the goodness.
 
-Data migrations can be created at the same time as schema migrations,
-or independently.  Database (db:) tasks have been added and extended
-to run on data migrations only, or in conjunction with the schema
-migration.  For instance, `rake db:migrate:with_data` will run both
-schema and data migrations in the proper order.
-
-Note: If a data and schema migration share the same version number, schema gets precedence when migrating up. Data does down.
-
 Rails Support
 --------------------
 
-Rails 3.1: Version 1.2 supports Rails 3.1.0 and higher **but** is not longer maintained.
+Rails 3.1: Version 1.2 supports Rails 3.1.0 and higher **but** is no longer maintained.
 
 Rails 4: Version 2.0 supports Rails 4.0 and higher
 
@@ -113,15 +105,6 @@ You can generate a data migration as you would a schema migration:
 
     rails g data_migration add_this_to_that
 
-By default, the migration also generates a schema migration by the same name.
-This allows you to do things like:
-
-    rails g data_migration add_this_to_that this:string
-
-If you need a data only migration, either run it as such, with the skip-schema-migration flag:
-
-    rails g data_migration add_this_to_that --skip-schema-migration
-
 ### Rake Tasks
 
     $> rake -T data
@@ -145,15 +128,6 @@ If you need a data only migration, either run it as such, with the skip-schema-m
 Tasks work as they would with the 'vanilla' db version.  The 'with_data' addition to the 'db' tasks will run the task in the context of both the data and schema migrations.  That is, `rake db:rollback:with_data` will check to see if it was a schema or data migration invoked last, and do that.  Tasks invoked in that space also have an additional line of output, indicating if the action is performed on data or schema.
 
 With 'up' and 'down', you can specify the option 'BOTH', which defaults to false. Using true, will migrate both the data and schema (in the desired direction) if they both match the version provided.  Again, going up, schema is given precedence. Down its data.
-
-For more example, assume you have the 2 files:
-  db/migrate/20110419021211_add_x_to_y.rb
-  db/data/20110419021211_add_x_to_y.rb
-
-Running `rake db:migrate:up:with_data VERSION=20110419021211` would execute the 'db/migrate' version.
-Running `rake db:migrate:up:with_data VERSION=20110419021211` would execute the 'db/migrate' version, followed by the 'db/data' version.
-
-Going down instead of up would be the opposite.
 
 `rake db:migrate:status:with_data` provides and additional column to indicate which type of migration.
 
