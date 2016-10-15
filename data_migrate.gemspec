@@ -22,7 +22,9 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  s.post_install_message = %q{
-Note: --skip-schema-migration option is no longer available as of version 3.0.0
-}
+  s.post_install_message = <<-POST_INSTALL_MESSAGE
+#{"*" * 80}
+data-migrate: --skip-schema-migration option is no longer available as of version 3.0.0
+#{"*" * 80}
+POST_INSTALL_MESSAGE
 end
