@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## 3.0.1
+
+([gacha](https://github.com/gacha)) Capistrano fixes
+
 ## 3.0.0
 
 `--skip-schema-migration` removed deprecated. This gem will no longer generate schema
