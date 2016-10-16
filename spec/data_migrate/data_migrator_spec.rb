@@ -8,4 +8,10 @@ describe DataMigrate::DataMigrator do
     end
   end
 
+  describe :migrations_path do
+    it "returns correct migrations path" do
+      expect(subject.migrations_path).to eq("db/data")
+    end
+  end
+
 end
