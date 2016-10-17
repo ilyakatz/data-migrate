@@ -4,7 +4,7 @@ Data Migrate
 
 - [![Version](http://img.shields.io/gem/v/data_migrate.svg?style=flat-square)](https://rubygems.org/gems/data_migrate)
 - [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](http://opensource.org/licenses/MIT)
-- [![Travis](https://img.shields.io/travis/ilyakatz/data-migrate.svg)]()
+- [![Travis](https://img.shields.io/travis/ilyakatz/data-migrate.svg)](https://travis-ci.org/ilyakatz/data-migrate)
 
 
 Run data migrations alongside schema migrations.
