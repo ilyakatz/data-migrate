@@ -20,11 +20,8 @@ module DataMigrate
       attr_reader :migration_action
 
       def self.next_migration_number(dirname)
-        if ActiveRecord::Base.timestamped_migrations
-          Time.new.utc.strftime("%Y%m%d%H%M%S")
-        else
-          "%.3d" % (current_migration_number(dirname) + 1)
-        end
+        next_migration_number = current_migration_number(dirname) + 1
+        ActiveRecord::Migration.next_migration_number(next_migration_number)
       end
 
       def set_local_assigns!
