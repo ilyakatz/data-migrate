@@ -5,3 +5,6 @@ rvm:
   - 2.3.0
   - ruby-head
 script: bundle exec rspec
+gemfile:
+  - Gemfile
+  - Gemfile.rails5
