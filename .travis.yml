@@ -3,5 +3,13 @@ rvm:
   - 2.0.0
   - 2.1.0
   - 2.3.0
-  - ruby-head
 script: bundle exec rspec
+gemfile:
+  - Gemfile
+  - Gemfile.rails5
+matrix:
+  exclude:
+    - rvm: 2.0.0
+      gemfile: Gemfile.rails5
+    - rvm: 2.1.0
+      gemfile: Gemfile.rails5
