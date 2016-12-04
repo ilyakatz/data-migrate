@@ -1,5 +1,4 @@
 Data Migrate
-
 ====
 
 - [![Version](http://img.shields.io/gem/v/data_migrate.svg?style=flat-square)](https://rubygems.org/gems/data_migrate)
