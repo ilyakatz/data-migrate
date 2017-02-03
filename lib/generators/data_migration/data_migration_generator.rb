@@ -21,7 +21,10 @@ module DataMigrate
 
       def self.next_migration_number(dirname)
         if ActiveRecord::Base.timestamped_migrations
-          Time.new.utc.strftime("%Y%m%d%H%M%S")
+          # in order to avoid conflict with database migrations
+          # add a small offset https://github.com/ilyakatz/data-migrate/issues/31
+          t = Time.new
+          (t+1).utc.strftime("%Y%m%d%H%M%S")
         else
           "%.3d" % (current_migration_number(dirname) + 1)
         end
