@@ -215,6 +215,21 @@ namespace :db do
       puts "Current Data version: #{DataMigrate::DataMigrator.current_version}"
     end
   end
+
+  namespace :abort_if_pending_migrations do
+    desc "Raises an error if there are pending data or schema migrations"
+    task :with_data => :environment do
+      assure_data_schema_table
+      migrations = pending_migrations
+      if migrations.any?
+        puts "You have #{migrations.size} pending #{'migration'.pluralize(migrations.size)}:"
+        migrations.each do |migration|
+          puts '  %4d %6s %s' % [migration[:version], migration[:kind], migration[:name]]
+        end
+        abort %{Run `rails db:migrate:with_data` to update your database then try again.}
+      end
+    end
+  end
 end
 
 namespace :data do
@@ -309,6 +324,18 @@ namespace :data do
     assure_data_schema_table
     puts "Current data version: #{DataMigrate::DataMigrator.current_version}"
   end
+
+  desc "Raises an error if there are pending data migrations"
+  task :abort_if_pending_migrations => :environment do
+    migrations = pending_data_migrations
+    if migrations.any?
+      puts "You have #{migrations.size} pending data #{'migration'.pluralize(migrations.size)}:"
+      migrations.each do |migration|
+        puts '  %4d %s' % [migration[:version], migration[:name]]
+      end
+      abort %{Run `rails data:migrate` to update your database then try again.}
+    end
+  end
 end
 
 def pending_migrations
@@ -318,7 +345,7 @@ end
 def pending_data_migrations
   data_migrations = DataMigrate::DataMigrator.migrations('db/data')
   sort_migrations DataMigrate::DataMigrator.new(:up, data_migrations ).
-    pending_migrations.map{|m| { :version => m.version, :kind => :data }}
+    pending_migrations.map{|m| { :version => m.version, :kind => :data, :name => m.name }}
 end
 
 def pending_schema_migrations
@@ -326,7 +353,7 @@ def pending_schema_migrations
   sort_migrations(
     ActiveRecord::Migrator.new(:up, all_migrations).
     pending_migrations.
-    map{|m| { :version => m.version, :kind => :schema }})
+    map{|m| { :version => m.version, :kind => :schema, :name => m.name }})
 end
 
 def sort_migrations set_1, set_2=nil
