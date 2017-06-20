@@ -291,7 +291,9 @@ namespace :data do
       print_memory_usage do
         print_time_spent do
           DataMigrate::DataMigrator.migrate("db/data/", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
-          puts "The following statistics are for migration version: #{ENV["VERSION"] ? ENV["VERSION"].to_i : nil}"
+          if ENV["VERSION"]
+            puts "The following statistics are for migration version: #{ENV["VERSION"].to_i}"
+          end
           puts "=========================================================================="
         end
       end
@@ -419,7 +421,7 @@ def print_time_spent
     yield
   end
 
-  puts "Time spent: #{time.round(3)}"
+  puts "Time spent: #{time.round(3)} seconds"
 end
 
 def pending_migrations
