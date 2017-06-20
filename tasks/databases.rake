@@ -51,10 +51,11 @@ namespace :db do
             print_memory_usage do
               print_time_spent do
                 DataMigrate::DataMigrator.run(migration[:direction], "db/data/", migration[:version])
-                puts "The following statistics are for migration version: #{migration[:version]}"
+                puts "The following statistics are for migration version: #{migration[:version]}, and direction: #{migration[:direction]}"
                 puts "==============================================================================="
               end
             end
+            puts "==============================================================================="
           else
             DataMigrate::DataMigrator.run(migration[:direction], "db/data/", migration[:version])
           end
@@ -68,10 +69,11 @@ namespace :db do
                   Rails.application.config.paths["db/migrate"],
                   migration[:version]
                 )
-                puts "The following statistics are for migration version: #{migration[:version]}"
+                puts "The following statistics are for migration version: #{migration[:version]}, and direction: #{migration[:direction]}"
                 puts "==============================================================================="
               end
             end
+            puts "==============================================================================="
           else
             ActiveRecord::Migrator.run(
               migration[:direction],
@@ -119,10 +121,11 @@ namespace :db do
               print_memory_usage do
                 print_time_spent do
                   DataMigrate::DataMigrator.run(:up, "db/data/", migration[:version])
-                  puts "The following statistics are for migration version: #{migration[:version]}"
+                  puts "The following statistics are for migration version: #{migration[:version]}, and direction: 'up'"
                   puts "==============================================================================="
                 end
               end
+              puts "==============================================================================="
             else
               DataMigrate::DataMigrator.run(:up, "db/data/", migration[:version])
             end
@@ -132,10 +135,11 @@ namespace :db do
               print_memory_usage do
                 print_time_spent do
                   ActiveRecord::Migrator.run(:up, "db/migrate/", migration[:version])
-                  puts "The following statistics are for migration version: #{migration[:version]}"
+                  puts "The following statistics are for migration version: #{migration[:version]}, and direction: 'up'"
                   puts "==============================================================================="
                 end
               end
+              puts "==============================================================================="
             else
               ActiveRecord::Migrator.run(:up, "db/migrate/", migration[:version])
             end
@@ -164,10 +168,11 @@ namespace :db do
               print_memory_usage do
                 print_time_spent do
                   DataMigrate::DataMigrator.run(:down, "db/data/", migration[:version])
-                  puts "The following statistics are for migration version: #{migration[:version]}"
+                  puts "The following statistics are for migration version: #{migration[:version]}, and direction: 'down'"
                   puts "==============================================================================="
                 end
               end
+              puts "==============================================================================="
             else
               DataMigrate::DataMigrator.run(:down, "db/data/", migration[:version])
             end
@@ -177,10 +182,11 @@ namespace :db do
               print_memory_usage do
                 print_time_spent do
                   ActiveRecord::Migrator.run(:down, "db/migrate/", migration[:version])
-                  puts "The following statistics are for migration version: #{migration[:version]}"
+                  puts "The following statistics are for migration version: #{migration[:version]}, and direction: 'down'"
                   puts "==============================================================================="
                 end
               end
+              puts "==============================================================================="
             else
               ActiveRecord::Migrator.run(:down, "db/migrate/", migration[:version])
             end
@@ -297,6 +303,7 @@ namespace :data do
           puts "==============================================================================="
         end
       end
+      puts "==============================================================================="
     else
       DataMigrate::DataMigrator.migrate("db/data/", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
     end
@@ -324,10 +331,11 @@ namespace :data do
         print_memory_usage do
           print_time_spent do
             DataMigrate::DataMigrator.run(:up, "db/data/", version)
-            puts "The following statistics are for migration version: #{version}"
+            puts "The following statistics are for migration version: #{version}, and direction: 'up'"
             puts "==============================================================================="
           end
         end
+        puts "==============================================================================="
       else
         DataMigrate::DataMigrator.run(:up, "db/data/", version)
       end
@@ -346,6 +354,7 @@ namespace :data do
             puts "==============================================================================="
           end
         end
+        puts "==============================================================================="
       else
         DataMigrate::DataMigrator.run(:down, "db/data/", version)
       end
