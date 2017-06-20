@@ -1,4 +1,5 @@
 namespace :db do
+  time_spent_and_memory_pressure = ENV["WITH_STATS"] ? true : false
   namespace :migrate do
     desc "Migrate the database data and schema (options: VERSION=x, VERBOSE=false)."
     task :with_data => :environment do
@@ -6,7 +7,6 @@ namespace :db do
 
       ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
       target_version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
-      time_spent_and_memory_pressure = ENV["WITH_STATS"] ? true : false
       migrations = []
 
       if target_version.nil?
