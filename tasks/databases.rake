@@ -52,7 +52,7 @@ namespace :db do
               print_time_spent do
                 DataMigrate::DataMigrator.run(migration[:direction], "db/data/", migration[:version])
                 puts "The following statistics are for migration version: #{migration[:version]}"
-                puts "=========================================================================="
+                puts "==============================================================================="
               end
             end
           else
@@ -69,7 +69,7 @@ namespace :db do
                   migration[:version]
                 )
                 puts "The following statistics are for migration version: #{migration[:version]}"
-                puts "=========================================================================="
+                puts "==============================================================================="
               end
             end
           else
@@ -120,7 +120,7 @@ namespace :db do
                 print_time_spent do
                   DataMigrate::DataMigrator.run(:up, "db/data/", migration[:version])
                   puts "The following statistics are for migration version: #{migration[:version]}"
-                  puts "=========================================================================="
+                  puts "==============================================================================="
                 end
               end
             else
@@ -133,7 +133,7 @@ namespace :db do
                 print_time_spent do
                   ActiveRecord::Migrator.run(:up, "db/migrate/", migration[:version])
                   puts "The following statistics are for migration version: #{migration[:version]}"
-                  puts "=========================================================================="
+                  puts "==============================================================================="
                 end
               end
             else
@@ -165,7 +165,7 @@ namespace :db do
                 print_time_spent do
                   DataMigrate::DataMigrator.run(:down, "db/data/", migration[:version])
                   puts "The following statistics are for migration version: #{migration[:version]}"
-                  puts "=========================================================================="
+                  puts "==============================================================================="
                 end
               end
             else
@@ -178,7 +178,7 @@ namespace :db do
                 print_time_spent do
                   ActiveRecord::Migrator.run(:down, "db/migrate/", migration[:version])
                   puts "The following statistics are for migration version: #{migration[:version]}"
-                  puts "=========================================================================="
+                  puts "==============================================================================="
                 end
               end
             else
@@ -294,7 +294,7 @@ namespace :data do
           if ENV["VERSION"]
             puts "The following statistics are for migration version: #{ENV["VERSION"].to_i}"
           end
-          puts "=========================================================================="
+          puts "==============================================================================="
         end
       end
     else
@@ -325,7 +325,7 @@ namespace :data do
           print_time_spent do
             DataMigrate::DataMigrator.run(:up, "db/data/", version)
             puts "The following statistics are for migration version: #{version}"
-            puts "=========================================================================="
+            puts "==============================================================================="
           end
         end
       else
@@ -343,7 +343,7 @@ namespace :data do
           print_time_spent do
             DataMigrate::DataMigrator.run(:down, "db/data/", version)
             puts "The following statistics are for migration version: #{version}"
-            puts "=========================================================================="
+            puts "==============================================================================="
           end
         end
       else
