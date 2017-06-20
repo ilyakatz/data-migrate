@@ -1,5 +1,5 @@
+time_spent_and_memory_pressure = ENV["WITH_STATS"] ? true : false
 namespace :db do
-  time_spent_and_memory_pressure = ENV["WITH_STATS"] ? true : false
   namespace :migrate do
     desc "Migrate the database data and schema (options: VERSION=x, VERBOSE=false)."
     task :with_data => :environment do
