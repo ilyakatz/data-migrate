@@ -13,8 +13,7 @@ migrations, except they should be reserved for data migrations. For
 instance, if you realize you need to titleize all your titles, this
 is the place to do it.
 
-Why should I use this?
-----------------------
+# Why should I use this?
 
 Its seems when a project hits a certain size, I get to manipulate data
 outside the application itself.  Changing defaults, new validations,
@@ -55,8 +54,7 @@ change their scripts to `db:migrate:with_data`.  Of course you want to
 test your migration, so you have the choice of `db:migrate:with_data` or
 `data:migrate` to just capture that data change.
 
-What's it do?
--------------
+## What's it do?
 
 Data migrations are stored in `db/data`. They act like schema
 migrations, except they should be reserved for data migrations. For
@@ -65,8 +63,7 @@ is the place to do it. Running any of the provided rake tasks also
 creates a data schema table to mirror the usual schema migrations
 table to track all the goodness.
 
-Rails Support
---------------------
+## Rails Support
 
 Rails 3.1: Version 1.2 supports Rails 3.1.0 and higher **but** is no longer maintained.
 
@@ -83,8 +80,7 @@ the gem wrote data migration versions into
 
 This may cause some unintended consequences. See [#22](https://github.com/ilyakatz/data-migrate/issues/22)
 
-Installation
-------------
+## Installation
 Add the gem to your project
 
     # Gemfile
@@ -98,8 +94,7 @@ is to mirror the way the standard 'db' rake tasks work. If you've
 installed previous to v1.1.0, you'll want to delete the
 'create\_data\_migrations_table' migration.
 
-Usage
------
+## Usage
 
 ### Generating Migrations
 
@@ -133,8 +128,7 @@ With 'up' and 'down', you can specify the option 'BOTH', which defaults to false
 
 `rake db:migrate:status:with_data` provides and additional column to indicate which type of migration.
 
-Capistrano Support
-------------------
+## Capistrano Support
 
 The gem comes with a capistrano task that can be used instead of `capistrano/rails/migrations`.
 
@@ -146,8 +140,18 @@ require 'capistrano/data_migrate'
 
 From now on capistrano will run `rake db:migrate:with_data` in every deploy.
 
-Thanks
-------
+### Contributing
+
+## Testing
+
+Run tests for a specific version of Rails
+
+```
+appraisal rails-4.2 rspec
+appraisal rails-5.0 rspec
+```
+
+## Thanks
 [Andrew J Vargo](http://github.com/ajvargo) Andrew was the original creator and maintainer of this project!
 
 [Jeremy Durham](http://jeremydurham.com/) for fleshing out the idea with me, and providing guidance.
