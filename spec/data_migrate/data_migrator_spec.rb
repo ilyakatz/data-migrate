@@ -2,17 +2,31 @@ require 'spec_helper'
 
 describe DataMigrate::DataMigrator do
   let(:subject) { DataMigrate::DataMigrator }
+  let(:db_config) {
+    {
+      adapter: "sqlite3",
+      database: "spec/db/test.db"
+    }
+  }
 
   describe :assure_data_schema_table do
+    before do
+      expect(subject).to receive(:db_config) { db_config }.at_least(:once)
+      ActiveRecord::Base.establish_connection(db_config)
+    end
+
+    after do
+      ActiveRecord::Migration.drop_table("data_migrations")
+    end
+
     it do
-      expect(subject).to receive(:db_config) {
-        {
-          adapter: "sqlite3",
-          database: "../db/test.db"
-        }
-      }.at_least(:once)
+      expect(
+        ActiveRecord::Base.connection.table_exists?("data_migrations")
+      ).to eq false
       subject.assure_data_schema_table
-      binding.pry
+      expect(
+        ActiveRecord::Base.connection.table_exists?("data_migrations")
+      ).to eq true
     end
   end
 
