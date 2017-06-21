@@ -41,12 +41,18 @@ module DataMigrate
       end
 
       def assure_data_schema_table
-        config = ActiveRecord::Base.configurations[Rails.env || 'development'] || ENV["DATABASE_URL"]
-        ActiveRecord::Base.establish_connection(config)
+        ActiveRecord::Base.establish_connection(db_config)
         sm_table = DataMigrate::DataMigrator.schema_migrations_table_name
 
         unless table_exists?(ActiveRecord::Base.connection, sm_table)
-          ActiveRecord::Base.connection.create_table(sm_table, :id => false) do |schema_migrations_table|
+          create_table(sm_table)
+        end
+      end
+
+      private
+
+      def create_table(sm_table)
+        ActiveRecord::Base.connection.create_table(sm_table, :id => false) do |schema_migrations_table|
             schema_migrations_table.column :version, :string, :null => false
           end
 
@@ -57,10 +63,7 @@ module DataMigrate
           ActiveRecord::Base.connection.add_index sm_table, :version,
             :unique => true,
             :name => index_name
-        end
       end
-
-      private
 
       def table_exists?(connection, table_name)
         # Avoid the warning that table_exists? prints in Rails 5.0 due a change in behavior between
@@ -71,6 +74,11 @@ module DataMigrate
           connection.table_exists?(schema_migrations_table_name)
         end
       end
+
+      def db_config
+        ActiveRecord::Base.configurations[Rails.env || 'development'] || ENV["DATABASE_URL"]
+      end
+
     end
   end
 end
