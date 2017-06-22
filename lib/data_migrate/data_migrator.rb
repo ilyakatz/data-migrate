@@ -16,7 +16,7 @@ module DataMigrate
 
     class << self
       def get_all_versions(connection = ActiveRecord::Base.connection)
-        if connection.table_exists?(schema_migrations_table_name)
+        if table_exists?(connection, schema_migrations_table_name)
           # Certain versions of the gem wrote data migration versions into
           # schema_migrations table. After the fix, it was corrected to write into
           # data_migrations. However, not to break anything we are going to
@@ -41,12 +41,18 @@ module DataMigrate
       end
 
       def assure_data_schema_table
-        config = ActiveRecord::Base.configurations[Rails.env || 'development'] || ENV["DATABASE_URL"]
-        ActiveRecord::Base.establish_connection(config)
+        ActiveRecord::Base.establish_connection(db_config)
         sm_table = DataMigrate::DataMigrator.schema_migrations_table_name
 
-        unless ActiveRecord::Base.connection.table_exists?(sm_table)
-          ActiveRecord::Base.connection.create_table(sm_table, :id => false) do |schema_migrations_table|
+        unless table_exists?(ActiveRecord::Base.connection, sm_table)
+          create_table(sm_table)
+        end
+      end
+
+      private
+
+      def create_table(sm_table)
+        ActiveRecord::Base.connection.create_table(sm_table, :id => false) do |schema_migrations_table|
             schema_migrations_table.column :version, :string, :null => false
           end
 
@@ -57,7 +63,20 @@ module DataMigrate
           ActiveRecord::Base.connection.add_index sm_table, :version,
             :unique => true,
             :name => index_name
+      end
+
+      def table_exists?(connection, table_name)
+        # Avoid the warning that table_exists? prints in Rails 5.0 due a change in behavior between
+        # Rails 5.0 and Rails 5.1 of this method with respect to database views.
+        if ActiveRecord.version >= Gem::Version.new('5.0') && ActiveRecord.version < Gem::Version.new('5.1')
+          connection.data_source_exists?(table_name)
+        else
+          connection.table_exists?(schema_migrations_table_name)
         end
+      end
+
+      def db_config
+        ActiveRecord::Base.configurations[Rails.env || 'development'] || ENV["DATABASE_URL"]
       end
 
     end

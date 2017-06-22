@@ -1,5 +1,5 @@
-class <%= migration_class_name %> < ActiveRecord::Migration
-  def up
+class <%= migration_class_name %> < <%= migration_base_class_name %>
+  def  up
   end
 
   def down
