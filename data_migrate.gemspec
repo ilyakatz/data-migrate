@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec"
   s.add_development_dependency "rspec-core"
   s.add_development_dependency "pry"
+  s.add_development_dependency "rb-readline"
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "timecop"
 
