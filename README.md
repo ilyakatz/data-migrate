@@ -69,7 +69,7 @@ Rails 3.1: Version 1.2 supports Rails 3.1.0 and higher **but** is no longer main
 
 Rails 4: Version 2.0 supports Rails 4.0 and higher
 
-Rails 5: Not tested
+Rails 5.0: Supported
 
 ### Important note
 
