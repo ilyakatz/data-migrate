@@ -13,15 +13,4 @@ describe DataMigrate::Generators::DataMigrationGenerator do
       end
     end
   end
-
-  describe :migration_base_class_name do
-    let(:subject) { DataMigrate::Generators::DataMigrationGenerator.new(['my_migration']) }
-    it "returns the correct base class name" do
-      if ActiveRecord.version >= Gem::Version.new('5.0')
-        expect(subject.send(:migration_base_class_name)).to eq("ActiveRecord::Migration[#{ActiveRecord::Migration.current_version}]")
-      else
-        expect(subject.send(:migration_base_class_name)).to eq('ActiveRecord::Migration')
-      end
-    end
-  end
 end

@@ -5,4 +5,5 @@ if Rails::VERSION::MAJOR >= 5
 else
   require File.join(File.dirname(__FILE__), 'data_migrate', 'migration')
 end
+require File.join(File.dirname(__FILE__), 'data_migrate', 'silversheet_migration')
 require File.join(File.dirname(__FILE__), 'data_migrate', 'railtie')
