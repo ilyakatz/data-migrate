@@ -33,14 +33,6 @@ module DataMigrate
           @table_name       = $2.pluralize
         end
       end
-
-      def migration_base_class_name
-        if ActiveRecord.version >= Gem::Version.new('5.0')
-          "ActiveRecord::Migration[#{ActiveRecord::Migration.current_version}]"
-        else
-          'ActiveRecord::Migration'
-        end
-      end
     end
   end
 end

@@ -1,8 +1,5 @@
-class <%= migration_class_name %> < <%= migration_base_class_name %>
+class <%= migration_class_name %> < SilversheetMigration
   def self.up
-  end
-
-  def self.down
-    raise ActiveRecord::IrreversibleMigration
+    setup(count: 0)
   end
 end
