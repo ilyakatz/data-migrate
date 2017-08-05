@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = "data_migrate"
 
-  s.add_dependency('rails', '>= 4.0', '< 5.1')
+  s.add_dependency('rails', '>= 4.0')
   s.add_development_dependency "appraisal"
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec"

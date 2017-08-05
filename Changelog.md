@@ -1,6 +1,10 @@
 Changelog
 =========
 
+## 3.2.0
+- Add support for Rails 5.1
+- No longer testing EOL rubies
+
 ## 3.1.0
 
 Rails 5.0 support thanks to
