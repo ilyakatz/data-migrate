@@ -13,6 +13,8 @@ migrations, except they should be reserved for data migrations. For
 instance, if you realize you need to titleize all your titles, this
 is the place to do it.
 
+![Travis](./screenshot.png)
+
 # Why should I use this?
 
 Its seems when a project hits a certain size, I get to manipulate data
@@ -26,35 +28,37 @@ migration.  It'd be much better to keep concerns separate. The benefit
 of having them separate has to do with your data model.
 
 For instance, lets take an absurd example, to illustrate: You have
-your infamous [Rails blog](http://media.rubyonrails.org/video/rails-0-5.mov)
-that has posts with many comments.  After some use, you decide you are
-going to be a trend setter, and want only one comment per post, and
-just the text. "Frist!!1!1" rules the day. Given that you:
-- write a migration to add a comment column to Post
-- write a migration to move the contents of the first comments to the Post
-- drop the column_id column from Post
-- drop the Comment model
-- fix all your test/controller/view mojo.
+a blog application that has posts with many comments.
+After some use, you decide you are going to be a trend setter,
+and want only one comment per post, and just the text.
+
+Given that you:
+- write a migration to add a comment column to `Post`
+- write a migration to move the contents of the first comments to the `Post`
+- drop the `column_id` column from `Post`
+- drop the `Comment` model
+- fix all your tests
 
 You've just got bit.  When you `rake setup:development`, the mess gets
 mad at you after it creates your database, and starts cranking through
 migrations.  It gets to the part where you iterate over the comments
-and it blows up.  You don't have a comment model anymore for it to
+and it blows up.  You don't have a `Comment` model anymore for it to
 even try and get 'all' from.  You think you are smarter, and wrap the
-AR call in a conditional based on the environment. That's fine until
-you get that QA gal, and she wants her own thing. Then the UI people
-get tired of waiting for the full stack to load on page refreshes, so
-you have to edit past migrations...
+ActiveRecord call in a conditional based on the environment.
+
+That's fine until you get that QA gal, and she wants her own thing.
+Then the UI people get tired of waiting for the full stack to load on page
+refreshes, so you have to edit past migrations...
 
 With Data Migrate, you have the control.  You can generate your
 migrations as schema or data as you would as your work flow. For
 setting tasks that don't require any intermediate AR activity, like
-dev and test, you stick with db:migrate.  For your prod, and qa, you
+dev and test, you stick with `db:migrate`.  For production and QA, you
 change their scripts to `db:migrate:with_data`.  Of course you want to
 test your migration, so you have the choice of `db:migrate:with_data` or
 `data:migrate` to just capture that data change.
 
-## What's it do?
+## What does it do?
 
 Data migrations are stored in `db/data`. They act like schema
 migrations, except they should be reserved for data migrations. For
@@ -71,7 +75,11 @@ Rails 4: Version 2.0 supports Rails 4.0 and higher
 
 Rails 5.0: Supported
 
-### Important note
+Rails 5.1: Supported
+
+### Important notes for older versions
+
+#### v2
 
 If you upgraded to Rails 4 while using `data_migrate` prior to version 2,
 the gem wrote data migration versions into
@@ -79,6 +87,11 @@ the gem wrote data migration versions into
 `data_migrations`.
 
 This may cause some unintended consequences. See [#22](https://github.com/ilyakatz/data-migrate/issues/22)
+
+#### v1
+
+If you've installed previous to v1.1.0, you'll want to delete the
+`create_data_migrations_table` migration.
 
 ## Installation
 Add the gem to your project
@@ -89,10 +102,9 @@ Add the gem to your project
 Then `bundle install` and you are ready to go.
 
 So you know, when you use one of the provide rake tasks, a table
-called 'data_migrations' will be created in your database. This
-is to mirror the way the standard 'db' rake tasks work. If you've
-installed previous to v1.1.0, you'll want to delete the
-'create\_data\_migrations_table' migration.
+called `data_migrations` will be created in your database. This
+is to mirror the way the standard `db` rake tasks work.
+
 
 ## Usage
 
@@ -147,6 +159,7 @@ From now on capistrano will run `rake db:migrate:with_data` in every deploy.
 Run tests for a specific version of Rails
 
 ```
+appraisal install
 appraisal rails-4.2 rspec
 appraisal rails-5.0 rspec
 ```
