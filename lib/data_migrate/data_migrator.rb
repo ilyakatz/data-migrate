@@ -58,7 +58,10 @@ module DataMigrate
           assure_data_schema_table
         end
 
-        db_list = ActiveRecord::Base.connection.select_values("SELECT version FROM #{DataMigrate::DataMigrator.schema_migrations_table_name}")
+        table_name = DataMigrate::DataMigrator.schema_migrations_table_name
+        db_list = ActiveRecord::Base.connection.select_values(
+          "SELECT version FROM #{table_name}"
+        )
         file_list = []
         Dir.foreach(File.join(Rails.root, 'db', 'data')) do |file|
           # only files matching "20091231235959_some_name.rb" pattern
@@ -67,7 +70,14 @@ module DataMigrate
             file_list << [status, match_data[1], match_data[2]]
           end
         end
-        # output
+
+        display_status(config, db_list, file_list)
+
+      end
+
+      private
+
+      def display_status(config, db_list, file_list)
         puts "\ndatabase: #{config['database']}\n\n"
         puts "#{"Status".center(8)}  #{"Migration ID".ljust(14)}  Migration Name"
         puts "-" * 50
@@ -79,8 +89,6 @@ module DataMigrate
         end
         puts
       end
-
-      private
 
       def create_table(sm_table)
         ActiveRecord::Base.connection.create_table(sm_table, :id => false) do |schema_migrations_table|
