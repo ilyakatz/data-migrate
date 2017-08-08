@@ -1,6 +1,12 @@
 Changelog
 =========
 
+## 3.2.1
+
+data_migrate table into rails schema dump, thakns to
+[jturkel](https://github.com/jturkel) 
+
+
 ## 3.2.0
 - Add support for Rails 5.1
 - No longer testing EOL rubies
