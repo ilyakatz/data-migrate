@@ -57,7 +57,7 @@ namespace :db do
         end
       end
 
-      Rake::Task["db:schema:dump"].invoke if ActiveRecord::Base.schema_format == :ruby
+      Rake::Task["db:_dump"].invoke
     end
 
     namespace :redo do
@@ -96,6 +96,8 @@ namespace :db do
             ActiveRecord::Migrator.run(:up, "db/migrate/", migration[:version])
           end
         end
+
+        Rake::Task["db:_dump"].invoke
       end
     end
 
@@ -121,6 +123,8 @@ namespace :db do
             ActiveRecord::Migrator.run(:down, "db/migrate/", migration[:version])
           end
         end
+
+        Rake::Task["db:_dump"].invoke
       end
     end
 
@@ -184,6 +188,8 @@ namespace :db do
           ActiveRecord::Migrator.run(:down, "db/migrate/", past_migration[:version])
         end
       end
+
+      Rake::Task["db:_dump"].invoke
     end
   end
 
@@ -204,6 +210,8 @@ namespace :db do
           ActiveRecord::Migrator.run(:up, "db/migrate/", pending_migration[:version])
         end
       end
+
+      Rake::Task["db:_dump"].invoke
     end
   end
 
