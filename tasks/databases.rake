@@ -1,4 +1,9 @@
 namespace :db do
+
+  Rake::Task['db:_dump'].enhance do
+    Rake::Task["data:dump"].invoke
+  end
+
   namespace :migrate do
     desc "Migrate the database data and schema (options: VERSION=x, VERBOSE=false)."
     task :with_data => :environment do
@@ -223,6 +228,17 @@ namespace :db do
       puts "Current Data version: #{DataMigrate::DataMigrator.current_version}"
     end
   end
+
+  namespace :schema do
+    namespace :load do
+      desc 'Load both schema.rb and data_schema.rb file into the database'
+      task :with_data => :environment do
+        Rake::Task["db:schema:load"].invoke
+
+        DataMigrate::DatabaseTasks.load_schema_current(:ruby, ENV['SCHEMA'])
+      end
+    end
+  end
 end
 
 namespace :data do
@@ -231,6 +247,8 @@ namespace :data do
     assure_data_schema_table
     #ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
     DataMigrate::DataMigrator.migrate("db/data/", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
+
+    Rake::Task["data:dump"].invoke
   end
 
   namespace :migrate do
@@ -252,6 +270,7 @@ namespace :data do
       version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
       raise "VERSION is required" unless version
       DataMigrate::DataMigrator.run(:up, "db/data/", version)
+      Rake::Task["data:dump"].invoke
     end
 
     desc 'Runs the "down" for a given migration VERSION.'
@@ -260,6 +279,7 @@ namespace :data do
       raise "VERSION is required" unless version
       assure_data_schema_table
       DataMigrate::DataMigrator.run(:down, "db/data/", version)
+      Rake::Task["data:dump"].invoke
     end
 
     desc "Display status of data migrations"
@@ -274,7 +294,7 @@ namespace :data do
       file_list = []
       Dir.foreach(File.join(Rails.root, 'db', 'data')) do |file|
         # only files matching "20091231235959_some_name.rb" pattern
-        if match_data = /(\d{14})_(.+)\.rb/.match(file)
+        if match_data = DataMigrate::DataMigrator.match(file)
           status = db_list.delete(match_data[1]) ? 'up' : 'down'
           file_list << [status, match_data[1], match_data[2]]
         end
@@ -298,6 +318,7 @@ namespace :data do
     assure_data_schema_table
     step = ENV['STEP'] ? ENV['STEP'].to_i : 1
     DataMigrate::DataMigrator.rollback('db/data/', step)
+    Rake::Task["data:dump"].invoke
   end
 
   desc 'Pushes the schema to the next version (specify steps w/ STEP=n).'
@@ -310,12 +331,35 @@ namespace :data do
     migrations.each do | pending_migration |
       DataMigrate::DataMigrator.run(:up, "db/data/", pending_migration[:version])
     end
+    Rake::Task["data:dump"].invoke
   end
 
   desc "Retrieves the current schema version number for data migrations"
   task :version => :environment do
     assure_data_schema_table
     puts "Current data version: #{DataMigrate::DataMigrator.current_version}"
+  end
+
+  desc 'Create a db/data_schema.rb file that stores the current data version'
+  task :dump => :environment do
+    if ActiveRecord::Base.dump_schema_after_migration
+      case ActiveRecord::Base.schema_format
+      when :ruby
+        filename = DataMigrate::DatabaseTasks.schema_file
+        File.open(filename, "w:utf-8") do |file|
+          DataMigrate::SchemaDumper.dump(ActiveRecord::Base.connection, file)
+        end
+      else
+        raise <<-MSG.strip_heredoc
+          only Ruby-based data_schema files are supported at this time
+          (unknown schema format #{ActiveRecord::Base.schema_format})
+        MSG
+      end
+    end
+
+    # Allow this task to be called as many times as required. An example is the
+    # migrate:redo task, which calls other two internally that depend on this one.
+    Rake::Task['data:dump'].reenable
   end
 end
 
