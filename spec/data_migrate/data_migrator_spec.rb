@@ -105,6 +105,7 @@ describe DataMigrate::Data do
     before do
       expect(DataMigrate::DataMigrator).to receive(:db_config) { db_config }.at_least(:once)
       ActiveRecord::Base.establish_connection(db_config)
+      ActiveRecord::Base.connection.initialize_schema_migrations_table
     end
 
     after do
@@ -161,6 +162,7 @@ describe DataMigrate::SchemaDumper do
       expect(DataMigrate::DataMigrator).to receive(:db_config) { db_config }.at_least(:once)
       ActiveRecord::Base.establish_connection(db_config)
 
+      ActiveRecord::Base.connection.initialize_schema_migrations_table
       DataMigrate::DataMigrator.assure_data_schema_table
 
       ActiveRecord::Base.connection.execute <<-SQL
