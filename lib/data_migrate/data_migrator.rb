@@ -180,7 +180,7 @@ module DataMigrate
 
       def initialize(connection)
         @connection = connection
-        @version = DataMigrate::DataMigrator.current_version rescue nil
+        @version = DataMigrate::DataSchemaMigration.all.map { |x| x.version.to_i }.max rescue 0
       end
   end
 end
