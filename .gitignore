@@ -4,3 +4,4 @@
 *.lock
 gemfiles/.bundle
 spec/db
+.vscode/
