@@ -1,6 +1,6 @@
-
 /.rvmrc
 *.gem
 *.lock
 gemfiles/.bundle
 spec/db
+.vscode/
