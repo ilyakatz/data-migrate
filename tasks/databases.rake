@@ -1,3 +1,4 @@
+time_spent_and_memory_pressure = ENV["WITH_STATS"] ? true : false
 namespace :db do
   namespace :migrate do
     desc "Migrate the database data and schema (options: VERSION=x, VERBOSE=false)."
@@ -46,14 +47,40 @@ namespace :db do
       migrations.each do |migration|
         if migration[:kind] == :data
           ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
-          DataMigrate::DataMigrator.run(migration[:direction], "db/data/", migration[:version])
+          if time_spent_and_memory_pressure
+            print_memory_usage do
+              print_time_spent do
+                DataMigrate::DataMigrator.run(migration[:direction], "db/data/", migration[:version])
+                puts "The following statistics are for migration version: #{migration[:version]}, and direction: #{migration[:direction]}"
+                puts "==============================================================================="
+              end
+            end
+            puts "===============================================================================\n"
+          else
+            DataMigrate::DataMigrator.run(migration[:direction], "db/data/", migration[:version])
+          end
         else
           ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-          ActiveRecord::Migrator.run(
-            migration[:direction],
-            Rails.application.config.paths["db/migrate"],
-            migration[:version]
-          )
+          if time_spent_and_memory_pressure
+            print_memory_usage do
+              print_time_spent do
+                ActiveRecord::Migrator.run(
+                  migration[:direction],
+                  Rails.application.config.paths["db/migrate"],
+                  migration[:version]
+                )
+                puts "The following statistics are for migration version: #{migration[:version]}, and direction: #{migration[:direction]}"
+                puts "==============================================================================="
+              end
+            end
+            puts "===============================================================================\n"
+          else
+            ActiveRecord::Migrator.run(
+              migration[:direction],
+              Rails.application.config.paths["db/migrate"],
+              migration[:version]
+            )
+          end
         end
       end
 
@@ -90,10 +117,32 @@ namespace :db do
         migrations.each do |migration|
           if migration[:kind] == :data
             ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
-            DataMigrate::DataMigrator.run(:up, "db/data/", migration[:version])
+            if time_spent_and_memory_pressure
+              print_memory_usage do
+                print_time_spent do
+                  DataMigrate::DataMigrator.run(:up, "db/data/", migration[:version])
+                  puts "The following statistics are for migration version: #{migration[:version]}, and direction: 'up'"
+                  puts "==============================================================================="
+                end
+              end
+              puts "===============================================================================\n"
+            else
+              DataMigrate::DataMigrator.run(:up, "db/data/", migration[:version])
+            end
           else
             ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-            ActiveRecord::Migrator.run(:up, "db/migrate/", migration[:version])
+            if time_spent_and_memory_pressure
+              print_memory_usage do
+                print_time_spent do
+                  ActiveRecord::Migrator.run(:up, "db/migrate/", migration[:version])
+                  puts "The following statistics are for migration version: #{migration[:version]}, and direction: 'up'"
+                  puts "==============================================================================="
+                end
+              end
+              puts "===============================================================================\n"
+            else
+              ActiveRecord::Migrator.run(:up, "db/migrate/", migration[:version])
+            end
           end
         end
 
@@ -117,10 +166,32 @@ namespace :db do
         migrations.each do |migration|
           if migration[:kind] == :data
             ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
-            DataMigrate::DataMigrator.run(:down, "db/data/", migration[:version])
+            if time_spent_and_memory_pressure
+              print_memory_usage do
+                print_time_spent do
+                  DataMigrate::DataMigrator.run(:down, "db/data/", migration[:version])
+                  puts "The following statistics are for migration version: #{migration[:version]}, and direction: 'down'"
+                  puts "==============================================================================="
+                end
+              end
+              puts "===============================================================================\n"
+            else
+              DataMigrate::DataMigrator.run(:down, "db/data/", migration[:version])
+            end
           else
             ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-            ActiveRecord::Migrator.run(:down, "db/migrate/", migration[:version])
+            if time_spent_and_memory_pressure
+              print_memory_usage do
+                print_time_spent do
+                  ActiveRecord::Migrator.run(:down, "db/migrate/", migration[:version])
+                  puts "The following statistics are for migration version: #{migration[:version]}, and direction: 'down'"
+                  puts "==============================================================================="
+                end
+              end
+              puts "===============================================================================\n"
+            else
+              ActiveRecord::Migrator.run(:down, "db/migrate/", migration[:version])
+            end
           end
         end
 
@@ -230,7 +301,20 @@ namespace :data do
   task :migrate => :environment do
     assure_data_schema_table
     #ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
-    DataMigrate::DataMigrator.migrate("db/data/", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
+    if time_spent_and_memory_pressure
+      print_memory_usage do
+        print_time_spent do
+          DataMigrate::DataMigrator.migrate("db/data/", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
+          if ENV["VERSION"]
+            puts "The following statistics are for migration version: #{ENV["VERSION"].to_i}"
+          end
+          puts "==============================================================================="
+        end
+      end
+      puts "===============================================================================\n"
+    else
+      DataMigrate::DataMigrator.migrate("db/data/", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
+    end
   end
 
   namespace :migrate do
@@ -251,7 +335,18 @@ namespace :data do
       assure_data_schema_table
       version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
       raise "VERSION is required" unless version
-      DataMigrate::DataMigrator.run(:up, "db/data/", version)
+      if time_spent_and_memory_pressure
+        print_memory_usage do
+          print_time_spent do
+            DataMigrate::DataMigrator.run(:up, "db/data/", version)
+            puts "The following statistics are for migration version: #{version}, and direction: 'up'"
+            puts "==============================================================================="
+          end
+        end
+        puts "===============================================================================\n"
+      else
+        DataMigrate::DataMigrator.run(:up, "db/data/", version)
+      end
     end
 
     desc 'Runs the "down" for a given migration VERSION.'
@@ -259,7 +354,18 @@ namespace :data do
       version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
       raise "VERSION is required" unless version
       assure_data_schema_table
-      DataMigrate::DataMigrator.run(:down, "db/data/", version)
+      if time_spent_and_memory_pressure
+        print_memory_usage do
+          print_time_spent do
+            DataMigrate::DataMigrator.run(:down, "db/data/", version)
+            puts "The following statistics are for migration version: #{version}"
+            puts "==============================================================================="
+          end
+        end
+        puts "===============================================================================\n"
+      else
+        DataMigrate::DataMigrator.run(:down, "db/data/", version)
+      end
     end
 
     desc "Display status of data migrations"
@@ -317,6 +423,22 @@ namespace :data do
     assure_data_schema_table
     puts "Current data version: #{DataMigrate::DataMigrator.current_version}"
   end
+end
+
+def print_memory_usage
+  memory_before = `ps -o rss= -p #{Process.pid}`.to_i
+  yield
+  memory_after = `ps -o rss= -p #{Process.pid}`.to_i
+
+  puts "Memory usage: #{((memory_after - memory_before) / 1024.0).round(3)} MB"
+end
+
+def print_time_spent
+  time = Benchmark.realtime do
+    yield
+  end
+
+  puts "Time spent: #{time.round(3)} seconds"
 end
 
 def pending_migrations
