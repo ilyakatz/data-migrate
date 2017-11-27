@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe DataMigrate::Data do
   let(:subject) { DataMigrate::Data }
   let(:db_config) do
@@ -7,7 +9,7 @@ describe DataMigrate::Data do
     }
   end
   let(:fixture_file_timestamps) do
-    ["20091231235959", "20101231235959", "20111231235959"]
+    %w[20091231235959 20101231235959 20111231235959]
   end
 
   around do |example|
@@ -68,7 +70,7 @@ describe DataMigrate::Data do
         SQL
 
         db_list_data = ActiveRecord::Base.connection.
-          select_values(sql_select).map(&:to_i)
+                       select_values(sql_select).map(&:to_i)
         expect(db_list_data).to match_array(
           [fixture_file_timestamps[0], fixture_file_timestamps[1]].map(&:to_i)
         )

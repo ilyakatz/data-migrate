@@ -1,17 +1,21 @@
+# frozen_string_literal: true
+
 module DataMigrate
   ##
   # Provides the definition method for data_schema.rb
   class Data < ActiveRecord::Schema
     # This method is based on the following two methods
     #   ActiveRecord::Schema#define
-    #   ActiveRecord::ConnectionAdapters::SchemaStatements#ssume_migrated_upto_version
+    #   ActiveRecord::ConnectionAdapters::SchemaStatements
+    #     #assume_migrated_upto_version
     def define(info)
       DataMigrate::DataMigrator.assure_data_schema_table
 
       return if info[:version].blank?
 
       version = info[:version].to_i
-      sm_table = quote_table_name(DataMigrate::DataMigrator.schema_migrations_table_name)
+      table_name = DataMigrate::DataMigrator.schema_migrations_table_name
+      sm_table = quote_table_name(table_name)
       migrated = select_values("SELECT version FROM #{sm_table}").map(&:to_i)
 
       versions = []
@@ -27,7 +31,8 @@ module DataMigrate
       inserted = Set.new
       (versions - migrated).each do |v|
         if inserted.include?(v)
-          raise "Duplicate data migration #{v}. Please renumber your data migrations to resolve the conflict."
+          raise "Duplicate data migration #{v}. Please renumber your data " \
+            "migrations to resolve the conflict."
         elsif v < version
           execute "INSERT INTO #{sm_table} (version) VALUES ('#{v}')"
           inserted << v

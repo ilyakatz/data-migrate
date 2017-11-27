@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module DataMigrate
   ##
-  # Provides the capability to write the current data schema version to the data_schema file
-  # Based on ActiveRecord::SchemaDumper
+  # Provides the capability to write the current data schema version to
+  # the data_schema file Based on ActiveRecord::SchemaDumper
   class SchemaDumper
     private_class_method :new
 
@@ -26,9 +28,17 @@ module DataMigrate
 
     private
 
-      def initialize(connection)
-        @connection = connection
-        @version = DataMigrate::DataSchemaMigration.all.map { |x| x.version.to_i }.max rescue 0
+    def initialize(connection)
+      @connection = connection
+      all_versions = DataMigrate::DataSchemaMigration.all.map do |x|
+        x.version.to_i
       end
+
+      @version = begin
+                    all_versions.max
+                  rescue StandardError
+                    0
+                  end
+    end
   end
 end

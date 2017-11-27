@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DataMigrate
   ##
   # This class extends DatabaseTasks to override the schema_file method.
@@ -9,7 +11,8 @@ module DataMigrate
       when :ruby
         File.join(db_dir, "data_schema.rb")
       else
-        message = "Only Ruby-based data_schema files are supported at this time."
+        message = "Only Ruby-based data_schema files are supported " \
+          "at this time."
         Kernel.abort message
       end
     end

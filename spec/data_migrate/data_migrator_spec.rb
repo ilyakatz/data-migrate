@@ -43,19 +43,19 @@ describe DataMigrate::DataMigrator do
   end
 
   describe :match do
-    context 'when the file does not match' do
-      it 'returns nil' do
-        expect(subject.match('not_a_data_migration_file')).to be_nil
+    context "when the file does not match" do
+      it "returns nil" do
+        expect(subject.match("not_a_data_migration_file")).to be_nil
       end
     end
 
-    context 'when the file matches' do
-      it 'returns a valid MatchData object' do
-        match_data = subject.match('20091231235959_some_name.rb')
+    context "when the file matches" do
+      it "returns a valid MatchData object" do
+        match_data = subject.match("20091231235959_some_name.rb")
 
-        expect(match_data[0]).to eq '20091231235959_some_name.rb'
-        expect(match_data[1]).to eq '20091231235959'
-        expect(match_data[2]).to eq 'some_name'
+        expect(match_data[0]).to eq "20091231235959_some_name.rb"
+        expect(match_data[1]).to eq "20091231235959"
+        expect(match_data[2]).to eq "some_name"
       end
     end
   end

@@ -230,7 +230,7 @@ namespace :db do
 
   namespace :schema do
     namespace :load do
-      desc 'Load both schema.rb and data_schema.rb file into the database'
+      desc "Load both schema.rb and data_schema.rb file into the database"
       task with_data: :environment do
         Rake::Task["db:schema:load"].invoke
 
