@@ -1,6 +1,5 @@
 namespace :db do
-
-  Rake::Task['db:_dump'].enhance do
+  Rake::Task["db:_dump"].enhance do
     Rake::Task["data:dump"].invoke
   end
 
@@ -232,10 +231,10 @@ namespace :db do
   namespace :schema do
     namespace :load do
       desc 'Load both schema.rb and data_schema.rb file into the database'
-      task :with_data => :environment do
+      task with_data: :environment do
         Rake::Task["db:schema:load"].invoke
 
-        DataMigrate::DatabaseTasks.load_schema_current(:ruby, ENV['SCHEMA'])
+        DataMigrate::DatabaseTasks.load_schema_current(:ruby, ENV["SCHEMA"])
       end
     end
   end
@@ -340,8 +339,8 @@ namespace :data do
     puts "Current data version: #{DataMigrate::DataMigrator.current_version}"
   end
 
-  desc 'Create a db/data_schema.rb file that stores the current data version'
-  task :dump => :environment do
+  desc "Create a db/data_schema.rb file that stores the current data version"
+  task dump: :environment do
     if ActiveRecord::Base.dump_schema_after_migration
       case ActiveRecord::Base.schema_format
       when :ruby
@@ -357,9 +356,10 @@ namespace :data do
       end
     end
 
-    # Allow this task to be called as many times as required. An example is the
-    # migrate:redo task, which calls other two internally that depend on this one.
-    Rake::Task['data:dump'].reenable
+    # Allow this task to be called as many times as required. An example
+    # is the migrate:redo task, which calls other two internally
+    # that depend on this one.
+    Rake::Task["data:dump"].reenable
   end
 end
 
