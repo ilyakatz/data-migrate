@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe DataMigrate::SchemaDumper do
   let(:subject) { DataMigrate::SchemaDumper }
   let(:db_config) do
@@ -7,13 +9,13 @@ describe DataMigrate::SchemaDumper do
     }
   end
   let(:fixture_file_timestamps) do
-    ["20091231235959", "20101231235959", "20111231235959"]
+    %w[20091231235959 20101231235959 20111231235959]
   end
 
   describe :dump do
     before do
-      expect(DataMigrate::DataMigrator)
-        .to receive(:db_config) { db_config }.at_least(:once)
+      expect(DataMigrate::DataMigrator).
+        to receive(:db_config) { db_config }.at_least(:once)
       ActiveRecord::Base.establish_connection(db_config)
 
       ActiveRecord::Base.connection.initialize_schema_migrations_table

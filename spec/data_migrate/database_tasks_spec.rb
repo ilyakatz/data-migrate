@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 describe DataMigrate::DatabaseTasks do
   let(:subject) { DataMigrate::DatabaseTasks }
 
@@ -14,4 +16,3 @@ describe DataMigrate::DatabaseTasks do
     end
   end
 end
-
