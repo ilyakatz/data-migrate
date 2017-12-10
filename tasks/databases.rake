@@ -1,8 +1,4 @@
 namespace :db do
-  Rake::Task["db:_dump"].enhance do
-    Rake::Task["data:dump"].invoke
-  end
-
   namespace :migrate do
     desc "Migrate the database data and schema (options: VERSION=x, VERBOSE=false)."
     task :with_data => :environment do
@@ -62,6 +58,7 @@ namespace :db do
       end
 
       Rake::Task["db:_dump"].invoke
+      Rake::Task["data:dump"].invoke
     end
 
     namespace :redo do
@@ -102,6 +99,7 @@ namespace :db do
         end
 
         Rake::Task["db:_dump"].invoke
+        Rake::Task["data:dump"].invoke
       end
     end
 
@@ -129,6 +127,7 @@ namespace :db do
         end
 
         Rake::Task["db:_dump"].invoke
+        Rake::Task["data:dump"].invoke
       end
     end
 
@@ -194,6 +193,7 @@ namespace :db do
       end
 
       Rake::Task["db:_dump"].invoke
+      Rake::Task["data:dump"].invoke
     end
   end
 
@@ -216,6 +216,7 @@ namespace :db do
       end
 
       Rake::Task["db:_dump"].invoke
+      Rake::Task["data:dump"].invoke
     end
   end
 
