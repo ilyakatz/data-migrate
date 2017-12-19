@@ -1,4 +1,6 @@
-require 'active_record'
+# frozen_string_literal: true
+
+require "active_record"
 
 module DataMigrate
 
@@ -33,11 +35,19 @@ module DataMigrate
       end
 
       def schema_migrations_table_name
-        ActiveRecord::Base.table_name_prefix + 'data_migrations' + ActiveRecord::Base.table_name_suffix
+        ActiveRecord::Base.table_name_prefix + "data_migrations" +
+          ActiveRecord::Base.table_name_suffix
       end
 
       def migrations_path
-        'db/data'
+        "db/data"
+      end
+
+      ##
+      # Provides the full migrations_path filepath
+      # @return (String)
+      def full_migrations_path
+        File.join(Rails.root, *migrations_path.split(File::SEPARATOR))
       end
 
       def assure_data_schema_table
@@ -47,6 +57,15 @@ module DataMigrate
         unless table_exists?(ActiveRecord::Base.connection, sm_table)
           create_table(sm_table)
         end
+      end
+
+      ##
+      # Compares the given filename with what we expect data migration
+      # filenames to be, eg the "20091231235959_some_name.rb" pattern
+      # @param (String) filename
+      # @return (MatchData)
+      def match(filename)
+        /(\d{14})_(.+)\.rb/.match(filename)
       end
 
       private
@@ -66,9 +85,11 @@ module DataMigrate
       end
 
       def table_exists?(connection, table_name)
-        # Avoid the warning that table_exists? prints in Rails 5.0 due a change in behavior between
-        # Rails 5.0 and Rails 5.1 of this method with respect to database views.
-        if ActiveRecord.version >= Gem::Version.new('5.0') && ActiveRecord.version < Gem::Version.new('5.1')
+        # Avoid the warning that table_exists? prints in Rails 5.0 due a
+        # change in behavior between Rails 5.0 and Rails 5.1 of this method
+        # with respect to database views.
+        if ActiveRecord.version >= Gem::Version.new("5.0") &&
+           ActiveRecord.version < Gem::Version.new("5.1")
           connection.data_source_exists?(table_name)
         else
           connection.table_exists?(schema_migrations_table_name)
@@ -76,9 +97,9 @@ module DataMigrate
       end
 
       def db_config
-        ActiveRecord::Base.configurations[Rails.env || 'development'] || ENV["DATABASE_URL"]
+        ActiveRecord::Base.configurations[Rails.env || "development"] ||
+          ENV["DATABASE_URL"]
       end
-
     end
   end
 end
