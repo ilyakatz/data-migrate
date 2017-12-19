@@ -1,9 +1,13 @@
 Changelog
 =========
 
+## 3.3.0
+The concept of schema:dump to data migrations, thanks to
+[tobyndockerill](https://github.com/tobyndockerill)
+
 ## 3.2.1
 
-data_migrate table into rails schema dump, thakns to
+data_migrate table into rails schema dump, thanks to
 [jturkel](https://github.com/jturkel) 
 
 

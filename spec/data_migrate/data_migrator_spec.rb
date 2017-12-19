@@ -2,12 +2,12 @@ require 'spec_helper'
 
 describe DataMigrate::DataMigrator do
   let(:subject) { DataMigrate::DataMigrator }
-  let(:db_config) {
+  let(:db_config) do
     {
       adapter: "sqlite3",
       database: "spec/db/test.db"
     }
-  }
+  end
 
   describe :assure_data_schema_table do
     before do
@@ -42,4 +42,21 @@ describe DataMigrate::DataMigrator do
     end
   end
 
+  describe :match do
+    context "when the file does not match" do
+      it "returns nil" do
+        expect(subject.match("not_a_data_migration_file")).to be_nil
+      end
+    end
+
+    context "when the file matches" do
+      it "returns a valid MatchData object" do
+        match_data = subject.match("20091231235959_some_name.rb")
+
+        expect(match_data[0]).to eq "20091231235959_some_name.rb"
+        expect(match_data[1]).to eq "20091231235959"
+        expect(match_data[2]).to eq "some_name"
+      end
+    end
+  end
 end
