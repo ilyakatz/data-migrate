@@ -10,9 +10,9 @@ describe DataMigrate::DatabaseTasks do
     allow(subject).to receive(:db_dir).and_return("db")
   end
 
-  describe :schema_file do
+  describe :data_schema_file do
     it "returns the correct data schema file path" do
-      expect(subject.schema_file).to eq "db/data_schema.rb"
+      expect(subject.data_schema_file).to eq "db/data_schema.rb"
     end
   end
 end
