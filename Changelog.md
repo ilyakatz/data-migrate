@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## 3.3.1
+Regression fix, thanks to [subakva](https://github.com/subakva)
+
 ## 3.3.0
 The concept of schema:dump to data migrations, thanks to
 [tobyndockerill](https://github.com/tobyndockerill)
