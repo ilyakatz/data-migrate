@@ -141,6 +141,9 @@ Tasks work as they would with the 'vanilla' db version. The 'with_data' addition
 With 'up' and 'down', you can specify the option 'BOTH', which defaults to false. Using true, will migrate both the data and schema (in the desired direction) if they both match the version provided.  Again, going up, schema is given precedence. Down its data.
 
 `rake db:migrate:status:with_data` provides and additional column to indicate which type of migration.
+### Configuration
+
+`data_migrate` respects `ActiveRecord::Base.dump_schema_after_migration`. If it is set to `false`, data schema file will not be generated
 
 ## Capistrano Support
 
