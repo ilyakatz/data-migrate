@@ -1,0 +1,2 @@
+# Use same configration as used by HoundCI
+inherit_from: .ruby-style.yml

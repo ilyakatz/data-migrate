@@ -2,5 +2,6 @@
 *.gem
 *.lock
 gemfiles/.bundle
-spec/db
+spec/db/test.db
 .vscode/
+tasks/databases.rake
