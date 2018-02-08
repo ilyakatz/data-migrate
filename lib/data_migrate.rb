@@ -6,6 +6,7 @@ require File.join(File.dirname(__FILE__), "data_migrate",
 require File.join(File.dirname(__FILE__), "data_migrate", "data_schema")
 require File.join(File.dirname(__FILE__), "data_migrate", "database_tasks")
 require File.join(File.dirname(__FILE__), "data_migrate", "schema_dumper")
+require File.join(File.dirname(__FILE__), "data_migrate", "status_service")
 if Rails::VERSION::MAJOR >= 5
   require File.join(File.dirname(__FILE__), "data_migrate", "migration_five")
 else

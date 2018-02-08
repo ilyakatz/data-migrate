@@ -24,6 +24,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rb-readline"
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "timecop"
+  s.add_development_dependency "rubocop"
+  s.add_development_dependency "overcommit"
 
 
   s.files         = `git ls-files`.split("\n")

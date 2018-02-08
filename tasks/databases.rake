@@ -286,30 +286,9 @@ namespace :data do
     task :status => :environment do
       config = ActiveRecord::Base.configurations[Rails.env || 'development']
       ActiveRecord::Base.establish_connection(config)
-      unless ActiveRecord::Base.connection.table_exists?(DataMigrate::DataMigrator.schema_migrations_table_name)
-        puts 'Data migrations table does not exist yet.'
-        next  # means "return" for rake task
-      end
-      db_list = ActiveRecord::Base.connection.select_values("SELECT version FROM #{DataMigrate::DataMigrator.schema_migrations_table_name}")
-      file_list = []
-      Dir.foreach(File.join(Rails.root, 'db', 'data')) do |file|
-        # only files matching "20091231235959_some_name.rb" pattern
-        if match_data = DataMigrate::DataMigrator.match(file)
-          status = db_list.delete(match_data[1]) ? 'up' : 'down'
-          file_list << [status, match_data[1], match_data[2]]
-        end
-      end
-      # output
+      connection = ActiveRecord::Base.connection
       puts "\ndatabase: #{config['database']}\n\n"
-      puts "#{"Status".center(8)}  #{"Migration ID".ljust(14)}  Migration Name"
-      puts "-" * 50
-      file_list.each do |file|
-        puts "#{file[0].center(8)}  #{file[1].ljust(14)}  #{file[2].humanize}"
-      end
-      db_list.each do |version|
-        puts "#{'up'.center(8)}  #{version.ljust(14)}  *** NO FILE ***"
-      end
-      puts
+      DataMigrate::StatusService.dump(connection)
     end
   end
 

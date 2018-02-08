@@ -1,6 +1,8 @@
 Changelog
 =========
 
+## 3.4.0
+`rake data:migrate:status` to return result in chronological order
 ## 3.3.1
 Regression fix, thanks to [subakva](https://github.com/subakva)
 
