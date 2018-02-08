@@ -1,7 +1,3 @@
-appraise 'rails-4.0' do
-  gem 'rails', '4.0.13'
-end
-
 appraise 'rails-4.1' do
   gem 'rails', '4.1.16'
 end

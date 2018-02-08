@@ -1,6 +1,6 @@
-require 'generators/data_migrate'
-require 'rails/generators'
-require 'rails/generators/active_record/migration'
+require "generators/data_migrate"
+require "rails/generators"
+require "rails/generators/active_record/migration"
 
 module DataMigrate
   module Generators
@@ -9,11 +9,11 @@ module DataMigrate
       include ActiveRecord::Generators::Migration
 
 
-      argument :attributes, type: :array, default: [], banner: 'field:type field:type'
+      argument :attributes, type: :array, default: [], banner: "field:type field:type"
 
       def create_data_migration
         set_local_assigns!
-        migration_template 'data_migration.rb', "db/data/#{file_name}.rb"
+        migration_template "data_migration.rb", "db/data/#{file_name}.rb"
       end
 
       protected
@@ -26,10 +26,10 @@ module DataMigrate
       end
 
       def migration_base_class_name
-        if ActiveRecord.version >= Gem::Version.new('5.0')
+        if ActiveRecord.version >= Gem::Version.new("5.0")
           "ActiveRecord::Migration[#{ActiveRecord::Migration.current_version}]"
         else
-          'ActiveRecord::Migration'
+          "ActiveRecord::Migration"
         end
       end
     end

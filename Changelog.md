@@ -1,6 +1,11 @@
 Changelog
 =========
 
+## 3.5.0
+
+Deprecated support for rails 4.0
+Improvements to timestamped migrations, thanks to [Pierre-Michard](https://github.com/Pierre-Michard)
+
 ## 3.4.0
 `rake data:migrate:status` to return result in chronological order
 ## 3.3.1
