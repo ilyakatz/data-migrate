@@ -30,9 +30,7 @@ module DataMigrate
 
     def initialize(connection)
       @connection = connection
-      all_versions = DataMigrate::DataSchemaMigration.all.map do |x|
-        x.version.to_i
-      end
+      all_versions =  DataSchemaMigration.normalized_versions
 
       @version = begin
                     all_versions.max

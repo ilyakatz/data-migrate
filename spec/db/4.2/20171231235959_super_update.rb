@@ -1,4 +1,4 @@
-class SuperUpdate < ActiveRecord::Migration[5.2]
+class SuperUpdate < ActiveRecord::Migration
   def up
     puts "Doing data migration"
   end

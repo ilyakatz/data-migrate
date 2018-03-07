@@ -5,3 +5,4 @@ gemfiles/.bundle
 spec/db/test.db
 .vscode/
 tasks/databases.rake
+.DS_Store
