@@ -30,7 +30,7 @@ describe DataMigrate::Data do
       expect(DataMigrate::DataMigrator).
         to receive(:db_config) { db_config }.at_least(:once)
       ActiveRecord::Base.establish_connection(db_config)
-      ActiveRecord::Base.connection.initialize_schema_migrations_table
+      #ActiveRecord::Base.connection.initialize_schema_migrations_table
     end
 
     after do
@@ -70,7 +70,7 @@ describe DataMigrate::Data do
         SQL
 
         db_list_data = ActiveRecord::Base.connection.
-                       select_values(sql_select).map(&:to_i)
+          select_values(sql_select).map(&:to_i)
         expect(db_list_data).to match_array(
           [fixture_file_timestamps[0], fixture_file_timestamps[1]].map(&:to_i)
         )
