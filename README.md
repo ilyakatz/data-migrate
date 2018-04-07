@@ -164,9 +164,9 @@ From now on capistrano will run `rake db:migrate:with_data` in every deploy.
 Run tests for a specific version of Rails
 
 ```
-appraisal install
-appraisal rails-4.2 rspec
-appraisal rails-5.0 rspec
+bundle exec appraisal install
+bundle exec appraisal rails-4.2 rspec
+bundle exec appraisal rails-5.0 rspec
 ```
 
 ## Thanks
