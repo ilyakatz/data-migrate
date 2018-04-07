@@ -13,16 +13,7 @@ describe DataMigrate::Data do
     %w[20091231235959 20101231235959 20111231235959]
   end
 
-  # before do
-  #   ActiveRecord::Base.connection.execute <<-SQL
-  #     INSERT INTO #{DataMigrate::DataMigrator.schema_migrations_table_name}
-  #     VALUES #{fixture_file_timestamps.map { |t| "(#{t})" }.join(', ')}
-  #   SQL
-  # end
 
-  # after do
-  #   ActiveRecord::Migration.drop_table("data_migrations")
-  # end
 
   around do |example|
     Dir.mktmpdir do |temp_dir|
@@ -42,7 +33,7 @@ describe DataMigrate::Data do
       expect(DataMigrate::DataMigrator).
         to receive(:db_config) { db_config }.at_least(:once)
       ActiveRecord::Base.establish_connection(db_config)
-      ActiveRecord::Base.connection.initialize_schema_migrations_table
+      ActiveRecord::SchemaMigration.create_table
     end
 
     after do
