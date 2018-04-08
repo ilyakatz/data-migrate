@@ -14,8 +14,6 @@ describe DataMigrate::Data do
     %w[20091231235959 20101231235959 20111231235959]
   end
 
-
-
   around do |example|
     Dir.mktmpdir do |temp_dir|
       @temp_dir = temp_dir

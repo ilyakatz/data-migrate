@@ -18,7 +18,7 @@ describe DataMigrate::SchemaDumper do
         to receive(:db_config) { db_config }.at_least(:once)
       ActiveRecord::Base.establish_connection(db_config)
 
-      #ActiveRecord::Base.connection.initialize_schema_migrations_table
+      ActiveRecord::SchemaMigration.create_table
       DataMigrate::DataMigrator.assure_data_schema_table
 
       ActiveRecord::Base.connection.execute <<-SQL
