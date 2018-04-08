@@ -13,3 +13,5 @@ else
   require File.join(File.dirname(__FILE__), "data_migrate", "migration")
 end
 require File.join(File.dirname(__FILE__), "data_migrate", "railtie")
+
+require File.join(File.dirname(__FILE__), "extend_database_tasks")
