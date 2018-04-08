@@ -15,3 +15,19 @@ ActiveRecord::Migrator.instance_eval do
     Array(@migrations_paths)
   end
 end
+
+ActiveRecord::Migrator.class_eval do
+  def initialize(direction, migrations, target_version = nil)
+    @direction         = direction
+    @target_version    = target_version
+    @migrated_versions = nil
+    @migrations        = migrations
+
+    validate(@migrations)
+
+    ActiveRecord::SchemaMigration.create_table
+    ActiveRecord::InternalMetadata.create_table
+
+    DataMigrate::DataMigrator.assure_data_schema_table
+  end
+end

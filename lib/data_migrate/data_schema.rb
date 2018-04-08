@@ -9,8 +9,6 @@ module DataMigrate
     #   ActiveRecord::ConnectionAdapters::SchemaStatements
     #     #assume_migrated_upto_version
     def define(info)
-      DataMigrate::DataMigrator.assure_data_schema_table
-
       return if info[:version].blank?
 
       version = info[:version].to_i
