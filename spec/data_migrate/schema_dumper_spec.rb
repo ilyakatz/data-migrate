@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "spec_helper"
 
 describe DataMigrate::SchemaDumper do
   let(:subject) { DataMigrate::SchemaDumper }
@@ -14,7 +15,7 @@ describe DataMigrate::SchemaDumper do
 
   describe :dump do
     before do
-      expect(DataMigrate::DataMigrator).
+      allow(DataMigrate::DataMigrator).
         to receive(:db_config) { db_config }.at_least(:once)
       ActiveRecord::Base.establish_connection(db_config)
 
@@ -22,7 +23,7 @@ describe DataMigrate::SchemaDumper do
       DataMigrate::DataMigrator.assure_data_schema_table
 
       ActiveRecord::Base.connection.execute <<-SQL
-        INSERT INTO #{DataMigrate::DataMigrator.schema_migrations_table_name}
+        INSERT INTO #{DataMigrate::DataSchemaMigration.table_name}
         VALUES #{fixture_file_timestamps.map { |t| "(#{t})" }.join(', ')}
       SQL
     end

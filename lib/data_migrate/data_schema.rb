@@ -14,20 +14,32 @@ module DataMigrate
       return if info[:version].blank?
 
       version = info[:version].to_i
-      table_name = DataMigrate::DataMigrator.schema_migrations_table_name
-      sm_table = quote_table_name(table_name)
-      migrated = select_values("SELECT version FROM #{sm_table}").map(&:to_i)
-
-      versions = []
-      Dir.foreach(DataMigrate::DataMigrator.full_migrations_path) do |file|
-        match_data = DataMigrate::DataMigrator.match(file)
-        versions << match_data[1].to_i if match_data
-      end
 
       unless migrated.include?(version)
         execute "INSERT INTO #{sm_table} (version) VALUES ('#{version}')"
       end
 
+      insert(version)
+    end
+
+    private
+
+    def migrated
+      @migrated ||= select_values("SELECT version FROM #{sm_table}").map(&:to_i)
+    end
+
+    def versions
+      @version ||= begin
+        versions = []
+        Dir.foreach(DataMigrate::DataMigrator.full_migrations_path) do |file|
+          match_data = DataMigrate::DataMigrator.match(file)
+          versions << match_data[1].to_i if match_data
+        end
+        versions
+      end
+    end
+
+    def insert(version)
       inserted = Set.new
       (versions - migrated).each do |v|
         if inserted.include?(v)
@@ -38,6 +50,14 @@ module DataMigrate
           inserted << v
         end
       end
+    end
+
+    def sm_table
+      quote_table_name(table_name)
+    end
+
+    def table_name
+      DataMigrate::DataSchemaMigration.table_name
     end
   end
 end

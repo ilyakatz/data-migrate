@@ -29,8 +29,8 @@ describe DataMigrate::Data do
 
   describe :define do
     before do
-      expect(DataMigrate::DataMigrator).
-        to receive(:db_config) { db_config }.at_least(:once)
+      allow(DataMigrate::DataMigrator).
+        to receive(:db_config) { db_config }
       ActiveRecord::Base.establish_connection(db_config)
       ActiveRecord::SchemaMigration.create_table
     end
@@ -68,7 +68,7 @@ describe DataMigrate::Data do
 
         sql_select = <<-SQL
           SELECT version
-          FROM #{DataMigrate::DataMigrator.schema_migrations_table_name}
+          FROM #{DataMigrate::DataSchemaMigration.table_name}
         SQL
 
         db_list_data = ActiveRecord::Base.connection.

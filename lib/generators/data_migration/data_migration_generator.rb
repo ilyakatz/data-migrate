@@ -29,7 +29,7 @@ module DataMigrate
         if ActiveRecord.version >= Gem::Version.new("5.0")
           "ActiveRecord::Migration[#{ActiveRecord::Migration.current_version}]"
         elsif ActiveRecord.version >= Gem::Version.new("5.2")
-          "MigrationContext"
+          "DataMigrate::MigrationContext"
         else
           "ActiveRecord::Migration"
         end
