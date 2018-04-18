@@ -10,7 +10,7 @@ describe DataMigrate::DataMigrator do
   end
 
   after do
-    ActiveRecord::Migration.drop_table("data_migrations")
+    ActiveRecord::Migration.drop_table("data_migrations") rescue nil
   end
 
   let(:db_config) do
