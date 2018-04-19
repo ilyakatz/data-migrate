@@ -32,13 +32,13 @@ module DataMigrate
 
       db_list =  DataMigrate::MigrationContext.new("db/data").migrations_status
       # output
-      puts "\ndatabase: #{ActiveRecord::Base.connection_config[:database]}\n\n"
-      puts "#{'Status'.center(8)}  #{'Migration ID'.ljust(14)}  Migration Name"
-      puts "-" * 50
+      stream.puts "\ndatabase: #{ActiveRecord::Base.connection_config[:database]}\n\n"
+      stream.puts "#{'Status'.center(8)}  #{'Migration ID'.ljust(14)}  Migration Name"
+      stream.puts "-" * 50
       db_list.each do |status, version, name|
-        puts "#{status.center(8)}  #{version.ljust(14)}  #{name}"
+        stream.puts "#{status.center(8)}  #{version.ljust(14)}  #{name}"
       end
-      puts
+      stream.puts
     end
   end
 end
