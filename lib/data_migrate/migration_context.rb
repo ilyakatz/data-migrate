@@ -6,10 +6,10 @@ module DataMigrate
 
     def up(target_version = nil)
       selected_migrations = if block_given?
-        migrations.select { |m| yield m }
-      else
-        migrations
-      end
+                              migrations.select { |m| yield m }
+                            else
+                              migrations
+                            end
 
       DataMigrator.new(:up, selected_migrations, target_version).migrate
     end
@@ -20,7 +20,6 @@ module DataMigrate
     end
 
     def migration_files
-
       paths = Array(migrations_paths)
       Dir[*paths.flat_map { |path| "#{path}/**/[0-9]*_*.rb" }]
     end

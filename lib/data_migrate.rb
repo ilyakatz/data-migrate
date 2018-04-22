@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-require 'pry'
+
+require "pry"
 if Rails::VERSION::MAJOR == 5 && Rails::VERSION::MINOR == 2
   require File.join(File.dirname(__FILE__), "data_migrate", "data_migrator_five")
 else

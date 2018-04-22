@@ -32,8 +32,8 @@ module DataMigrate
       # Eg. rake data:versions will show version from the schema_migrations table
       # which may be a version of actual schema migration and not data migration
       @migrated_versions =
-        DataMigrate::DataSchemaMigration.normalized_versions.map{ |x| x.to_i }.sort +
-        ActiveRecord::SchemaMigration.normalized_versions.map{ |x| x.to_i }.sort
+        DataMigrate::DataSchemaMigration.normalized_versions.map(&:to_i).sort +
+        ActiveRecord::SchemaMigration.normalized_versions.map(&:to_i).sort
     end
 
     class << self
@@ -57,14 +57,14 @@ module DataMigrate
 
     private
 
-      def record_version_state_after_migrating(version)
-        if down?
-          migrated.delete(version)
-          DataMigrate::DataSchemaMigration.where(version: version.to_s).delete_all
-        else
-          migrated << version
-          DataMigrate::DataSchemaMigration.create!(version: version.to_s)
-        end
+    def record_version_state_after_migrating(version)
+      if down?
+        migrated.delete(version)
+        DataMigrate::DataSchemaMigration.where(version: version.to_s).delete_all
+      else
+        migrated << version
+        DataMigrate::DataSchemaMigration.create!(version: version.to_s)
       end
+    end
   end
 end
