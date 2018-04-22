@@ -1,16 +1,20 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe DataMigrate::DataMigrator do
 
   before do
     unless Rails::VERSION::MAJOR == 5 and
-      Rails::VERSION::MINOR == 2
+           Rails::VERSION::MINOR == 2
       skip("Tests are only applicable for Rails 5.2")
     end
   end
 
   after do
-    ActiveRecord::Migration.drop_table("data_migrations") rescue nil
+    begin
+      ActiveRecord::Migration.drop_table("data_migrations")
+    rescue StandardError
+      nil
+    end
   end
 
   let(:db_config) do
@@ -25,7 +29,7 @@ describe DataMigrate::DataMigrator do
       ActiveRecord::Base.establish_connection(db_config)
     end
 
-    it 'migrates existing file' do
+    it "migrates existing file" do
       context = DataMigrate::MigrationContext.new("spec/db/data")
       context.migrate(nil)
       context.migrations_status
