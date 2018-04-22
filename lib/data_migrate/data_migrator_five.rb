@@ -49,6 +49,10 @@ module DataMigrate
       def match(filename)
         /(\d{14})_(.+)\.rb/.match(filename)
       end
+
+      def migrations_status
+        DataMigrate::MigrationContext.new(migrations_paths).migrations_status
+      end
     end
 
     private

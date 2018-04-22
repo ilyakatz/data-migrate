@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 require "spec_helper"
 
 describe DataMigrate::StatusService do
@@ -12,32 +11,30 @@ describe DataMigrate::StatusService do
   end
   let(:service) { DataMigrate::StatusService }
 
-  describe :dump do
+  context "table does not exists" do
     before do
       ActiveRecord::Base.establish_connection(db_config)
     end
 
-    describe "table does not exist" do
-      it "table doesn't exist" do
-        expect_any_instance_of(service).to receive(:table_name) { "bogus"}
-        stream = StringIO.new
-        service.dump(ActiveRecord::Base.connection, stream)
-        stream.rewind
+    it "show error message" do
+      allow_any_instance_of(service).to receive(:table_name) { "bogus"}
+      stream = StringIO.new
 
-        expected = "Data migrations table does not exist"
-        expect(stream.read).to include expected
-      end
+      service.dump(ActiveRecord::Base.connection, stream)
+
+      stream.rewind
+      expected = "Data migrations table does not exist"
+      expect(stream.read).to include expected
     end
   end
 
-  describe :dump do
-    context "table exists"
+  context "table exists" do
     let(:fixture_file_timestamps) do
       %w[20091231235959 20101231235959 20111231235959]
     end
 
     before do
-      expect(DataMigrate::DataMigrator).
+      allow(DataMigrate::DataMigrator).
         to receive(:db_config) { db_config }.at_least(:once)
       ActiveRecord::Base.establish_connection(db_config)
 
@@ -45,11 +42,11 @@ describe DataMigrate::StatusService do
       DataMigrate::DataMigrator.assure_data_schema_table
 
       ActiveRecord::Base.connection.execute <<-SQL
-        INSERT INTO #{DataMigrate::DataMigrator.schema_migrations_table_name}
+        INSERT INTO #{DataMigrate::DataSchemaMigration.table_name}
         VALUES #{fixture_file_timestamps.map { |t| "(#{t})" }.join(', ')}
       SQL
 
-      expect_any_instance_of(service).to receive(:root_folder) { "spec" }
+      allow_any_instance_of(service).to receive(:root_folder) { "spec" }
     end
 
     after do
@@ -70,7 +67,7 @@ describe DataMigrate::StatusService do
       service.dump(ActiveRecord::Base.connection, stream)
       stream.rewind
 
-      expected = "   up     20101231235959  *** NO FILE ***"
+      expected = "   up     20101231235959  ********** NO FILE **********"
       s = stream.read
       expect(s).to include expected
     end

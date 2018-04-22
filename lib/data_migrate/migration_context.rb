@@ -20,6 +20,7 @@ module DataMigrate
     end
 
     def migration_files
+
       paths = Array(migrations_paths)
       Dir[*paths.flat_map { |path| "#{path}/**/[0-9]*_*.rb" }]
     end

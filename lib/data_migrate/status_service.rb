@@ -16,29 +16,50 @@ module DataMigrate
     end
 
     def dump(stream)
-      output(stream)
+      unless @connection.table_exists?(table_name)
+        stream.puts "Data migrations table does not exist yet."
+        return
+      end
+      sql = "SELECT version FROM #{DataMigrate::DataMigrator.schema_migrations_table_name}"
+      db_list = ActiveRecord::Base.connection.select_values(sql)
+      output(stream, db_list)
     end
 
     private
 
     def table_name
-      DataMigrate::DataSchemaMigration.table_name
+      DataMigrate::DataMigrator.schema_migrations_table_name
     end
 
-    def output(stream)
-      unless DataMigrate::DataSchemaMigration.table_exists?
-        abort "Data migrations table does not exist yet."
-      end
-
-      db_list =  DataMigrate::MigrationContext.new("db/data").migrations_status
-      # output
-      stream.puts "\ndatabase: #{ActiveRecord::Base.connection_config[:database]}\n\n"
-      stream.puts "#{'Status'.center(8)}  #{'Migration ID'.ljust(14)}  Migration Name"
+    def output(stream, db_list)
+      stream.puts "#{"Status".center(8)}  #{"Migration ID".ljust(14)}  Migration Name"
       stream.puts "-" * 50
-      db_list.each do |status, version, name|
-        stream.puts "#{status.center(8)}  #{version.ljust(14)}  #{name}"
+      list =  migration_files(db_list) + migration_list(db_list)
+      list.sort! {|line1, line2| line1[1] <=> line2[1]}
+      list.each do |file|
+        stream.puts "#{file[0].center(8)}  #{file[1].ljust(14)}  #{file[2]}"
       end
       stream.puts
+    end
+
+    def migration_list(db_list)
+      list = []
+      db_list.each do |version|
+        list << ["up", version, "********** NO FILE *************"]
+      end
+      list
+    end
+
+    def migration_files(db_list)
+      file_list = []
+      Dir.foreach(File.join(root_folder, "db", "data")) do |file|
+        # only files matching "20091231235959_some_name.rb" pattern
+        if match_data = DataMigrate::DataMigrator.match(file)
+          status = db_list.delete(match_data[1]) ? "up" : "down"
+          file_list << [status, match_data[1], match_data[2].humanize]
+        end
+      end
+      file_list
     end
   end
 end
