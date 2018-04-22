@@ -41,8 +41,6 @@ module DataMigrate
       stream.puts
     end
 
-    private
-
     def db_list
       DataMigrate::DataMigrator.migrations_status
     end
