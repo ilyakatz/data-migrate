@@ -246,15 +246,8 @@ namespace :data do
   desc 'Migrate data migrations (options: VERSION=x, VERBOSE=false)'
   task :migrate => :environment do
     assure_data_schema_table
-    #DataMigrate::DataMigrator.migrate("db/data/", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
     target_version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
-    # ActiveRecord::Base.connection.migration_context.migrate(target_version) do |migration|
-    #   scope.blank? || scope == migration.scope
-    # end
-    DataMigrate::MigrationContext.new("db/data").migrate(target_version)
-    #do |migration|
-    #   scope.blank? || scope == migration.scope
-    # end
+    DataMigrate::MigrationContext.new.migrate(target_version)
     Rake::Task["data:dump"].invoke
   end
 
