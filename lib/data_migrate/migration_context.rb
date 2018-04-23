@@ -1,7 +1,7 @@
 module DataMigrate
   class MigrationContext < ActiveRecord::MigrationContext
     def initialize(migrations_paths = "db/data")
-      @migrations_paths = migrations_paths
+      @migrations_paths = migrations_paths || "db/data"
     end
 
     def up(target_version = nil)

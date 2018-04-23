@@ -1,3 +1,5 @@
+require 'data_migrate/tasks/data_migrate_tasks'
+
 namespace :db do
   namespace :migrate do
     desc "Migrate the database data and schema (options: VERSION=x, VERBOSE=false)."
@@ -245,9 +247,7 @@ require 'pry'
 namespace :data do
   desc 'Migrate data migrations (options: VERSION=x, VERBOSE=false)'
   task :migrate => :environment do
-    assure_data_schema_table
-    target_version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
-    DataMigrate::MigrationContext.new.migrate(target_version)
+    DataMigrate::Tasks::DataMigrateTasks.migrate
     Rake::Task["data:dump"].invoke
   end
 

@@ -69,13 +69,7 @@ table to track all the goodness.
 
 ## Rails Support
 
-Rails 3.1: Version 1.2 supports Rails 3.1.0 and higher **but** is no longer maintained.
-
-Rails 4: Version 2.0 supports Rails 4.0 and higher
-
-Rails 5.0: Supported
-
-Rails 5.1: Supported
+Support Rails 4.2 through 5.2
 
 ### Important notes for older versions
 
