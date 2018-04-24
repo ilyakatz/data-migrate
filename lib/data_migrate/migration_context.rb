@@ -14,6 +14,21 @@ module DataMigrate
       DataMigrator.new(:up, selected_migrations, target_version).migrate
     end
 
+    def down(target_version = nil)
+      selected_migrations =
+        if block_given?
+          migrations.select { |m| yield m }
+        else
+          migrations
+        end
+
+      DataMigrator.new(:down, selected_migrations, target_version).migrate
+    end
+
+    def run(direction, target_version)
+      DataMigrator.new(direction, migrations, target_version).run
+    end
+
     def current_version
       get_all_versions.max || 0
     rescue ActiveRecord::NoDatabaseError
@@ -29,7 +44,7 @@ module DataMigrate
 
       file_list = migration_files.map do |file|
         version, name, scope = parse_migration_filename(file)
-        raise IllegalMigrationNameError.new(file) unless version
+        raise ActiveRecord::IllegalMigrationNameError.new(file) unless version
         version = ActiveRecord::SchemaMigration.normalize_migration_number(version)
         status = db_list.delete(version) ? "up" : "down"
         [status, version, (name + scope).humanize]
@@ -50,6 +65,25 @@ module DataMigrate
       else
         []
       end
+    end
+
+    def move(direction, steps)
+      migrator = DataMigrator.new(direction, migrations)
+
+      if current_version != 0 && !migrator.current_migration
+        raise ActiveRecord::UnknownMigrationVersionError.new(current_version)
+      end
+
+      start_index =
+        if current_version.zero?
+          0
+        else
+          migrator.migrations.index(migrator.current_migration)
+        end
+
+      finish = migrator.migrations[start_index + steps]
+      version = finish ? finish.version : 0
+      send(direction, version)
     end
 
   end

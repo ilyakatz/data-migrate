@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require "pry"
 if Rails::VERSION::MAJOR == 5 && Rails::VERSION::MINOR == 2
   require File.join(File.dirname(__FILE__), "data_migrate", "data_migrator_five")
 else
@@ -13,8 +12,10 @@ require File.join(File.dirname(__FILE__), "data_migrate", "database_tasks")
 require File.join(File.dirname(__FILE__), "data_migrate", "schema_dumper")
 if Rails::VERSION::MAJOR == 5 &&  Rails::VERSION::MINOR == 2
   require File.join(File.dirname(__FILE__), "data_migrate", "status_service_five")
+  require File.join(File.dirname(__FILE__), "data_migrate", "schema_migration_five")
 else
   require File.join(File.dirname(__FILE__), "data_migrate", "status_service")
+  require File.join(File.dirname(__FILE__), "data_migrate", "schema_migration")
 end
 if Rails::VERSION::MAJOR == 5
   if  Rails::VERSION::MINOR == 2

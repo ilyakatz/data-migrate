@@ -1,9 +1,9 @@
 class SuperUpdate < ActiveRecord::Migration[5.2]
   def up
-    puts "Doing data migration"
+    puts "Doing SuperUpdate"
   end
 
   def down
-    raise ActiveRecord::IrreversibleMigration
+    puts "Undoing SuperUpdate"
   end
 end

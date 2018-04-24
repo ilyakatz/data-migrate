@@ -4,6 +4,6 @@ class SomeName < ActiveRecord::Migration[5.2]
   end
 
   def down
-    raise ActiveRecord::IrreversibleMigration
+    puts "Undoing SomeName"
   end
 end
