@@ -54,9 +54,12 @@ describe DataMigrate::DatabaseTasks do
     end
   end
 
-  describe :forward do
+  context "migrations" do
     after do
-      ActiveRecord::Migration.drop_table("data_migrations")
+      begin
+        ActiveRecord::Migration.drop_table("data_migrations")
+      rescue ActiveRecord::StatementInvalid
+      end
       ActiveRecord::Migration.drop_table("schema_migrations")
     end
 
@@ -64,10 +67,10 @@ describe DataMigrate::DatabaseTasks do
       ActiveRecord::Base.establish_connection(db_config)
       ActiveRecord::SchemaMigration.create_table
 
-      expect(DataMigrate::SchemaMigration).to receive(:migrations_paths) {
+      allow(DataMigrate::SchemaMigration).to receive(:migrations_paths) {
         migration_path
       }
-      expect(DataMigrate::DatabaseTasks).to receive(:data_migrations_path) {
+      allow(DataMigrate::DatabaseTasks).to receive(:data_migrations_path) {
         data_migrations_path
       }.at_least(:once)
       allow(DataMigrate::DatabaseTasks).to receive(:schema_migrations_path) {
@@ -75,20 +78,37 @@ describe DataMigrate::DatabaseTasks do
       }.at_least(:once)
     end
 
-    it "run forward default amount of times" do
-      subject.forward
-      versions = DataMigrate::DataSchemaMigration.normalized_versions
-      expect(versions.count).to eq(1)
+    describe :past_migrations do
+      it do
+        subject.forward
+        m = subject.past_migrations
+        expect(m.count).to eq 1
+        expect(m.first[:version]).to eq 20091231235959
+      end
+
+      it "shows nothing without any migrations" do
+        m = subject.past_migrations
+        expect(m.count).to eq 0
+      end
     end
 
-    it "run forward defined number of times" do
-      subject.forward(2)
-      versions = DataMigrate::DataSchemaMigration.normalized_versions
-      expect(versions.count).to eq(1)
-      expect(versions.first).to eq "20091231235959"
-      versions = ActiveRecord::SchemaMigration.normalized_versions
-      expect(versions.count).to eq(1)
-      expect(versions.first).to eq "20131111111111"
+    describe :forward do
+
+      it "run forward default amount of times" do
+        subject.forward
+        versions = DataMigrate::DataSchemaMigration.normalized_versions
+        expect(versions.count).to eq(1)
+      end
+
+      it "run forward defined number of times" do
+        subject.forward(2)
+        versions = DataMigrate::DataSchemaMigration.normalized_versions
+        expect(versions.count).to eq(1)
+        expect(versions.first).to eq "20091231235959"
+        versions = ActiveRecord::SchemaMigration.normalized_versions
+        expect(versions.count).to eq(1)
+        expect(versions.first).to eq "20131111111111"
+      end
     end
   end
 end

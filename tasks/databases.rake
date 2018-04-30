@@ -124,7 +124,7 @@ namespace :db do
             DataMigrate::DataMigrator.run(:down, "db/data/", migration[:version])
           else
             ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-            ActiveRecord::Migrator.run(:down, "db/migrate/", migration[:version])
+            DataMigrate::SchemaMigration.run(:down, "db/migrate/", migration[:version])
           end
         end
 
@@ -346,10 +346,6 @@ def sort_string migration
   "#{migration[:version]}_#{migration[:kind] == :data ? 1 : 0}"
 end
 
-
-
-
-
 def connect_to_database
   config = ActiveRecord::Base.configurations[Rails.env || 'development']
   ActiveRecord::Base.establish_connection(config)
@@ -365,13 +361,8 @@ def connect_to_database
   config
 end
 
-def past_migrations sort=nil
-  sort = sort.downcase if sort
-  db_list_data = ActiveRecord::Base.connection.select_values("SELECT version FROM #{DataMigrate::DataMigrator.schema_migrations_table_name}").sort
-  db_list_schema = ActiveRecord::Base.connection.select_values("SELECT version FROM #{ActiveRecord::Migrator.schema_migrations_table_name}").sort
-  migrations = db_list_data.map{|d| {:version => d.to_i, :kind => :data }} + db_list_schema.map{|d| {:version => d.to_i, :kind => :schema }}
-
-  sort == 'asc' ? sort_migrations(migrations) : sort_migrations(migrations).reverse
+def past_migrations(sort=nil)
+  DataMigrate::DatabaseTasks.past_migrations(sort)
 end
 
 def assure_data_schema_table

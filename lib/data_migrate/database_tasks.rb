@@ -54,5 +54,29 @@ module DataMigrate
     def self.sort_string(migration)
       "#{migration[:version]}_#{migration[:kind] == :data ? 1 : 0}"
     end
+
+    def self.past_migrations(sort = nil)
+      sort = sort.downcase if sort
+      db_list_data =
+        if DataMigrate::DataSchemaMigration.table_exists?
+          DataMigrate::DataSchemaMigration.normalized_versions.sort
+        else
+          []
+        end
+      db_list_schema = ActiveRecord::SchemaMigration.normalized_versions.sort.sort
+      migrations = db_list_data.map do |d|
+        {
+          version: d.to_i, kind: :data
+        }
+      end +
+                   db_list_schema.map do |d|
+                     {
+                       version: d.to_i, kind: :schema
+                     }
+                   end
+
+      sort == "asc" ? sort_migrations(migrations) : sort_migrations(migrations).reverse
+    end
+
   end
 end
