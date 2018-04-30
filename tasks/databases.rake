@@ -96,7 +96,7 @@ namespace :db do
             DataMigrate::DataMigrator.run(:up, "db/data/", migration[:version])
           else
             ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-            ActiveRecord::Migrator.run(:up, "db/migrate/", migration[:version])
+            DataMigrate::SchemaMigration.run(:up, "db/migrate/", migration[:version])
           end
         end
 
