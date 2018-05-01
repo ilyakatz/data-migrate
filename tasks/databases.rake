@@ -139,8 +139,12 @@ namespace :db do
         config = connect_to_database
         next unless config
 
-        db_list_data = ActiveRecord::Base.connection.select_values("SELECT version FROM #{DataMigrate::DataMigrator.schema_migrations_table_name}")
-        db_list_schema = ActiveRecord::Base.connection.select_values("SELECT version FROM #{ActiveRecord::Migrator.schema_migrations_table_name}")
+        db_list_data = ActiveRecord::Base.connection.select_values(
+          "SELECT version FROM #{DataMigrate::DataSchemaMigration.table_name}"
+        )
+        db_list_schema = ActiveRecord::Base.connection.select_values(
+          "SELECT version FROM #{ActiveRecord::SchemaMigration.schema_migrations_table_name}"
+        )
         file_list = []
 
         Dir.foreach(File.join(Rails.root, 'db', 'data')) do |file|
@@ -350,11 +354,11 @@ def connect_to_database
   config = ActiveRecord::Base.configurations[Rails.env || 'development']
   ActiveRecord::Base.establish_connection(config)
 
-  unless ActiveRecord::Base.connection.table_exists?(DataMigrate::DataMigrator.schema_migrations_table_name)
+  unless DataMigrate::DataSchemaMigration.table_exists?
     puts 'Data migrations table does not exist yet.'
     config = nil
   end
-  unless ActiveRecord::Base.connection.table_exists?(ActiveRecord::Migrator.schema_migrations_table_name)
+  unless ActiveRecord::SchemaMigration.table_exists?
     puts 'Schema migrations table does not exist yet.'
     config = nil
   end
