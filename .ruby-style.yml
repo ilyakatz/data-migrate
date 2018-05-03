@@ -1057,3 +1057,5 @@ Style/FrozenStringLiteralComment:
   Enabled: false
 Layout/SpaceBeforeFirstArg:
   Enabled: false
+Style/FormatStringToken:
+  Enabled: false

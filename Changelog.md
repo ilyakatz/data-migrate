@@ -1,6 +1,12 @@
 Changelog
 =========
 
+## 4.0.0
+
+Support for Rails 5.2
+Deprecated support for Rails 4.1
+Internal changes to make data-migrate behavior more similar to Rails migrations
+
 ## 3.5.0
 
 Deprecated support for rails 4.0

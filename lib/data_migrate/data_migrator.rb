@@ -16,7 +16,12 @@ module DataMigrate
       end
     end
 
+
     class << self
+      def current_version(connection = ActiveRecord::Base.connection)
+        get_all_versions(connection).max || 0
+      end
+
       def get_all_versions(connection = ActiveRecord::Base.connection)
         if table_exists?(connection, schema_migrations_table_name)
           # Certain versions of the gem wrote data migration versions into

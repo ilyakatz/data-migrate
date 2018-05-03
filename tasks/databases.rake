@@ -1,3 +1,5 @@
+require 'data_migrate/tasks/data_migrate_tasks'
+
 namespace :db do
   namespace :migrate do
     desc "Migrate the database data and schema (options: VERSION=x, VERBOSE=false)."
@@ -49,7 +51,7 @@ namespace :db do
           DataMigrate::DataMigrator.run(migration[:direction], "db/data/", migration[:version])
         else
           ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-          ActiveRecord::Migrator.run(
+          DataMigrate::SchemaMigration.run(
             migration[:direction],
             Rails.application.config.paths["db/migrate"],
             migration[:version]
@@ -94,7 +96,7 @@ namespace :db do
             DataMigrate::DataMigrator.run(:up, "db/data/", migration[:version])
           else
             ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-            ActiveRecord::Migrator.run(:up, "db/migrate/", migration[:version])
+            DataMigrate::SchemaMigration.run(:up, "db/migrate/", migration[:version])
           end
         end
 
@@ -122,7 +124,7 @@ namespace :db do
             DataMigrate::DataMigrator.run(:down, "db/data/", migration[:version])
           else
             ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-            ActiveRecord::Migrator.run(:down, "db/migrate/", migration[:version])
+            DataMigrate::SchemaMigration.run(:down, "db/migrate/", migration[:version])
           end
         end
 
@@ -137,8 +139,12 @@ namespace :db do
         config = connect_to_database
         next unless config
 
-        db_list_data = ActiveRecord::Base.connection.select_values("SELECT version FROM #{DataMigrate::DataMigrator.schema_migrations_table_name}")
-        db_list_schema = ActiveRecord::Base.connection.select_values("SELECT version FROM #{ActiveRecord::Migrator.schema_migrations_table_name}")
+        db_list_data = ActiveRecord::Base.connection.select_values(
+          "SELECT version FROM #{DataMigrate::DataSchemaMigration.table_name}"
+        )
+        db_list_schema = ActiveRecord::Base.connection.select_values(
+          "SELECT version FROM #{ActiveRecord::SchemaMigration.schema_migrations_table_name}"
+        )
         file_list = []
 
         Dir.foreach(File.join(Rails.root, 'db', 'data')) do |file|
@@ -201,20 +207,8 @@ namespace :db do
     desc 'Pushes the schema to the next version (specify steps w/ STEP=n).'
     task :with_data => :environment do
       assure_data_schema_table
-      # TODO: No worky for .forward
       step = ENV['STEP'] ? ENV['STEP'].to_i : 1
-      # DataMigrate::DataMigrator.forward('db/data/', step)
-      migrations = pending_migrations.reverse.pop(step).reverse
-      migrations.each do | pending_migration |
-        if pending_migration[:kind] == :data
-          ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
-          DataMigrate::DataMigrator.run(:up, "db/data/", pending_migration[:version])
-        elsif pending_migration[:kind] == :schema
-          ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-          ActiveRecord::Migrator.run(:up, "db/migrate/", pending_migration[:version])
-        end
-      end
-
+      DataMigrate::DatabaseTasks.forward(step)
       Rake::Task["db:_dump"].invoke
       Rake::Task["data:dump"].invoke
     end
@@ -244,10 +238,7 @@ end
 namespace :data do
   desc 'Migrate data migrations (options: VERSION=x, VERBOSE=false)'
   task :migrate => :environment do
-    assure_data_schema_table
-    #ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
-    DataMigrate::DataMigrator.migrate("db/data/", ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
-
+    DataMigrate::Tasks::DataMigrateTasks.migrate
     Rake::Task["data:dump"].invoke
   end
 
@@ -336,21 +327,18 @@ namespace :data do
 end
 
 def pending_migrations
-  sort_migrations pending_data_migrations, pending_schema_migrations
+  DataMigrate::DatabaseTasks.sort_migrations(
+    DataMigrate::DatabaseTasks.pending_schema_migrations,
+    DataMigrate::DatabaseTasks.pending_data_migrations
+  )
 end
 
 def pending_data_migrations
-  data_migrations = DataMigrate::DataMigrator.migrations('db/data')
-  sort_migrations DataMigrate::DataMigrator.new(:up, data_migrations ).
-    pending_migrations.map{|m| { :version => m.version, :kind => :data }}
+  DataMigrate::DatabaseTasks.pending_data_migrations
 end
 
 def pending_schema_migrations
-  all_migrations = ActiveRecord::Migrator.migrations(Rails.application.config.paths["db/migrate"])
-  sort_migrations(
-    ActiveRecord::Migrator.new(:up, all_migrations).
-    pending_migrations.
-    map{|m| { :version => m.version, :kind => :schema }})
+  DataMigrate::DatabaseTasks.pending_schema_migrations
 end
 
 def sort_migrations set_1, set_2=nil
@@ -366,24 +354,19 @@ def connect_to_database
   config = ActiveRecord::Base.configurations[Rails.env || 'development']
   ActiveRecord::Base.establish_connection(config)
 
-  unless ActiveRecord::Base.connection.table_exists?(DataMigrate::DataMigrator.schema_migrations_table_name)
+  unless DataMigrate::DataSchemaMigration.table_exists?
     puts 'Data migrations table does not exist yet.'
     config = nil
   end
-  unless ActiveRecord::Base.connection.table_exists?(ActiveRecord::Migrator.schema_migrations_table_name)
+  unless ActiveRecord::SchemaMigration.table_exists?
     puts 'Schema migrations table does not exist yet.'
     config = nil
   end
   config
 end
 
-def past_migrations sort=nil
-  sort = sort.downcase if sort
-  db_list_data = ActiveRecord::Base.connection.select_values("SELECT version FROM #{DataMigrate::DataMigrator.schema_migrations_table_name}").sort
-  db_list_schema = ActiveRecord::Base.connection.select_values("SELECT version FROM #{ActiveRecord::Migrator.schema_migrations_table_name}").sort
-  migrations = db_list_data.map{|d| {:version => d.to_i, :kind => :data }} + db_list_schema.map{|d| {:version => d.to_i, :kind => :schema }}
-
-  sort == 'asc' ? sort_migrations(migrations) : sort_migrations(migrations).reverse
+def past_migrations(sort=nil)
+  DataMigrate::DatabaseTasks.past_migrations(sort)
 end
 
 def assure_data_schema_table
