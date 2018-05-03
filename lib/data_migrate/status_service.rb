@@ -45,7 +45,7 @@ module DataMigrate
     def migration_list(db_list)
       list = []
       db_list.each do |version|
-        list << ["up", version, "*** NO FILE ***"]
+        list << ["up", version, "********** NO FILE *************"]
       end
       list
     end

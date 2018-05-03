@@ -1,13 +1,13 @@
 require "generators/data_migrate"
 require "rails/generators"
 require "rails/generators/active_record/migration"
+require "rails/generators/migration"
 
 module DataMigrate
   module Generators
     class DataMigrationGenerator < Rails::Generators::NamedBase
       namespace "data_migration"
       include ActiveRecord::Generators::Migration
-
 
       argument :attributes, type: :array, default: [], banner: "field:type field:type"
 
@@ -28,6 +28,8 @@ module DataMigrate
       def migration_base_class_name
         if ActiveRecord.version >= Gem::Version.new("5.0")
           "ActiveRecord::Migration[#{ActiveRecord::Migration.current_version}]"
+        elsif ActiveRecord.version >= Gem::Version.new("5.2")
+          "DataMigrate::MigrationContext"
         else
           "ActiveRecord::Migration"
         end

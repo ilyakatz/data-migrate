@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "spec_helper"
+
 describe DataMigrate::Data do
   let(:subject) { DataMigrate::Data }
   let(:db_config) do
@@ -27,10 +29,10 @@ describe DataMigrate::Data do
 
   describe :define do
     before do
-      expect(DataMigrate::DataMigrator).
-        to receive(:db_config) { db_config }.at_least(:once)
+      allow(DataMigrate::DataMigrator).
+        to receive(:db_config) { db_config }
       ActiveRecord::Base.establish_connection(db_config)
-      ActiveRecord::Base.connection.initialize_schema_migrations_table
+      ActiveRecord::SchemaMigration.create_table
     end
 
     after do
@@ -66,11 +68,11 @@ describe DataMigrate::Data do
 
         sql_select = <<-SQL
           SELECT version
-          FROM #{DataMigrate::DataMigrator.schema_migrations_table_name}
+          FROM #{DataMigrate::DataSchemaMigration.table_name}
         SQL
 
         db_list_data = ActiveRecord::Base.connection.
-                       select_values(sql_select).map(&:to_i)
+          select_values(sql_select).map(&:to_i)
         expect(db_list_data).to match_array(
           [fixture_file_timestamps[0], fixture_file_timestamps[1]].map(&:to_i)
         )
