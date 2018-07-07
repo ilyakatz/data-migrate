@@ -37,6 +37,11 @@ describe DataMigrate::DataMigrator do
       ActiveRecord::SchemaMigration.create_table
     end
 
+    after do
+      ActiveRecord::Migration.drop_table("data_migrations")
+      ActiveRecord::Migration.drop_table("schema_migrations")
+    end
+
     it "migrates existing file" do
       context.migrate(nil)
       context.migrations_status
