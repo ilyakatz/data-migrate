@@ -28,3 +28,12 @@ else
 end
 require File.join(File.dirname(__FILE__), "data_migrate", "railtie")
 require File.join(File.dirname(__FILE__), "data_migrate", "tasks/data_migrate_tasks")
+
+module DataMigrate
+  include ActiveSupport::Configurable
+  class << self
+    def configure
+      yield config
+    end
+  end
+end
