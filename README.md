@@ -82,12 +82,6 @@ the gem wrote data migration versions into
 
 If you need to use these old migrations, add the following configuration
 
-```
-  DataMigrate.configure do |config|
-    config.schema_data_migrations = true  # false by default
-  end
-```
-
 It is recommended to move all legacy migrations from `schema_migrations` table into `data_migrations` table
 
 This may cause some unintended consequences. See [#22](https://github.com/ilyakatz/data-migrate/issues/22)

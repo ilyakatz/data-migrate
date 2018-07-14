@@ -33,26 +33,6 @@ describe DataMigrate::DataMigrator do
       expect(migrated).to include 20090000000000
       expect(migrated).to include 20110000000000
     end
-
-    it "load legacy migrations" do
-      DataMigrate.configure do |config|
-        config.schema_data_migrations = true
-      end
-      subject.assure_data_schema_table
-      DataMigrate::DataSchemaMigration.create(version: 20090000000000)
-      ::ActiveRecord::SchemaMigration.create(version: 20100000000000)
-      DataMigrate::DataSchemaMigration.create(version: 20110000000000)
-      ::ActiveRecord::SchemaMigration.create(version: 20120000000000)
-      migrated = subject.new(:up, []).load_migrated
-      expect(migrated.count).to eq 4
-      expect(migrated).to include 20090000000000
-      expect(migrated).to include 20110000000000
-
-      DataMigrate.configure do |config|
-        config.schema_data_migrations = nil
-      end
-    end
-
   end
 
   describe :assure_data_schema_table do

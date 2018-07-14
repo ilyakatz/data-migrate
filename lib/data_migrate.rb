@@ -28,6 +28,7 @@ else
 end
 require File.join(File.dirname(__FILE__), "data_migrate", "railtie")
 require File.join(File.dirname(__FILE__), "data_migrate", "tasks/data_migrate_tasks")
+require File.join(File.dirname(__FILE__), "data_migrate", "legacy_migrator")
 
 module DataMigrate
   include ActiveSupport::Configurable

@@ -25,19 +25,6 @@ module DataMigrate
     def load_migrated
       @migrated_versions =
         DataMigrate::DataSchemaMigration.normalized_versions.map(&:to_i).sort
-      # Certain versions of the gem wrote data migration versions into
-      # schema_migrations table. After the fix, it was corrected to write into
-      # data_migrations. However, not to break anything we are going to
-      # get versions from both tables.
-      #
-      # This may cause some problems:
-      # Eg. rake data:versions will show version from the schema_migrations table
-      # which may be a version of actual schema migration and not data migration
-      if DataMigrate.config.schema_data_migrations
-        @migrated_versions += ActiveRecord::SchemaMigration.normalized_versions.map(&:to_i).sort
-      else
-        @migrated_versions
-      end
     end
 
     class << self
