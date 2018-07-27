@@ -86,7 +86,8 @@ module DataMigrate
 
           ActiveRecord::Base.connection.add_index sm_table, :version,
             :unique => true,
-            :name => index_name
+            :name => index_name,
+            :length => 191
       end
 
       def table_exists?(connection, table_name)
