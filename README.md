@@ -80,6 +80,10 @@ the gem wrote data migration versions into
 `schema_migrations` table. After the fix, it was corrected to write into
 `data_migrations`.
 
+If you need to use these old migrations, add the following configuration
+
+It is recommended to move all legacy migrations from `schema_migrations` table into `data_migrations` table
+
 This may cause some unintended consequences. See [#22](https://github.com/ilyakatz/data-migrate/issues/22)
 
 #### v1

@@ -4,6 +4,9 @@ describe DataMigrate::DataMigrator do
   let(:context) {
     DataMigrate::MigrationContext.new("spec/db/data")
   }
+  let(:schema_context) {
+    ActiveRecord::MigrationContext.new("spec/db/migrate/5.2")
+  }
 
   before do
     unless Rails::VERSION::MAJOR == 5 and
@@ -15,6 +18,7 @@ describe DataMigrate::DataMigrator do
   after do
     begin
       ActiveRecord::Migration.drop_table("data_migrations")
+      ActiveRecord::Migration.drop_table("schema_migrations")
     rescue StandardError
       nil
     end
@@ -31,6 +35,11 @@ describe DataMigrate::DataMigrator do
     before do
       ActiveRecord::Base.establish_connection(db_config)
       ActiveRecord::SchemaMigration.create_table
+    end
+
+    after do
+      ActiveRecord::Migration.drop_table("data_migrations")
+      ActiveRecord::Migration.drop_table("schema_migrations")
     end
 
     it "migrates existing file" do
@@ -93,6 +102,16 @@ describe DataMigrate::DataMigrator do
       versions = DataMigrate::DataSchemaMigration.normalized_versions
       expect(versions.count).to eq(1)
       expect(versions).to include("20091231235959")
+    end
+
+    it "rolls back 2 migrations" do
+      context.migrate(nil)
+      schema_context.migrate(nil)
+      expect {
+        context.rollback(2)
+      }.to output(/Undoing SomeName/).to_stdout
+      versions = DataMigrate::DataSchemaMigration.normalized_versions
+      expect(versions.count).to eq(0)
     end
 
     it "rolls back 2 migrations" do

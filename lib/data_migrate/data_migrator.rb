@@ -16,6 +16,9 @@ module DataMigrate
       end
     end
 
+    def load_migrated(connection = ActiveRecord::Base.connection)
+      self.class.get_all_versions(connection)
+    end
 
     class << self
       def current_version(connection = ActiveRecord::Base.connection)
@@ -24,16 +27,7 @@ module DataMigrate
 
       def get_all_versions(connection = ActiveRecord::Base.connection)
         if table_exists?(connection, schema_migrations_table_name)
-          # Certain versions of the gem wrote data migration versions into
-          # schema_migrations table. After the fix, it was corrected to write into
-          # data_migrations. However, not to break anything we are going to
-          # get versions from both tables.
-          #
-          # This may cause some problems:
-          # Eg. rake data:versions will show version from the schema_migrations table
-          # which may be a version of actual schema migration and not data migration
-          DataMigrate::DataSchemaMigration.all.map { |x| x.version.to_i }.sort +
-            ActiveRecord::SchemaMigration.all.map { |x| x.version.to_i }.sort
+          DataMigrate::DataSchemaMigration.all.map { |x| x.version.to_i }.sort
         else
           []
         end

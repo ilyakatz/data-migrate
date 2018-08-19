@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe DataMigrate::DataMigrator do
   let(:subject) { DataMigrate::DataMigrator }
@@ -7,6 +7,32 @@ describe DataMigrate::DataMigrator do
       adapter: "sqlite3",
       database: "spec/db/test.db"
     }
+  end
+
+  describe :load_migrated do
+    before do
+      allow(subject).to receive(:db_config) { db_config }.at_least(:once)
+      ActiveRecord::Base.establish_connection(db_config)
+      ::ActiveRecord::SchemaMigration.create_table
+      DataMigrate::DataSchemaMigration.create_table
+    end
+
+    after do
+      ActiveRecord::Migration.drop_table("data_migrations")
+      ActiveRecord::Migration.drop_table("schema_migrations")
+    end
+
+    it do
+      subject.assure_data_schema_table
+      DataMigrate::DataSchemaMigration.create(version: 20090000000000)
+      ::ActiveRecord::SchemaMigration.create(version: 20100000000000)
+      DataMigrate::DataSchemaMigration.create(version: 20110000000000)
+      ::ActiveRecord::SchemaMigration.create(version: 20120000000000)
+      migrated = subject.new(:up, []).load_migrated
+      expect(migrated.count).to eq 2
+      expect(migrated).to include 20090000000000
+      expect(migrated).to include 20110000000000
+    end
   end
 
   describe :assure_data_schema_table do

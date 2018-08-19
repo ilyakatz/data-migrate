@@ -1,6 +1,18 @@
 Changelog
 =========
 
+## 5.0.0
+
+Remove support for legacy migrations (from v2).
+
+**IMPORTANT**: If you used this gem from before version 2, make sure to run migration script
+
+```
+DataMigrate::LegacyMigrator.new.migrate
+```
+
+**Failure to do so may cause re-running old migrations**
+
 ## 4.0.0
 
 Support for Rails 5.2
@@ -24,7 +36,7 @@ The concept of schema:dump to data migrations, thanks to
 ## 3.2.1
 
 data_migrate table into rails schema dump, thanks to
-[jturkel](https://github.com/jturkel) 
+[jturkel](https://github.com/jturkel)
 
 
 ## 3.2.0

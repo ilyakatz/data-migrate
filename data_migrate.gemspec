@@ -35,7 +35,10 @@ Gem::Specification.new do |s|
 
   s.post_install_message = <<-POST_INSTALL_MESSAGE
 #{"*" * 80}
-data-migrate: --skip-schema-migration option is no longer available as of version 3.0.0
+data-migrate: IMPORTANT: Breaking change introduced for migrations from v2.
+
+Failure to run the migration can have serious consequences.
+See Readme for more info.
 #{"*" * 80}
 POST_INSTALL_MESSAGE
 end
