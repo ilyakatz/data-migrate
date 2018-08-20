@@ -83,11 +83,11 @@ module DataMigrate
           suffix = ActiveRecord::Base.table_name_suffix
           prefix = ActiveRecord::Base.table_name_prefix
           index_name = "#{prefix}unique_data_migrations#{suffix}"
+          
+          options = {unique: true, name: index_name}          
+          options[:length] = 191 if ActiveRecord::Base.connection_config[:adapter] == "mysql2"
 
-          ActiveRecord::Base.connection.add_index sm_table, :version,
-            :unique => true,
-            :name => index_name,
-            :length => 191
+          ActiveRecord::Base.connection.add_index sm_table, :version, options
       end
 
       def table_exists?(connection, table_name)
