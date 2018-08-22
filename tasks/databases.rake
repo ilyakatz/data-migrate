@@ -1,5 +1,4 @@
 require 'data_migrate/tasks/data_migrate_tasks'
-require 'pry'
 
 namespace :db do
   namespace :migrate do
