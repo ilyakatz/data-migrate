@@ -40,17 +40,9 @@ describe DataMigrate::DatabaseTasks do
     allow(subject).to receive(:db_dir).and_return("db")
   end
 
-  before do
-    allow(DataMigrate::Tasks::DataMigrateTasks).to receive(:migrations_paths) {
-      data_migrations_path
-    }
-    allow(DataMigrate::DataMigrator).to receive(:db_config) { db_config }
-    ActiveRecord::Base.establish_connection(db_config)
-  end
-
-  describe :data_schema_file do
+  describe :schema_file do
     it "returns the correct data schema file path" do
-      expect(subject.data_schema_file).to eq "db/data_schema.rb"
+      expect(subject.schema_file).to eq "db/data_schema.rb"
     end
   end
 

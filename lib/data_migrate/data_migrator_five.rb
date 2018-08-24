@@ -6,6 +6,14 @@ module DataMigrate
   class DataMigrator < ActiveRecord::Migrator
     self.migrations_paths = ["db/data"]
 
+    def self.migrations_path
+      "db/data"
+    end
+
+    def self.full_migrations_path
+      File.join(Rails.root, *migrations_path.split(File::SEPARATOR))
+    end
+
     def self.assure_data_schema_table
       DataMigrate::DataSchemaMigration.create_table
     end
