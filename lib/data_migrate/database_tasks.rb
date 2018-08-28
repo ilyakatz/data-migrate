@@ -2,11 +2,12 @@
 
 module DataMigrate
   ##
-  # This class extends DatabaseTasks to add a data_schema_file method.
+  # This class extends DatabaseTasks to add a schema_file method.
   class DatabaseTasks
     extend ActiveRecord::Tasks::DatabaseTasks
 
-    def self.data_schema_file
+    # This overrides ActiveRecord::Tasks::DatabaseTasks
+    def self.schema_file(_format = nil)
       File.join(db_dir, "data_schema.rb")
     end
 

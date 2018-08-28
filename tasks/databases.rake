@@ -313,7 +313,7 @@ namespace :data do
   desc "Create a db/data_schema.rb file that stores the current data version"
   task dump: :environment do
     if ActiveRecord::Base.dump_schema_after_migration
-      filename = DataMigrate::DatabaseTasks.data_schema_file
+      filename = DataMigrate::DatabaseTasks.schema_file
       File.open(filename, "w:utf-8") do |file|
         DataMigrate::SchemaDumper.dump(ActiveRecord::Base.connection, file)
       end
