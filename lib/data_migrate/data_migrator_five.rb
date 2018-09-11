@@ -7,6 +7,7 @@ module DataMigrate
     self.migrations_paths = ["db/data"]
 
     def self.assure_data_schema_table
+      ActiveRecord::Base.establish_connection(db_config)
       DataMigrate::DataSchemaMigration.create_table
     end
 
@@ -41,6 +42,13 @@ module DataMigrate
         /(\d{14})_(.+)\.rb/.match(filename)
       end
 
+      ##
+      # Provides the full migrations_path filepath
+      # @return (String)
+      def full_migrations_path
+        File.join(Rails.root, *migrations_paths.split(File::SEPARATOR))
+      end
+
       def migrations_status
         DataMigrate::MigrationContext.new(migrations_paths).migrations_status
       end
@@ -57,6 +65,11 @@ module DataMigrate
 
       def rollback(migrations_path, steps)
         DataMigrate::MigrationContext.new(migrations_path).rollback(steps)
+      end
+
+      def db_config
+        ActiveRecord::Base.configurations[Rails.env || "development"] ||
+          ENV["DATABASE_URL"]
       end
     end
 
