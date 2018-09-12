@@ -48,9 +48,9 @@ describe DataMigrate::DatabaseTasks do
     ActiveRecord::Base.establish_connection(db_config)
   end
 
-  describe :data_schema_file do
+  describe :schema_file do
     it "returns the correct data schema file path" do
-      expect(subject.data_schema_file).to eq "db/data_schema.rb"
+      expect(subject.schema_file(nil)).to eq "db/data_schema.rb"
     end
   end
 

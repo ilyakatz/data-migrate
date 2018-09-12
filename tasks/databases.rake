@@ -229,7 +229,24 @@ namespace :db do
       task with_data: :environment do
         Rake::Task["db:schema:load"].invoke
 
-        DataMigrate::DatabaseTasks.load_schema_current(:ruby, ENV["SCHEMA"])
+        DataMigrate::DatabaseTasks.load_schema_current(
+          :ruby,
+          ENV["DATA_SCHEMA"]
+        )
+      end
+    end
+  end
+
+  namespace :structure do
+    namespace :load do
+      desc "Load both structure.sql and data_schema.rb file into the database"
+      task with_data: :environment do
+        Rake::Task["db:structure:load"].invoke
+
+        DataMigrate::DatabaseTasks.load_schema_current(
+          :ruby,
+          ENV["DATA_SCHEMA"]
+        )
       end
     end
   end
@@ -313,7 +330,7 @@ namespace :data do
   desc "Create a db/data_schema.rb file that stores the current data version"
   task dump: :environment do
     if ActiveRecord::Base.dump_schema_after_migration
-      filename = DataMigrate::DatabaseTasks.data_schema_file
+      filename = DataMigrate::DatabaseTasks.schema_file
       File.open(filename, "w:utf-8") do |file|
         DataMigrate::SchemaDumper.dump(ActiveRecord::Base.connection, file)
       end

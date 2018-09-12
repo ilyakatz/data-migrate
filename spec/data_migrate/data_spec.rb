@@ -31,8 +31,6 @@ describe DataMigrate::Data do
     before do
       allow(DataMigrate::DataMigrator).
         to receive(:db_config) { db_config }
-      ActiveRecord::Base.establish_connection(db_config)
-      ActiveRecord::SchemaMigration.create_table
     end
 
     after do
