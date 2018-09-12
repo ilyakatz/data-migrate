@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## 5.1.0
+Fixes to `db:schema:load:with_data` + `db:structure:load:with_data` definition, thanks to [craineum](https://github.com/craineum)
+
 ## 5.0.0
 
 Remove support for legacy migrations (from v2).
