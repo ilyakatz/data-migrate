@@ -304,7 +304,7 @@ namespace :data do
   task :rollback => :environment do
     assure_data_schema_table
     step = ENV['STEP'] ? ENV['STEP'].to_i : 1
-    DataMigrate::DataMigrator.rollback('db/data/', step)
+    DataMigrate::DataMigrator.rollback(DataMigrate::Tasks::DataMigrateTasks.migrations_paths, step)
     Rake::Task["data:dump"].invoke
   end
 
