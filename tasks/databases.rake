@@ -389,3 +389,19 @@ end
 def assure_data_schema_table
   DataMigrate::DataMigrator.assure_data_schema_table
 end
+
+def db_data_path
+  if Rails.application && Rails.application.paths["db/data"]
+    Rails.application.paths["db/data"].existent.first
+  else
+    File.join(Rails.root, "db", "data")
+  end
+end
+
+def db_migrate_path
+  if Rails.application && Rails.application.paths["db/migrate"]
+    Rails.application.paths["db/migrate"].existent.first
+  else
+    File.join(Rails.root, "db", "migrate")
+  end
+end
