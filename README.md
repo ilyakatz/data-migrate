@@ -145,6 +145,17 @@ With 'up' and 'down', you can specify the option 'BOTH', which defaults to false
 
 `data_migrate` respects `ActiveRecord::Base.dump_schema_after_migration`. If it is set to `false`, data schema file will not be generated
 
+
+By default, data migrations are added to the `db/data/` path. 
+You can override this setting in `config/initializers/data_migrate.rb`
+
+```ruby
+DataMigrate.configure do |config|
+  config.data_migrations_path = "db/awesomepath/"
+end
+
+```
+
 ## Capistrano Support
 
 The gem comes with a capistrano task that can be used instead of `capistrano/rails/migrations`.
