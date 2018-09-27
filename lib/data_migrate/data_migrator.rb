@@ -39,7 +39,8 @@ module DataMigrate
       end
 
       def migrations_path
-        "db/data"
+        DataMigrate.config.data_migrations_path || "db/data"
+        # Rails.config.data_migrations_path || "db/data"
       end
 
       ##
@@ -95,6 +96,7 @@ module DataMigrate
         end
       end
 
+
       def db_config
         ActiveRecord::Base.configurations[Rails.env || "development"] ||
           ENV["DATABASE_URL"]
@@ -102,3 +104,5 @@ module DataMigrate
     end
   end
 end
+
+
