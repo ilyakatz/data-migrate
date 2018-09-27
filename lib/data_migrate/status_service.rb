@@ -52,7 +52,7 @@ module DataMigrate
 
     def migration_files(db_list)
       file_list = []
-      Dir.foreach(File.join(root_folder, "db", "data")) do |file|
+      Dir.foreach(File.join(root_folder, DataMigrate.config.data_migrations_path)) do |file|
         # only files matching "20091231235959_some_name.rb" pattern
         if match_data = DataMigrate::DataMigrator.match(file)
           status = db_list.delete(match_data[1]) ? "up" : "down"

@@ -2,6 +2,7 @@ require "generators/data_migrate"
 require "rails/generators"
 require "rails/generators/active_record/migration"
 require "rails/generators/migration"
+require "data_migrate/config"
 
 module DataMigrate
   module Generators
@@ -13,7 +14,7 @@ module DataMigrate
 
       def create_data_migration
         set_local_assigns!
-        migration_template "data_migration.rb", "db/data/#{file_name}.rb"
+        migration_template "data_migration.rb", "#{data_migrations_path}#{file_name}.rb"
       end
 
       protected
@@ -33,6 +34,10 @@ module DataMigrate
         else
           "ActiveRecord::Migration"
         end
+      end
+
+      def data_migrations_path
+        DataMigrate.config.data_migrations_path
       end
     end
   end
