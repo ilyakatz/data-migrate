@@ -3,16 +3,15 @@
 require "active_record"
 
 module DataMigrate
-
   class DataMigrator < ActiveRecord::Migrator
 
     def record_version_state_after_migrating(version)
       if down?
         migrated.delete(version)
-        DataMigrate::DataSchemaMigration.where(:version => version.to_s).delete_all
+        DataMigrate::DataSchemaMigration.where(version: version.to_s).delete_all
       else
         migrated << version
-        DataMigrate::DataSchemaMigration.create!(:version => version.to_s)
+        DataMigrate::DataSchemaMigration.create!(version: version.to_s)
       end
     end
 
@@ -70,17 +69,18 @@ module DataMigrate
       private
 
       def create_table(sm_table)
-        ActiveRecord::Base.connection.create_table(sm_table, :id => false) do |schema_migrations_table|
-            schema_migrations_table.column :version, :string, :null => false
-          end
+        ActiveRecord::Base.connection.create_table(sm_table, id: false) do |schema_migrations_table|
+          schema_migrations_table.column :version, :string, null: false
+        end
 
-          suffix = ActiveRecord::Base.table_name_suffix
-          prefix = ActiveRecord::Base.table_name_prefix
-          index_name = "#{prefix}unique_data_migrations#{suffix}"
+        suffix = ActiveRecord::Base.table_name_suffix
+        prefix = ActiveRecord::Base.table_name_prefix
+        index_name = "#{prefix}unique_data_migrations#{suffix}"
 
-          ActiveRecord::Base.connection.add_index sm_table, :version,
-            :unique => true,
-            :name => index_name
+        options = {unique: true, name: index_name}
+        options[:length] = 191 if ActiveRecord::Base.connection_config[:adapter] == "mysql2"
+
+        ActiveRecord::Base.connection.add_index sm_table, :version, options
       end
 
       def table_exists?(connection, table_name)
