@@ -46,7 +46,7 @@ module DataMigrate
       # Provides the full migrations_path filepath
       # @return (String)
       def full_migrations_path
-        DataMigrate.data_migrations_path.first
+        DataMigrate.data_migrations_paths.first
       end
 
       def migrations_status
