@@ -38,12 +38,12 @@ module DataMigrate
       yield config
     end
 
-    def data_migrations_path
-      @data_migrations_path ||= Rails.application.paths["db/data"].existent || File.join(Rails.root, "db/data")
+    def data_migrations_paths
+      @data_migrations_paths ||= Rails.application.paths["data/migrate"]&.existent || [ File.join(Rails.root, "data/data") ]
     end
 
-    def db_migrations_path
-      @db_migrations_path ||= Rails.application.paths["db/migrate"].existent || File.join(Rails.root, "db/migrate")
+    def db_migrations_paths
+      @db_migrations_paths ||= Rails.application.paths["db/migrate"].existent || [ File.join(Rails.root, "db/migrate") ]
     end
   end
 end
