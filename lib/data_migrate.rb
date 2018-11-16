@@ -39,7 +39,7 @@ module DataMigrate
     end
 
     def data_migrations_paths
-      @data_migrations_paths ||= Rails.application.paths["data/migrate"]&.existent || [ File.join(Rails.root, "data/data") ]
+      @data_migrations_paths ||= Rails.application.paths["data/migrate"]&.existent || [ File.join(Rails.root, "data/migrate") ]
     end
 
     def db_migrations_paths
