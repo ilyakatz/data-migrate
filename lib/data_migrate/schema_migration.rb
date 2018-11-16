@@ -21,7 +21,7 @@ module DataMigrate
     end
 
     def self.migrations_paths
-      Rails.application.config.paths["db/migrate"].to_a
+      DataMigrate.db_migrations_paths
     end
 
     def self.sort_string(migration)

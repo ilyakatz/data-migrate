@@ -46,7 +46,7 @@ module DataMigrate
       # Provides the full migrations_path filepath
       # @return (String)
       def full_migrations_path
-        File.join(Rails.root, *migrations_paths.split(File::SEPARATOR))
+        DataMigrate.data_migrations_path.first
       end
 
       def migrations_status

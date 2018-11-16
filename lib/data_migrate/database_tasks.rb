@@ -26,11 +26,12 @@ module DataMigrate
     end
 
     def self.data_migrations_path
-      "db/data/"
+      DataMigrate.data_migrations_path.first
+
     end
 
     def self.schema_migrations_path
-      "db/migrate/"
+      DataMigrate.db_migrations_path.first
     end
 
     def self.pending_migrations

@@ -3,13 +3,7 @@ module DataMigrate
     module DataMigrateTasks
       extend self
       def migrations_paths
-        @migrations_paths ||= begin
-          if Rails.application && Rails.application.paths["db/data"]
-            Rails.application.paths["db/data"].to_a
-          else
-            "db/data/"
-          end
-        end
+        DataMigrate.data_migrations_paths
       end
 
       def migrate

@@ -38,15 +38,11 @@ module DataMigrate
           ActiveRecord::Base.table_name_suffix
       end
 
-      def migrations_path
-        "db/data"
-      end
-
       ##
       # Provides the full migrations_path filepath
       # @return (String)
       def full_migrations_path
-        File.join(Rails.root, *migrations_path.split(File::SEPARATOR))
+        DataMigrate.data_migrations_path.first
       end
 
       def assure_data_schema_table
