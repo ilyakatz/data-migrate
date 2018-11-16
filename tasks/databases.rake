@@ -254,7 +254,6 @@ end
 namespace :data do
   desc 'Migrate data migrations (options: VERSION=x, VERBOSE=false)'
   task :migrate => :environment do
-    binding.pry
     DataMigrate::Tasks::DataMigrateTasks.migrate
     Rake::Task["data:dump"].invoke
   end
