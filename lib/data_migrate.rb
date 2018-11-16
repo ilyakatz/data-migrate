@@ -32,9 +32,18 @@ require File.join(File.dirname(__FILE__), "data_migrate", "legacy_migrator")
 
 module DataMigrate
   include ActiveSupport::Configurable
+
   class << self
     def configure
       yield config
+    end
+
+    def data_migrations_path
+      @data_migrations_path ||= Rails.application.paths["db/data"].existent || File.join(Rails.root, "db/data")
+    end
+
+    def db_migrations_path
+      @db_migrations_path ||= Rails.application.paths["db/migrate"].existent || File.join(Rails.root, "db/migrate")
     end
   end
 end

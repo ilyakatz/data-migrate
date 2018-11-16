@@ -48,7 +48,7 @@ namespace :db do
       migrations.each do |migration|
         if migration[:kind] == :data
           ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
-          DataMigrate::DataMigrator.run(migration[:direction], db_data_path, migration[:version])
+          DataMigrate::DataMigrator.run(migration[:direction], DataMigrate.data_migrations_path, migration[:version])
         else
           ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
           DataMigrate::SchemaMigration.run(
@@ -93,10 +93,10 @@ namespace :db do
         migrations.each do |migration|
           if migration[:kind] == :data
             ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
-            DataMigrate::DataMigrator.run(:up, db_data_path, migration[:version])
+            DataMigrate::DataMigrator.run(:up, DataMigrate.data_migrations_path, migration[:version])
           else
             ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-            DataMigrate::SchemaMigration.run(:up, db_migrate_path, migration[:version])
+            DataMigrate::SchemaMigration.run(:up, DataMigrate.db_migrations_path, migration[:version])
           end
         end
 
@@ -121,10 +121,10 @@ namespace :db do
         migrations.each do |migration|
           if migration[:kind] == :data
             ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
-            DataMigrate::DataMigrator.run(:down, db_data_path, migration[:version])
+            DataMigrate::DataMigrator.run(:down, DataMigrate.data_migrations_path, migration[:version])
           else
             ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-            DataMigrate::SchemaMigration.run(:down, db_migrate_path, migration[:version])
+            DataMigrate::SchemaMigration.run(:down, DataMigrate.db_migrations_path, migration[:version])
           end
         end
 
@@ -146,7 +146,7 @@ namespace :db do
           "SELECT version FROM #{ActiveRecord::SchemaMigration.schema_migrations_table_name}"
         )
         file_list = []
-        Dir.foreach(db_data_path) do |file|
+        Dir.foreach(DataMigrate.data_migrations_path.first) do |file|
           # only files matching "20091231235959_some_name.rb" pattern
           if match_data = /(\d{14})_(.+)\.rb/.match(file)
             status = db_list_data.delete(match_data[1]) ? 'up' : 'down'
@@ -154,7 +154,7 @@ namespace :db do
           end
         end
 
-        Dir.foreach(db_migrate_path) do |file|
+        Dir.foreach(DataMigrate.db_migrations_path.first) do |file|
           # only files matching "20091231235959_some_name.rb" pattern
           if match_data = /(\d{14})_(.+)\.rb/.match(file)
             status = db_list_schema.delete(match_data[1]) ? 'up' : 'down'
@@ -190,10 +190,10 @@ namespace :db do
       past_migrations[0..(step - 1)].each do | past_migration |
         if past_migration[:kind] == :data
           ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
-          DataMigrate::DataMigrator.run(:down, db_data_path, past_migration[:version])
+          DataMigrate::DataMigrator.run(:down, DataMigrate.data_migrations_path, past_migration[:version])
         elsif past_migration[:kind] == :schema
           ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-          ActiveRecord::Migrator.run(:down, db_migrate_path, past_migration[:version])
+          ActiveRecord::Migrator.run(:down, DataMigrate.db_migrations_path, past_migration[:version])
         end
       end
 
@@ -254,6 +254,7 @@ end
 namespace :data do
   desc 'Migrate data migrations (options: VERSION=x, VERBOSE=false)'
   task :migrate => :environment do
+    binding.pry
     DataMigrate::Tasks::DataMigrateTasks.migrate
     Rake::Task["data:dump"].invoke
   end
@@ -276,7 +277,7 @@ namespace :data do
       assure_data_schema_table
       version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
       raise "VERSION is required" unless version
-      DataMigrate::DataMigrator.run(:up, db_data_path, version)
+      DataMigrate::DataMigrator.run(:up, DataMigrate.data_migrations_path, version)
       Rake::Task["data:dump"].invoke
     end
 
@@ -285,7 +286,7 @@ namespace :data do
       version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
       raise "VERSION is required" unless version
       assure_data_schema_table
-      DataMigrate::DataMigrator.run(:down, db_data_path, version)
+      DataMigrate::DataMigrator.run(:down, DataMigrate.data_migrations_path, version)
       Rake::Task["data:dump"].invoke
     end
 
@@ -304,7 +305,7 @@ namespace :data do
   task :rollback => :environment do
     assure_data_schema_table
     step = ENV['STEP'] ? ENV['STEP'].to_i : 1
-      DataMigrate::DataMigrator.rollback(db_data_path, step)
+      DataMigrate::DataMigrator.rollback(DataMigrate.data_migrations_path, step)
     Rake::Task["data:dump"].invoke
   end
 
@@ -316,7 +317,7 @@ namespace :data do
     # DataMigrate::DataMigrator.forward('db/data/', step)
     migrations = pending_data_migrations.reverse.pop(step).reverse
     migrations.each do | pending_migration |
-      DataMigrate::DataMigrator.run(:up, db_data_path, pending_migration[:version])
+      DataMigrate::DataMigrator.run(:up, DataMigrate.data_migrations_path, pending_migration[:version])
     end
     Rake::Task["data:dump"].invoke
   end
@@ -388,20 +389,4 @@ end
 
 def assure_data_schema_table
   DataMigrate::DataMigrator.assure_data_schema_table
-end
-
-def db_data_path
-  if Rails.application && Rails.application.paths["db/data"]
-    Rails.application.paths["db/data"].existent.first
-  else
-    File.join(Rails.root, "db", "data")
-  end
-end
-
-def db_migrate_path
-  if Rails.application && Rails.application.paths["db/migrate"]
-    Rails.application.paths["db/migrate"].existent.first
-  else
-    File.join(Rails.root, "db", "migrate")
-  end
 end
