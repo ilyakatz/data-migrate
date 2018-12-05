@@ -62,6 +62,15 @@ describe DataMigrate::StatusService do
       expect(stream.read).to include expected
     end
 
+    it "excludes files without .rb extension" do
+      stream = StringIO.new
+      service.dump(ActiveRecord::Base.connection, stream)
+      stream.rewind
+
+      expected = "20181128000207  Excluded file"
+      expect(stream.read).to_not include expected
+    end
+
     it "shows missing file migration" do
       stream = StringIO.new
       service.dump(ActiveRecord::Base.connection, stream)
