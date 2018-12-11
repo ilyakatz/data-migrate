@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## 5.3.0
+Add support to configure data migration path 
+
 ## 5.1.0
 Fixes to `db:schema:load:with_data` + `db:structure:load:with_data` definition, thanks to [craineum](https://github.com/craineum)
 

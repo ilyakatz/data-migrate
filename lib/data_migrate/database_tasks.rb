@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "data_migrate/config"
+
 module DataMigrate
   ##
   # This class extends DatabaseTasks to add a schema_file method.
@@ -26,7 +28,7 @@ module DataMigrate
     end
 
     def self.data_migrations_path
-      "db/data/"
+      DataMigrate.config.data_migrations_path
     end
 
     def self.schema_migrations_path
