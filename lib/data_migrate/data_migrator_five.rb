@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 require "active_record"
+require "data_migrate/config"
 
 module DataMigrate
   class DataMigrator < ActiveRecord::Migrator
-    self.migrations_paths = ["db/data"]
+    self.migrations_paths = [DataMigrate.config.data_migrations_path]
 
     def self.assure_data_schema_table
       ActiveRecord::Base.establish_connection(db_config)
