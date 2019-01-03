@@ -15,7 +15,7 @@ module DataMigrate
     attr_accessor :data_migrations_path
 
     def initialize
-      @data_migrations_path = "db/data/"
+      @data_migrations_path = Dir.pwd + "/db/data/"
     end
   end
 end
