@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## 5.3.1
+Change database task to use data_migrations_path_configuration
+
 ## 5.3.0
 Add support to configure data migration path 
 
