@@ -8,8 +8,8 @@ namespace :deploy do
       info '[deploy:migrate] Checking changes in db/migrate or db/data' if conditionally_migrate
 
       if conditionally_migrate &&
-          test("diff -q #{release_path}/db/migrate #{current_path}/db/migrate") &&
-          test("diff -q #{release_path}/db/data #{current_path}/db/data")
+         test("diff -q #{release_path}/db/migrate #{current_path}/db/migrate") &&
+         test("diff -q #{release_path}/db/data #{current_path}/db/data")
         info '[deploy:migrate] Skip `deploy:migrate` (nothing changed in db/migrate or db/data)'
       else
         info '[deploy:migrate] Run `rake db:migrate:with_data`'
