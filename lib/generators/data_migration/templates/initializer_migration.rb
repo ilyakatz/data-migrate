@@ -5,6 +5,6 @@ class <%= 'CreateDataMigrations' %> < <%= migration_base_class_name %>
   end
 
   def down
-    raise ActiveRecord::IrreversibleMigration
+    drop_table :data_migrations
   end
 end
