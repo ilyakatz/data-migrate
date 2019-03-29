@@ -113,6 +113,12 @@ You can generate a data migration as you would a schema migration:
 
     rails g data_migration add_this_to_that
 
+### Generate data_migrations table migration
+
+You can generate a data migration table migration to be able to manipulate it with rails default migrations:
+
+    rails g data_migration initialize
+
 ### Rake Tasks
 
     $> rake -T data
@@ -146,7 +152,7 @@ With 'up' and 'down', you can specify the option 'BOTH', which defaults to false
 `data_migrate` respects `ActiveRecord::Base.dump_schema_after_migration`. If it is set to `false`, data schema file will not be generated
 
 
-By default, data migrations are added to the `db/data/` path. 
+By default, data migrations are added to the `db/data/` path.
 You can override this setting in `config/initializers/data_migrate.rb`
 
 ```ruby
