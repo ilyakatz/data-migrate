@@ -343,14 +343,6 @@ namespace :data do
   end
 end
 
-namespace :data_migrate do
-  desc "Creates the data_migrations table on initialize."
-  task :initialize => :environment do
-    assure_data_schema_table
-  end
-end
-
-
 def pending_migrations
   DataMigrate::DatabaseTasks.sort_migrations(
     DataMigrate::DatabaseTasks.pending_schema_migrations,

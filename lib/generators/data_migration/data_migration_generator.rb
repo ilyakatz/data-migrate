@@ -14,10 +14,18 @@ module DataMigrate
 
       def create_data_migration
         set_local_assigns!
-        migration_template "data_migration.rb", "#{data_migrations_path}#{file_name}.rb"
+        call_migration!
       end
 
       protected
+
+      def call_migration!
+        if file_name == 'initialize'
+          migration_template "initializer_migration.rb", "db/migrate/create_data_migrations.rb"
+        else
+          migration_template "data_migration.rb", "#{data_migrations_path}#{file_name}.rb"
+        end
+      end
 
       def set_local_assigns!
         if file_name =~ /^(add|remove)_.*_(?:to|from)_(.*)/
