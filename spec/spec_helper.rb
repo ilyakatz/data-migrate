@@ -1,5 +1,6 @@
 require 'rspec'
 require 'rails'
+require 'sqlite3'
 require 'data_migrate'
 require 'pry'
 require 'timecop'
