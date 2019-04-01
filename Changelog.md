@@ -1,6 +1,9 @@
 Changelog
 =========
 
+## 5.3.2
+Fix capistrano migration tasks to only skip migrations if there are no changes in the db/data and db/migrate folders
+
 ## 5.3.1
 Change database task to use data_migrations_path_configuration
 
