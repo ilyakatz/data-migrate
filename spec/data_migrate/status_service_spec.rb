@@ -46,7 +46,7 @@ describe DataMigrate::StatusService do
         VALUES #{fixture_file_timestamps.map { |t| "(#{t})" }.join(', ')}
       SQL
 
-      allow_any_instance_of(service).to receive(:root_folder) { "spec" }
+      allow_any_instance_of(service).to receive(:root_folder) { "./" }
     end
 
     after do

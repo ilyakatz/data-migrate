@@ -11,21 +11,6 @@ describe DataMigrate::Tasks::DataMigrateTasks do
   end
 
   before do
-    if Rails::VERSION::MAJOR == 5
-      if Rails::VERSION::MINOR == 2
-        allow(DataMigrate::Tasks::DataMigrateTasks).to receive(:migrations_paths) {
-          "spec/db/data"
-        }
-      else
-        allow(DataMigrate::Tasks::DataMigrateTasks).to receive(:migrations_paths) {
-          "spec/db/5.0"
-        }
-      end
-    else
-      allow(DataMigrate::Tasks::DataMigrateTasks).to receive(:migrations_paths) {
-        "spec/db/4.2"
-      }
-    end
     allow(DataMigrate::DataMigrator).to receive(:db_config) { db_config }
     ActiveRecord::Base.establish_connection(db_config)
   end
@@ -36,9 +21,9 @@ describe DataMigrate::Tasks::DataMigrateTasks do
 
   describe :migrate do
     it do
-      expect {
+       expect {
         DataMigrate::Tasks::DataMigrateTasks.migrate
-      }.to output(/20091231235959 SomeName: migrating/).to_stdout
+       }.to output(/20091231235959 SomeName: migrating/).to_stdout
     end
 
     it do

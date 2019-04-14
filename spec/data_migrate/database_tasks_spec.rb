@@ -5,7 +5,9 @@ require "spec_helper"
 describe DataMigrate::DatabaseTasks do
   let(:subject) { DataMigrate::DatabaseTasks }
   let(:migration_path) {
-    if Rails::VERSION::MAJOR == 5
+    if Rails::VERSION::MAJOR == 6
+      "spec/db/migrate/6.0"
+    elsif Rails::VERSION::MAJOR == 5
       if Rails::VERSION::MINOR == 2
         "spec/db/migrate/5.2"
       else
@@ -16,15 +18,7 @@ describe DataMigrate::DatabaseTasks do
     end
   }
   let(:data_migrations_path) {
-    if Rails::VERSION::MAJOR == 5
-      if Rails::VERSION::MINOR == 2
-        "spec/db/data"
-      else
-        "spec/db/5.0"
-      end
-    else
-      "spec/db/4.2"
-    end
+    DataMigrate.config.data_migrations_path
   }
   let(:db_config) do
     {

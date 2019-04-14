@@ -1,5 +1,10 @@
 # Changelog
 
+## 6.0.0
+
+Support for Rails 6
+No longer supporting Rails 4.2
+
 ## 5.3.3
 
 Ruby 2.2 and 2.3 are no longer actively validated with tests since they are both EOL
