@@ -20,6 +20,12 @@ module DataMigrate
     end
 
     class << self
+      alias_method :migrations_status_orig, :migrations_status
+
+      def migrations_status
+        migrations_status_orig([DataMigrate.config.data_migrations_path])
+      end
+
       def current_version(connection = ActiveRecord::Base.connection)
         get_all_versions(connection).max || 0
       end

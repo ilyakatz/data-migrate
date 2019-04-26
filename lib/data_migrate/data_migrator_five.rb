@@ -5,7 +5,9 @@ require "data_migrate/config"
 
 module DataMigrate
   class DataMigrator < ActiveRecord::Migrator
-    self.migrations_paths = [DataMigrate.config.data_migrations_path]
+    def self.migrations_paths
+      [DataMigrate.config.data_migrations_path]
+    end
 
     def self.assure_data_schema_table
       ActiveRecord::Base.establish_connection(db_config)
@@ -54,9 +56,10 @@ module DataMigrate
         DataMigrate::MigrationContext.new(migrations_paths).migrations_status
       end
 
-      #TODO: this was added to be backward compatible, need to re-evaluate
+      # TODO: this was added to be backward compatible, need to re-evaluate
       def migrations(_migrations_paths)
-        DataMigrate::MigrationContext.new(migrations_paths).migrations
+        #DataMigrate::MigrationContext.new(migrations_paths).migrations
+        DataMigrate::MigrationContext.new(_migrations_paths).migrations
       end
 
       #TODO: this was added to be backward compatible, need to re-evaluate

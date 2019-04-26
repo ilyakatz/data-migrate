@@ -17,13 +17,13 @@ is the place to do it.
 # Why should I use this?
 
 Its seems when a project hits a certain size, I get to manipulate data
-outside the application itself.  Changing defaults, new validations,
+outside the application itself. Changing defaults, new validations,
 one-to-one to one-to-many... I found it a pain and dodgy to have to
 step up migrations one by one, run a ruby script of some sort, then
-resume migrations.  It tanks a lot of the automation of deploy.
+resume migrations. It tanks a lot of the automation of deploy.
 
 If you don't use the one off scripts, you could do it as a regular
-migration.  It'd be much better to keep concerns separate. The benefit
+migration. It'd be much better to keep concerns separate. The benefit
 of having them separate has to do with your data model.
 
 For instance, lets take an absurd example, to illustrate: You have
@@ -32,28 +32,29 @@ After some use, you decide you are going to be a trend setter,
 and want only one comment per post, and just the text.
 
 Given that you:
+
 - write a migration to add a comment column to `Post`
 - write a migration to move the contents of the first comments to the `Post`
 - drop the `column_id` column from `Post`
 - drop the `Comment` model
 - fix all your tests
 
-You've just got bit.  When you `rake setup:development`, the mess gets
+You've just got bit. When you `rake setup:development`, the mess gets
 mad at you after it creates your database, and starts cranking through
-migrations.  It gets to the part where you iterate over the comments
-and it blows up.  You don't have a `Comment` model anymore for it to
-even try and get 'all' from.  You think you are smarter, and wrap the
+migrations. It gets to the part where you iterate over the comments
+and it blows up. You don't have a `Comment` model anymore for it to
+even try and get 'all' from. You think you are smarter, and wrap the
 ActiveRecord call in a conditional based on the environment.
 
 That's fine until you get that QA gal, and she wants her own thing.
 Then the UI people get tired of waiting for the full stack to load on page
 refreshes, so you have to edit past migrations...
 
-With Data Migrate, you have the control.  You can generate your
+With Data Migrate, you have the control. You can generate your
 migrations as schema or data as you would as your work flow. For
 setting tasks that don't require any intermediate AR activity, like
-dev and test, you stick with `db:migrate`.  For production and QA, you
-change their scripts to `db:migrate:with_data`.  Of course you want to
+dev and test, you stick with `db:migrate`. For production and QA, you
+change their scripts to `db:migrate:with_data`. Of course you want to
 test your migration, so you have the choice of `db:migrate:with_data` or
 `data:migrate` to just capture that data change.
 
@@ -68,7 +69,7 @@ table to track all the goodness.
 
 ## Rails Support
 
-Support Rails 4.2 through 5.2
+Support Rails 5.0 through 6.0
 
 ### Important notes for older versions
 
@@ -91,6 +92,7 @@ If you've installed previous to v1.1.0, you'll want to delete the
 `create_data_migrations_table` migration.
 
 ## Installation
+
 Add the gem to your project
 
     # Gemfile
@@ -101,7 +103,6 @@ Then `bundle install` and you are ready to go.
 So you know, when you use one of the provide rake tasks, a table
 called `data_migrations` will be created in your database. This
 is to mirror the way the standard `db` rake tasks work.
-
 
 ## Usage
 
@@ -136,15 +137,15 @@ You can generate a data migration as you would a schema migration:
 
 Tasks work as they would with the 'vanilla' db version. The 'with_data' addition to the 'db' tasks will run the task in the context of both the data and schema migrations. That is, rake db:rollback:with_data will check to see if it was a schema or data migration invoked last, and do that. Tasks invoked in that space also have an additional line of output, indicating if the action is performed on data or schema.
 
-With 'up' and 'down', you can specify the option 'BOTH', which defaults to false. Using true, will migrate both the data and schema (in the desired direction) if they both match the version provided.  Again, going up, schema is given precedence. Down its data.
+With 'up' and 'down', you can specify the option 'BOTH', which defaults to false. Using true, will migrate both the data and schema (in the desired direction) if they both match the version provided. Again, going up, schema is given precedence. Down its data.
 
 `rake db:migrate:status:with_data` provides and additional column to indicate which type of migration.
+
 ### Configuration
 
 `data_migrate` respects `ActiveRecord::Base.dump_schema_after_migration`. If it is set to `false`, data schema file will not be generated
 
-
-By default, data migrations are added to the `db/data/` path. 
+By default, data migrations are added to the `db/data/` path.
 You can override this setting in `config/initializers/data_migrate.rb`
 
 ```ruby
@@ -174,13 +175,14 @@ Run tests for a specific version of Rails
 
 ```
 bundle exec appraisal install
-bundle exec appraisal rails-4.2 rspec
 bundle exec appraisal rails-5.0 rspec
+bundle exec appraisal rails-5.2 rspec
 ```
 
 ## Thanks
+
 [Andrew J Vargo](http://github.com/ajvargo) Andrew was the original creator and maintainer of this project!
 
 [Jeremy Durham](http://jeremydurham.com/) for fleshing out the idea with me, and providing guidance.
 
-You!  Yes, you. Thanks for checking it out.
+You! Yes, you. Thanks for checking it out.

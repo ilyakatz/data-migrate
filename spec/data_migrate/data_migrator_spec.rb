@@ -9,6 +9,11 @@ describe DataMigrate::DataMigrator do
     }
   end
 
+  before do
+    allow(DataMigrate::DataMigrator).to receive(:db_config) { db_config }
+    ActiveRecord::Base.establish_connection(db_config)
+  end
+
   describe :load_migrated do
     before do
       allow(subject).to receive(:db_config) { db_config }.at_least(:once)
@@ -53,6 +58,22 @@ describe DataMigrate::DataMigrator do
       expect(
         ActiveRecord::Base.connection.table_exists?("data_migrations")
       ).to eq true
+    end
+  end
+
+  describe "#migrations_status" do
+    before do
+      allow(subject).to receive(:db_config) { db_config }.at_least(:once)
+      ActiveRecord::Base.establish_connection(db_config)
+      ::ActiveRecord::SchemaMigration.create_table
+      DataMigrate::DataSchemaMigration.create_table
+    end
+
+    it "returns all migrations statuses" do
+      status = subject.migrations_status
+      expect(status.length).to eq 2
+      expect(status.first).to eq ["down", "20091231235959", "Some name"]
+      expect(status.second).to eq ["down", "20171231235959", "Super update"]
     end
   end
 
