@@ -24,4 +24,37 @@ describe DataMigrate::Generators::DataMigrationGenerator do
       end
     end
   end
+
+  describe :create_data_migration do
+    let(:subject) { DataMigrate::Generators::DataMigrationGenerator.new(['my_migration']) }
+    let(:data_migrations_file_path) { 'abc/my_migration.rb' }
+
+    context 'when custom data migrations path has a trailing slash' do
+      before do
+        DataMigrate.config.data_migrations_path = 'abc/'
+      end
+
+      it 'returns correct file path' do
+        expect(subject).to receive(:migration_template).with(
+          'data_migration.rb', data_migrations_file_path
+        )
+
+        subject.create_data_migration
+      end
+    end
+
+    context 'when custom data migrations path does not have a trailing slash' do
+      before do
+        DataMigrate.config.data_migrations_path = 'abc'
+      end
+
+      it 'returns correct file path' do
+        expect(subject).to receive(:migration_template).with(
+          'data_migration.rb', data_migrations_file_path
+        )
+
+        subject.create_data_migration
+      end
+    end
+  end
 end
