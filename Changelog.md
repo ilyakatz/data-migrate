@@ -1,5 +1,8 @@
 # Changelog
 
+## 6.0.1
+Fix migrations being generated in wrong folder
+
 ## 6.0.0
 
 Support for Rails 6
