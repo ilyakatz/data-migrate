@@ -10,7 +10,7 @@ describe DataMigrate::DataMigrator do
   }
   let(:schema_context) {
     if (Rails::VERSION::MAJOR == 6)
-      ActiveRecord::MigrationContext.new("spec/db/migrate/6.0")
+      ActiveRecord::MigrationContext.new("spec/db/migrate/6.0", ActiveRecord::Base.connection.schema_migration)
     else
       ActiveRecord::MigrationContext.new("spec/db/migrate/5.2")
     end
