@@ -16,6 +16,16 @@ module DataMigrate
           DataMigrate::DataMigrator.migrate(migrations_paths, ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
         end
       end
+
+      def abort_if_pending_migrations(migrations, message)
+        if migrations.any?
+          puts "You have #{migrations.size} pending #{migrations.size > 1 ? 'migrations:' : 'migration:'}"
+          migrations.each do |pending_migration|
+            puts "  %4d %s" % [pending_migration[:version], pending_migration[:name]]
+          end
+          abort message
+        end
+      end
     end
   end
 end

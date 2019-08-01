@@ -69,7 +69,7 @@ module DataMigrate
     def self.pending_data_migrations
       data_migrations = DataMigrate::DataMigrator.migrations(data_migrations_path)
       sort_migrations(DataMigrate::DataMigrator.new(:up, data_migrations ).
-        pending_migrations.map {|m| { version: m.version, kind: :data }})
+        pending_migrations.map {|m| { version: m.version, name: m.name, kind: :data }})
     end
 
     def self.pending_schema_migrations

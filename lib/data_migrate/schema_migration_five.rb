@@ -7,7 +7,7 @@ module DataMigrate
       sort_migrations(
         ActiveRecord::Migrator.new(:up, all_migrations).
         pending_migrations.
-        map {|m| { version: m.version, kind: :schema }}
+        map {|m| { version: m.version, name: m.name, kind: :schema }}
       )
     end
 

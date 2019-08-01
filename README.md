@@ -82,26 +82,29 @@ You can generate a data migration as you would a schema migration:
 ### Rake Tasks
 
     $> rake -T data
-    rake data:dump                    # Create a db/data_schema.rb file that stores the current data version
-    rake data:forward                 # Pushes the schema to the next version (specify steps w/ STEP=n)
-    rake data:migrate                 # Migrate data migrations (options: VERSION=x, VERBOSE=false)
-    rake data:migrate:down            # Runs the "down" for a given migration VERSION
-    rake data:migrate:redo            # Rollbacks the database one migration and re migrate up (options: STEP=x, VERSION=x)
-    rake data:migrate:status          # Display status of data migrations
-    rake data:migrate:up              # Runs the "up" for a given migration VERSION
-    rake data:rollback                # Rolls the schema back to the previous version (specify steps w/ STEP=n)
-    rake data:schema:load             # Load data_schema.rb file into the database without running the data migrations
-    rake data:version                 # Retrieves the current schema version number for data migrations
-    rake db:forward:with_data         # Pushes the schema to the next version (specify steps w/ STEP=n)
-    rake db:migrate:down:with_data    # Runs the "down" for a given migration VERSION
-    rake db:migrate:redo:with_data    # Rollbacks the database one migration and re migrate up (options: STEP=x, VERSION=x)
-    rake db:migrate:status:with_data  # Display status of data and schema migrations
-    rake db:migrate:up:with_data      # Runs the "up" for a given migration VERSION
-    rake db:migrate:with_data         # Migrate the database data and schema (options: VERSION=x, VERBOSE=false)
-    rake db:rollback:with_data        # Rolls the schema back to the previous version (specify steps w/ STEP=n)
-    rake db:schema:load:with_data     # Load both schema.rb and data_schema.rb files into the database
-    rake db:structure:load:with_data  # Load both structure.sql and data_schema.rb files into the database
-    rake db:version:with_data         # Retrieves the current schema version numbers for data and schema migrations
+    rake data:abort_if_pending_migrations          # Raises an error if there are pending data migrations
+    rake data:dump                                 # Create a db/data_schema.rb file that stores the current data version
+    rake data:forward                              # Pushes the schema to the next version (specify steps w/ STEP=n)
+    rake data:migrate                              # Migrate data migrations (options: VERSION=x, VERBOSE=false)
+    rake data:migrate:down                         # Runs the "down" for a given migration VERSION
+    rake data:migrate:redo                         # Rollbacks the database one migration and re migrate up (options: STEP=x, VERSION=x)
+    rake data:migrate:status                       # Display status of data migrations
+    rake data:migrate:up                           # Runs the "up" for a given migration VERSION
+    rake data:rollback                             # Rolls the schema back to the previous version (specify steps w/ STEP=n)
+    rake data:schema:load                          # Load data_schema.rb file into the database without running the data migrations
+    rake data:version                              # Retrieves the current schema version number for data migrations
+    rake db:abort_if_pending_migrations:with_data  # Raises an error if there are pending migrations or data migrations
+    rake db:forward:with_data                      # Pushes the schema to the next version (specify steps w/ STEP=n)
+    rake db:migrate:down:with_data                 # Runs the "down" for a given migration VERSION
+    rake db:migrate:redo:with_data                 # Rollbacks the database one migration and re migrate up (options: STEP=x, VERSION=x)
+    rake db:migrate:status:with_data               # Display status of data and schema migrations
+    rake db:migrate:up:with_data                   # Runs the "up" for a given migration VERSION
+    rake db:migrate:with_data                      # Migrate the database data and schema (options: VERSION=x, VERBOSE=false)
+    rake db:rollback:with_data                     # Rolls the schema back to the previous version (specify steps w/ STEP=n)
+    rake db:schema:load:with_data                  # Load both schema.rb and data_schema.rb file into the database
+    rake db:structure:load:with_data               # Load both structure.sql and data_schema.rb file into the database
+    rake db:version:with_data                      # Retrieves the current schema version numbers for data and schema migrations
+
 
 Tasks work as they would with the 'vanilla' db version. The 'with_data' addition to the 'db' tasks will run the task in the context of both the data and schema migrations. That is, rake db:rollback:with_data will check to see if it was a schema or data migration invoked last, and do that. Tasks invoked in that space also have an additional line of output, indicating if the action is performed on data or schema.
 
