@@ -1,6 +1,11 @@
 # Changelog
 
-## 6.0.1
+## 6.0.3.beta
+
+Compatiblity with Rails 6 RC2 [y-yagi](https://github.com/y-yagi)
+
+## 6.0.1.beta
+
 Fix migrations being generated in wrong folder
 
 ## 6.0.0
