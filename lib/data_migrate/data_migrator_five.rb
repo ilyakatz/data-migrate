@@ -45,6 +45,9 @@ module DataMigrate
         /(\d{14})_(.+)\.rb/.match(filename)
       end
 
+      def needs_migration?
+        DataMigrate::DatabaseTasks.pending_migrations.count.positive?
+      end
       ##
       # Provides the full migrations_path filepath
       # @return (String)
