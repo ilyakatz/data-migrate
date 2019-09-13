@@ -194,7 +194,7 @@ namespace :db do
           DataMigrate::DataMigrator.run(:down, data_migrations_path, past_migration[:version])
         elsif past_migration[:kind] == :schema
           ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-          ActiveRecord::Migrator.run(:down, "db/migrate/", past_migration[:version])
+          DataMigrate::SchemaMigration.run(:down, "db/migrate/", past_migration[:version])
         end
       end
 
