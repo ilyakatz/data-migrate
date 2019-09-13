@@ -1,5 +1,8 @@
 # Changelog
 
+## 6.0.4.beta
+Fix rolling back schema migrations failing for Rails 5.2 and above
+
 ## 6.0.3.beta
 
 Compatiblity with Rails 6 RC2 [y-yagi](https://github.com/y-yagi)
