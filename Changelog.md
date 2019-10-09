@@ -1,6 +1,11 @@
 # Changelog
 
+## 6.0.5
+
+Fixing `needs_migration?` method for Rails 5.2 and up [EnomaDebby](https://github.com/EnomaDebby)
+
 ## 6.0.4.beta
+
 Fix rolling back schema migrations failing for Rails 5.2 and above
 
 ## 6.0.3.beta
