@@ -175,7 +175,7 @@ Run tests for a specific version of Rails
 
 ```
 bundle exec appraisal install
-bundle exec appraisal rails-5.0 rspec
+bundle exec appraisal rails-5.1 rspec
 bundle exec appraisal rails-5.2 rspec
 bundle exec appraisal rails-6.0 rspec
 ```
