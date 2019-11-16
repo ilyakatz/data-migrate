@@ -51,9 +51,7 @@ describe DataMigrate::DataMigrator do
     end
 
     it do
-      expect(
-        ActiveRecord::Base.connection.table_exists?("data_migrations")
-      ).to eq false
+      ActiveRecord::Migration.drop_table("data_migrations") rescue nil
       subject.assure_data_schema_table
       expect(
         ActiveRecord::Base.connection.table_exists?("data_migrations")

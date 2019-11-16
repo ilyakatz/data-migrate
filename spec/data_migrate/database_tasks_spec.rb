@@ -39,6 +39,7 @@ describe DataMigrate::DatabaseTasks do
       data_migrations_path
     }
     allow(DataMigrate::DataMigrator).to receive(:db_config) { db_config }
+    ActiveRecord::Base.configurations[:test] =db_config
     ActiveRecord::Base.establish_connection(db_config)
   end
 
@@ -58,7 +59,7 @@ describe DataMigrate::DatabaseTasks do
     end
 
     before do
-      ActiveRecord::Base.establish_connection(db_config)
+      # ActiveRecord::Base.establish_connection(db_config)
       ActiveRecord::SchemaMigration.create_table
 
       allow(DataMigrate::SchemaMigration).to receive(:migrations_paths) {
@@ -83,6 +84,35 @@ describe DataMigrate::DatabaseTasks do
       it "shows nothing without any migrations" do
         m = subject.past_migrations
         expect(m.count).to eq 0
+      end
+    end
+
+    describe :load_schema_current do
+      before do
+        allow(DataMigrate::DataMigrator).to receive(:full_migrations_path).and_return(migration_path)
+      end
+
+      it "loads the current schema file" do
+        if Rails::VERSION::MAJOR < 6
+          skip("Not implemented for Rails lower than 6")
+        end
+        allow(subject).to receive(:schema_location).and_return("spec/db/data/schema/")
+
+        subject.load_schema_current
+        versions = DataMigrate::DataSchemaMigration.normalized_versions
+        expect(versions.count).to eq(2)
+      end
+
+      it "loads schema file that has not been update with latest data migrations" do
+        if Rails::VERSION::MAJOR < 6
+          skip("Not implemented for Rails lower than 6")
+        end
+
+        allow(subject).to receive(:schema_location).and_return("spec/db/data/partial_schema/")
+
+        subject.load_schema_current
+        versions = DataMigrate::DataSchemaMigration.normalized_versions
+        expect(versions.count).to eq(1)
       end
     end
 
