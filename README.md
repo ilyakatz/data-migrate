@@ -14,45 +14,12 @@ is the place to do it.
 
 ![Travis](./screenshot.png)
 
-# Why should I use this?
+## Why should I use this?
 
-Its seems when a project hits a certain size, I get to manipulate data
-outside the application itself. Changing defaults, new validations,
-one-to-one to one-to-many... I found it a pain and dodgy to have to
-step up migrations one by one, run a ruby script of some sort, then
-resume migrations. It tanks a lot of the automation of deploy.
+With data-migrate you can generate your migrations for data as you would schema
+in your regular work flow.
 
-If you don't use the one off scripts, you could do it as a regular
-migration. It'd be much better to keep concerns separate. The benefit
-of having them separate has to do with your data model.
-
-For instance, lets take an absurd example, to illustrate: You have
-a blog application that has posts with many comments.
-After some use, you decide you are going to be a trend setter,
-and want only one comment per post, and just the text.
-
-Given that you:
-
-- write a migration to add a comment column to `Post`
-- write a migration to move the contents of the first comments to the `Post`
-- drop the `column_id` column from `Post`
-- drop the `Comment` model
-- fix all your tests
-
-You've just got bit. When you `rake setup:development`, the mess gets
-mad at you after it creates your database, and starts cranking through
-migrations. It gets to the part where you iterate over the comments
-and it blows up. You don't have a `Comment` model anymore for it to
-even try and get 'all' from. You think you are smarter, and wrap the
-ActiveRecord call in a conditional based on the environment.
-
-That's fine until you get that QA gal, and she wants her own thing.
-Then the UI people get tired of waiting for the full stack to load on page
-refreshes, so you have to edit past migrations...
-
-With Data Migrate, you have the control. You can generate your
-migrations as schema or data as you would as your work flow. For
-setting tasks that don't require any intermediate AR activity, like
+For setting tasks that don't require any intermediate AR activity, like
 dev and test, you stick with `db:migrate`. For production and QA, you
 change their scripts to `db:migrate:with_data`. Of course you want to
 test your migration, so you have the choice of `db:migrate:with_data` or
@@ -65,7 +32,7 @@ migrations, except they should be reserved for data migrations. For
 instance, if you realize you need to titleize all yours titles, this
 is the place to do it. Running any of the provided rake tasks also
 creates a data schema table to mirror the usual schema migrations
-table to track all the goodness.
+table to track all migrations.
 
 ## Rails Support
 
@@ -184,6 +151,6 @@ bundle exec appraisal rails-6.0 rspec
 
 [Andrew J Vargo](http://github.com/ajvargo) Andrew was the original creator and maintainer of this project!
 
-[Jeremy Durham](http://jeremydurham.com/) for fleshing out the idea with me, and providing guidance.
+[Jeremy Durham](http://jeremydurham.com/) for fleshing out the idea and providing guidance.
 
 You! Yes, you. Thanks for checking it out.
