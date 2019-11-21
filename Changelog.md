@@ -1,5 +1,14 @@
 # Changelog
 
+## 6.1.0
+
+Fixing `rake db:schema:load:with_data` for Rails 6
+
+Note:
+
+Rails 5.0 is no longer maintained. The gem will still work but it is not being
+actively tested.
+
 ## 6.0.5
 
 Fixing `needs_migration?` method for Rails 5.2 and up [EnomaDebby](https://github.com/EnomaDebby)

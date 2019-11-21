@@ -8,6 +8,33 @@ module DataMigrate
   class DatabaseTasks
     extend ActiveRecord::Tasks::DatabaseTasks
 
+    class << self
+      def schema_file_type(_format = nil)
+        "data_schema.rb"
+      end
+
+      def dump_filename(namespace, format = ActiveRecord::Base.schema_format)
+        filename = if namespace == "primary"
+          schema_file_type(format)
+        else
+          "#{namespace}_#{schema_file_type(format)}"
+        end
+
+        ENV["DATA_SCHEMA"] || File.join(schema_location, filename)
+      end
+
+      def schema_location
+        db_dir
+      end
+
+      def check_schema_file(filename)
+        unless File.exist?(filename)
+          message = +%{#{filename} doesn't exist yet. Run `rake data:migrate` to create it, then try again.}
+          Kernel.abort message
+        end
+      end
+    end
+
     # This overrides ActiveRecord::Tasks::DatabaseTasks
     def self.schema_file(_format = nil)
       File.join(db_dir, "data_schema.rb")

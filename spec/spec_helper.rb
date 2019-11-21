@@ -10,9 +10,16 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
+  config.after(:each) do
+    DataMigrate.configure do |config|
+      config.data_migrations_path = @prev_data_migrations_path
+    end
+  end
+
   config.before(:each) do |example|
     if example.metadata[:no_override]
     else
+      @prev_data_migrations_path = DataMigrate.config.data_migrations_path
       if Rails::VERSION::MAJOR == 6
         DataMigrate.configure do |config|
           config.data_migrations_path = "spec/db/6.0"
