@@ -90,7 +90,7 @@ You can generate a data migration as you would a schema migration:
     rake data:migrate:status          # Display status of data migrations
     rake data:migrate:up              # Runs the "up" for a given migration VERSION
     rake data:rollback                # Rolls the schema back to the previous version (specify steps w/ STEP=n)
-    rake data:schema:load             # Load data_schema.rb file into the database
+    rake data:schema:load             # Load data_schema.rb file into the database without running the data migrations
     rake data:version                 # Retrieves the current schema version number for data migrations
     rake db:forward:with_data         # Pushes the schema to the next version (specify steps w/ STEP=n)
     rake db:migrate:down:with_data    # Runs the "down" for a given migration VERSION
