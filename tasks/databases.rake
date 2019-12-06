@@ -341,6 +341,16 @@ namespace :data do
     # that depend on this one.
     Rake::Task["data:dump"].reenable
   end
+  
+  namespace :schema do
+    desc "Load data_schema.rb file into the database"
+    task load: :environment do
+      DataMigrate::DatabaseTasks.load_schema_current(
+        :ruby,
+        ENV["DATA_SCHEMA"]
+      )
+    end
+  end
 end
 
 def pending_migrations
