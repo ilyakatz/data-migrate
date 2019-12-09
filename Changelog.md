@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.2.0
+
+Add `rake data:schema:load` [timkrins](https://github.com/timkrins)
+
 ## 6.1.0
 
 Fixing `rake db:schema:load:with_data` for Rails 6
