@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.3.0
+
+Add `abort_if_pending_migrations` rake tasks [tomgia](https://github.com/tomgia)
+
 ## 6.2.0
 
 Add `rake data:schema:load` [timkrins](https://github.com/timkrins)

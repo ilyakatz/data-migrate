@@ -223,6 +223,14 @@ namespace :db do
     end
   end
 
+  namespace :abort_if_pending_migrations do
+    desc "Raises an error if there are pending migrations or data migrations"
+    task with_data: :environment do
+      message = %{Run `rake db:migrate:with_data` to update your database then try again.}
+      DataMigrate::Tasks::DataMigrateTasks.abort_if_pending_migrations(pending_migrations, message)
+    end
+  end
+
   namespace :schema do
     namespace :load do
       desc "Load both schema.rb and data_schema.rb file into the database"
@@ -325,6 +333,12 @@ namespace :data do
   task :version => :environment do
     assure_data_schema_table
     puts "Current data version: #{DataMigrate::DataMigrator.current_version}"
+  end
+
+  desc "Raises an error if there are pending data migrations"
+  task abort_if_pending_migrations: :environment do
+    message = %{Run `rake data:migrate` to update your database then try again.}
+    DataMigrate::Tasks::DataMigrateTasks.abort_if_pending_migrations(pending_data_migrations, message)
   end
 
   desc "Create a db/data_schema.rb file that stores the current data version"
