@@ -14,8 +14,8 @@ module DataMigrate
         ActiveRecord::Base.table_name_prefix + "data_migrations" + ActiveRecord::Base.table_name_suffix
       end
 
-      def index_name
-        "#{table_name_prefix}unique_data_migrations#{table_name_suffix}"
+      def primary_key
+        "version"
       end
     end
 

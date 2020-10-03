@@ -9,8 +9,8 @@ describe DataMigrate::DataSchemaMigration do
   end
 
   describe :index_name do
-    it "returns correct index name" do
-      expect(subject.index_name).to eq("unique_data_migrations")
+    it "returns correct primary key name" do
+      expect(subject.primary_key).to eq("version")
     end
   end
 end

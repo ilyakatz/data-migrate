@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.4.0
+
+Add primary key to data_migrations table [aandis](https://github.com/aandis)
+
 ## 6.3.0
 
 Add `abort_if_pending_migrations` rake tasks [tomgia](https://github.com/tomgia)

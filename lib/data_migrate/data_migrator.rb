@@ -76,17 +76,8 @@ module DataMigrate
 
       def create_table(sm_table)
         ActiveRecord::Base.connection.create_table(sm_table, id: false) do |schema_migrations_table|
-          schema_migrations_table.column :version, :string, null: false
+          schema_migrations_table.string :version, primary_key: true
         end
-
-        suffix = ActiveRecord::Base.table_name_suffix
-        prefix = ActiveRecord::Base.table_name_prefix
-        index_name = "#{prefix}unique_data_migrations#{suffix}"
-
-        options = {unique: true, name: index_name}
-        options[:length] = 191 if ActiveRecord::Base.connection_config[:adapter] == "mysql2"
-
-        ActiveRecord::Base.connection.add_index sm_table, :version, options
       end
 
       def table_exists?(connection, table_name)
