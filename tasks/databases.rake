@@ -346,6 +346,7 @@ namespace :data do
     if ActiveRecord::Base.dump_schema_after_migration
       filename = DataMigrate::DatabaseTasks.schema_file
       File.open(filename, "w:utf-8") do |file|
+        ActiveRecord::Base.establish_connection(DataMigrate.config.db_configuration)
         DataMigrate::SchemaDumper.dump(ActiveRecord::Base.connection, file)
       end
     end
@@ -355,7 +356,7 @@ namespace :data do
     # that depend on this one.
     Rake::Task["data:dump"].reenable
   end
-  
+
   namespace :schema do
     desc "Load data_schema.rb file into the database"
     task load: :environment do
