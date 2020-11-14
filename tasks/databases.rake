@@ -345,8 +345,8 @@ namespace :data do
   task dump: :environment do
     if ActiveRecord::Base.dump_schema_after_migration
       filename = DataMigrate::DatabaseTasks.schema_file
+      ActiveRecord::Base.establish_connection(DataMigrate.config.db_configuration)
       File.open(filename, "w:utf-8") do |file|
-        ActiveRecord::Base.establish_connection(DataMigrate.config.db_configuration)
         DataMigrate::SchemaDumper.dump(ActiveRecord::Base.connection, file)
       end
     end
