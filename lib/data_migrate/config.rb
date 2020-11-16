@@ -16,7 +16,7 @@ module DataMigrate
 
     def initialize
       @data_migrations_path = "db/data/"
-      @db_configuration = ActiveRecord::Base.connection_config
+      @db_configuration = nil
     end
   end
 end
