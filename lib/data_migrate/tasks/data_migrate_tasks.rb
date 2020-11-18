@@ -6,6 +6,16 @@ module DataMigrate
         @migrations_paths ||= DataMigrate.config.data_migrations_path
       end
 
+      def dump
+        if ActiveRecord::Base.dump_schema_after_migration
+          filename = DataMigrate::DatabaseTasks.schema_file
+          ActiveRecord::Base.establish_connection(DataMigrate.config.db_configuration) if DataMigrate.config.db_configuration
+          File.open(filename, "w:utf-8") do |file|
+            DataMigrate::SchemaDumper.dump(ActiveRecord::Base.connection, file)
+          end
+        end
+      end
+
       def migrate
         DataMigrate::DataMigrator.assure_data_schema_table
         target_version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
