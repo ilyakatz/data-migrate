@@ -1,0 +1,7 @@
+steps:
+  - name: ':rocket: Publish to Gem Server'
+    branches: master
+    agents:
+      queue: proof_of_concept
+    command:
+      - ./.buildkite/deploy_gem.sh
