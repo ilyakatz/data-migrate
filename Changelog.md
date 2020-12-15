@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.6.0
+
+Allow data dump connection to be configured [lewhit](https://github.com/lewhit)
+
 ## 6.4.0
 
 Add primary key to data_migrations table [aandis](https://github.com/aandis)
