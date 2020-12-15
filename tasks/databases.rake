@@ -343,19 +343,14 @@ namespace :data do
 
   desc "Create a db/data_schema.rb file that stores the current data version"
   task dump: :environment do
-    if ActiveRecord::Base.dump_schema_after_migration
-      filename = DataMigrate::DatabaseTasks.schema_file
-      File.open(filename, "w:utf-8") do |file|
-        DataMigrate::SchemaDumper.dump(ActiveRecord::Base.connection, file)
-      end
-    end
+    DataMigrate::Tasks::DataMigrateTasks.dump
 
     # Allow this task to be called as many times as required. An example
     # is the migrate:redo task, which calls other two internally
     # that depend on this one.
     Rake::Task["data:dump"].reenable
   end
-  
+
   namespace :schema do
     desc "Load data_schema.rb file into the database"
     task load: :environment do

@@ -3,6 +3,8 @@
 *.lock
 gemfiles/.bundle
 spec/db/test.db
+spec/db/other_test.db
+spec/db/data_schema.rb
 .vscode/
 .DS_Store
 .idea/
