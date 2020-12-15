@@ -16,6 +16,10 @@ module DataMigrate
         set_local_assigns!
         migration_template "data_migration.rb", data_migrations_file_path
       end
+      
+      def create_data_migration_spec
+        template "data_migration_spec.rb", data_migrations_spec_path
+      end
 
       protected
 
@@ -38,6 +42,22 @@ module DataMigrate
 
       def data_migrations_file_path
         File.join(data_migrations_path, "#{file_name}.rb")
+      end
+      
+      # The path to the real generated migration.
+      def data_migrations_load_path
+        File.join(
+          data_migrations_path,
+          [@migration_number, "#{file_name}.rb"].join("_")
+        )
+      end
+      
+      def data_migrations_spec_path
+        File.join(
+          "spec",
+          data_migrations_path,
+          [@migration_number, "#{file_name}_spec.rb"].join("_")
+        )
       end
 
       def data_migrations_path
