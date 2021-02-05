@@ -2,12 +2,13 @@ require 'data_migrate/tasks/data_migrate_tasks'
 
 namespace :db do
   namespace :migrate do
-    desc "Migrate the database data and schema (options: VERSION=x, VERBOSE=false)."
+    desc "Migrate the database data and schema (options: VERSION=x, VERBOSE=false, IGNORE_DATA_MIGRATE_ERROR=false)."
     task :with_data => :environment do
       assure_data_schema_table
 
       ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
       target_version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
+      ignore_error = ENV["IGNORE_DATA_MIGRATE_ERROR"] ? ENV["IGNORE_DATA_MIGRATE_ERROR"].downcase == "true" : false
       migrations = []
 
       if target_version.nil?
@@ -46,16 +47,24 @@ namespace :db do
       end
 
       migrations.each do |migration|
-        if migration[:kind] == :data
-          ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
-          DataMigrate::DataMigrator.run(migration[:direction], data_migrations_path, migration[:version])
-        else
-          ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-          DataMigrate::SchemaMigration.run(
-            migration[:direction],
-            Rails.application.config.paths["db/migrate"],
-            migration[:version]
-          )
+        begin
+          if migration[:kind] == :data
+            ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
+            DataMigrate::DataMigrator.run(migration[:direction], data_migrations_path, migration[:version])
+          else
+            ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
+            DataMigrate::SchemaMigration.run(
+              migration[:direction],
+              Rails.application.config.paths["db/migrate"],
+              migration[:version]
+            )
+          end
+        rescue => e
+          if ignore_error && ( migration[:kind] == :data )
+            puts "Data migration #{migration[:version]} failed. Skipping."
+          else
+            raise e
+          end
         end
       end
 
