@@ -47,24 +47,12 @@ namespace :db do
       end
 
       migrations.each do |migration|
-        begin
-          if migration[:kind] == :data
-            ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
-            DataMigrate::DataMigrator.run(migration[:direction], data_migrations_path, migration[:version])
-          else
-            ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-            DataMigrate::SchemaMigration.run(
-              migration[:direction],
-              Rails.application.config.paths["db/migrate"],
-              migration[:version]
-            )
-          end
-        rescue => e
-          if ignore_error && ( migration[:kind] == :data )
-            puts "Data migration #{migration[:version]} failed. Skipping."
-          else
-            raise e
-          end
+        run_and_print_migration(migration, :up)
+      rescue => e
+        if ignore_error && ( migration[:kind] == :data )
+          puts "Data migration #{migration[:version]} failed. Skipping."
+        else
+          raise e
         end
       end
 
@@ -100,13 +88,7 @@ namespace :db do
         end
 
         migrations.each do |migration|
-          if migration[:kind] == :data
-            ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
-            DataMigrate::DataMigrator.run(:up, data_migrations_path, migration[:version])
-          else
-            ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-            DataMigrate::SchemaMigration.run(:up, "db/migrate/", migration[:version])
-          end
+          run_and_print_migration(migration, :up)
         end
 
         Rake::Task["db:_dump"].invoke
@@ -128,13 +110,7 @@ namespace :db do
         end
 
         migrations.each do |migration|
-          if migration[:kind] == :data
-            ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
-            DataMigrate::DataMigrator.run(:down, data_migrations_path, migration[:version])
-          else
-            ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-            DataMigrate::SchemaMigration.run(:down, "db/migrate/", migration[:version])
-          end
+          run_and_print_migration(migration, :down)
         end
 
         Rake::Task["db:_dump"].invoke
@@ -198,13 +174,7 @@ namespace :db do
       step = ENV['STEP'] ? ENV['STEP'].to_i : 1
       assure_data_schema_table
       past_migrations[0..(step - 1)].each do | past_migration |
-        if past_migration[:kind] == :data
-          ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
-          DataMigrate::DataMigrator.run(:down, data_migrations_path, past_migration[:version])
-        elsif past_migration[:kind] == :schema
-          ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-          DataMigrate::SchemaMigration.run(:down, "db/migrate/", past_migration[:version])
-        end
+        run_and_print_migration(past_migration, :down)
       end
 
       Rake::Task["db:_dump"].invoke
@@ -420,4 +390,14 @@ end
 
 def data_migrations_path
   DataMigrate.config.data_migrations_path
+end
+
+def run_and_print_migration(migration, direction)
+  if migration[:kind] == :data
+    ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
+    DataMigrate::DataMigrator.run(direction, data_migrations_path, migration[:version])
+  else
+    ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
+    DataMigrate::SchemaMigration.run(direction, Rails.application.config.paths["db/migrate"], migration[:version])
+  end
 end
