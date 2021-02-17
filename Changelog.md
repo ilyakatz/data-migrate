@@ -1,5 +1,8 @@
 # Changelog
 
+## 6.6.1
+
+configs_for deprecation notice [borama](https://github.com/borama)
 ## 6.6.0
 
 Allow data dump connection to be configured [lewhit](https://github.com/lewhit)
