@@ -68,4 +68,36 @@ describe DataMigrate::SchemaMigration do
       expect(versions.count).to eq(0)
     end
   end
+
+  describe :migrations_paths do
+    context 'when schema migration path configured' do
+      let(:paths) {
+        if Rails::VERSION::MAJOR == 6
+          ["spec/db/migrate/6.0", "spec/db/components/migrate/6.0"]
+        elsif Rails::VERSION::MAJOR == 5
+          if Rails::VERSION::MINOR == 2
+            ["spec/db/migrate/5.2", "spec/db/components/migrate/5.2"]
+          else
+            ["spec/db/migrate/5.0", "spec/db/components/migrate/5.0"]
+          end
+        else
+          ["spec/db/migrate/4.2", "spec/db/components/migrate/4.2"]
+        end
+      }
+      let(:rails_root) { Pathname.new('blah') }
+
+      before do
+        allow(Rails).to receive(:root).and_return(rails_root)
+        DataMigrate.configure do |config|
+          config.schema_migrations_paths = paths
+        end
+      end
+
+      it "lists schema migration paths" do
+        expect(subject.migrations_paths.size).to eq(2)
+        expect(subject.migrations_paths.first.to_s).to match(/blah\/spec\/db\/migrate\/\d/)
+        expect(subject.migrations_paths.last.to_s).to match(/blah\/spec\/db\/components\/migrate\/\d/)
+      end
+    end
+  end
 end
