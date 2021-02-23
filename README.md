@@ -119,9 +119,12 @@ With 'up' and 'down', you can specify the option 'BOTH', which defaults to false
 By default, data migrations are added to the `db/data/` path.
 You can override this setting in `config/initializers/data_migrate.rb`
 
+Similarly, the default schema migration path is `db/migrate`, but you can override this by setting `schema_migrations_paths` (as below).
+
 ```ruby
 DataMigrate.configure do |config|
-  config.data_migrations_path = "db/awesomepath/"
+  config.data_migrations_path = 'db/awesomepath/'
+  config.schema_migrations_paths = ['db/migrate', 'awesome/db/migrate']
   config.db_configuration = {
     'host' => '127.0.0.1',
     'database' => 'awesome_database',

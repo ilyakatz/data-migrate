@@ -80,8 +80,6 @@ describe DataMigrate::SchemaMigration do
           else
             ["spec/db/migrate/5.0", "spec/db/components/migrate/5.0"]
           end
-        else
-          ["spec/db/migrate/4.2", "spec/db/components/migrate/4.2"]
         end
       }
       let(:rails_root) { Pathname.new('blah') }
