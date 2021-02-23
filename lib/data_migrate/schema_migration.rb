@@ -21,7 +21,14 @@ module DataMigrate
     end
 
     def self.migrations_paths
-      Rails.application.config.paths["db/migrate"].to_a
+      paths = DataMigrate.config.schema_migrations_paths
+      if paths
+        paths.to_a.map do |path|
+          Rails.root.join(path)
+        end
+      else
+        Rails.application.config.paths["db/migrate"].to_a
+      end
     end
 
     def self.sort_string(migration)

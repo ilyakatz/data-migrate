@@ -53,7 +53,7 @@ namespace :db do
           ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
           DataMigrate::SchemaMigration.run(
             migration[:direction],
-            Rails.application.config.paths["db/migrate"],
+            DataMigrate::SchemaMigration.migrations_paths,
             migration[:version]
           )
         end
