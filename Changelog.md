@@ -1,5 +1,6 @@
 # Changelog
 
+## 6.6.2
 ## 6.6.1
 
 configs_for deprecation notice [borama](https://github.com/borama)
