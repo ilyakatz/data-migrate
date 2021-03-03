@@ -21,7 +21,12 @@ module DataMigrate
     end
 
     def self.migrations_paths
-      Rails.application.config.paths["db/migrate"].to_a
+      db_name = DataMigrate.config.db_name
+      if db_name && Rails::VERSION::MINOR == 1
+        ActiveRecord::Base.configurations.configs_for(env_name: Rails.env, name: db_name).migrations_paths
+      else
+        Rails.application.config.paths["db/migrate"].to_a
+      end
     end
 
     def self.sort_string(migration)
