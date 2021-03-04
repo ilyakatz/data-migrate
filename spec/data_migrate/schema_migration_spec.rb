@@ -69,7 +69,7 @@ describe DataMigrate::SchemaMigration do
     end
   end
 
-  if Rails.version >= '6.0.3.5'
+  if Rails.version > '6.0.3.5'
     describe :migrations_paths do
       context 'when a db_name is configured' do
         let(:paths) { ["spec/db/migrate/6.0", "spec/db/components/migrate/6.0"] }
