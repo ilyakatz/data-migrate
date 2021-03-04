@@ -39,7 +39,7 @@ describe DataMigrate::DatabaseTasks do
       data_migrations_path
     }
     allow(DataMigrate::DataMigrator).to receive(:db_config) { db_config }
-    ActiveRecord::Base.configurations[:test] =db_config
+    allow(ActiveRecord::Base.configurations).to receive(:[]).with(:test).and_return(db_config)
     ActiveRecord::Base.establish_connection(db_config)
   end
 
