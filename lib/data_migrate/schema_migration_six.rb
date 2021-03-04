@@ -22,7 +22,7 @@ module DataMigrate
 
     def self.migrations_paths
       db_name = DataMigrate.config.db_name
-      if db_name && Rails.version >= '6.0.3.5'
+      if db_name && Rails.version > '6.0.3.5'
         ActiveRecord::Base.configurations.configs_for(env_name: Rails.env, name: db_name).migrations_paths
       else
         Rails.application.config.paths["db/migrate"].to_a
