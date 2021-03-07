@@ -87,25 +87,32 @@ describe DataMigrate::DatabaseTasks do
       end
     end
 
-    if Rails::VERSION::MAJOR < 6
-      skip("Not implemented for Rails lower than 6")
-    else
-      describe :load_schema_current do
-        it "loads the current schema file" do
-          allow(subject).to receive(:schema_location).and_return("spec/db/data/schema/")
+    describe :load_schema_current do
+      before do
+        allow(DataMigrate::DataMigrator).to receive(:full_migrations_path).and_return(migration_path)
+      end
 
-          subject.load_schema_current
-          versions = DataMigrate::DataSchemaMigration.normalized_versions
-          expect(versions.count).to eq(2)
+      it "loads the current schema file" do
+        if Rails::VERSION::MAJOR < 6
+          skip("Not implemented for Rails lower than 6")
+        end
+        allow(subject).to receive(:schema_location).and_return("spec/db/data/schema/")
+
+        subject.load_schema_current
+        versions = DataMigrate::DataSchemaMigration.normalized_versions
+        expect(versions.count).to eq(2)
+      end
+
+      it "loads schema file that has not been update with latest data migrations" do
+        if Rails::VERSION::MAJOR < 6
+          skip("Not implemented for Rails lower than 6")
         end
 
-        it "loads schema file that has not been update with latest data migrations" do
-          allow(subject).to receive(:schema_location).and_return("spec/db/data/partial_schema/")
+        allow(subject).to receive(:schema_location).and_return("spec/db/data/partial_schema/")
 
-          subject.load_schema_current
-          versions = DataMigrate::DataSchemaMigration.normalized_versions
-          expect(versions.count).to eq(1)
-        end
+        subject.load_schema_current
+        versions = DataMigrate::DataSchemaMigration.normalized_versions
+        expect(versions.count).to eq(1)
       end
     end
 
