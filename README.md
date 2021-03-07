@@ -129,7 +129,7 @@ DataMigrate.configure do |config|
     'username' => 'root',
     'password' => nil,
   }
-  config.db_name = 'primary'
+  config.spec_name = 'primary'
 end
 
 ```
