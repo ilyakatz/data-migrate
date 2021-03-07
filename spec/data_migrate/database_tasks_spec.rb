@@ -87,32 +87,29 @@ describe DataMigrate::DatabaseTasks do
       end
     end
 
-    describe :load_schema_current do
-      before do
-        allow(DataMigrate::DataMigrator).to receive(:full_migrations_path).and_return(migration_path)
-      end
-
-      it "loads the current schema file" do
-        if Rails::VERSION::MAJOR < 6
-          skip("Not implemented for Rails lower than 6")
-        end
-        allow(subject).to receive(:schema_location).and_return("spec/db/data/schema/")
-
-        subject.load_schema_current
-        versions = DataMigrate::DataSchemaMigration.normalized_versions
-        expect(versions.count).to eq(2)
-      end
-
-      it "loads schema file that has not been update with latest data migrations" do
-        if Rails::VERSION::MAJOR < 6
-          skip("Not implemented for Rails lower than 6")
+    if Rails::VERSION::MAJOR < 6
+      skip("Not implemented for Rails lower than 6")
+    else
+      describe :load_schema_current do
+        before do
+          allow(ActiveRecord::Base.configurations.configs_for(env_name: 'test')).to receive(:migrations_paths).and_return(migration_path)
         end
 
-        allow(subject).to receive(:schema_location).and_return("spec/db/data/partial_schema/")
+        it "loads the current schema file" do
+          allow(subject).to receive(:schema_location).and_return("spec/db/data/schema/")
 
-        subject.load_schema_current
-        versions = DataMigrate::DataSchemaMigration.normalized_versions
-        expect(versions.count).to eq(1)
+          subject.load_schema_current
+          versions = DataMigrate::DataSchemaMigration.normalized_versions
+          expect(versions.count).to eq(2)
+        end
+
+        it "loads schema file that has not been update with latest data migrations" do
+          allow(subject).to receive(:schema_location).and_return("spec/db/data/partial_schema/")
+
+          subject.load_schema_current
+          versions = DataMigrate::DataSchemaMigration.normalized_versions
+          expect(versions.count).to eq(1)
+        end
       end
     end
 
