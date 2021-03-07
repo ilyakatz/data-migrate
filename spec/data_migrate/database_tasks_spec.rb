@@ -39,8 +39,13 @@ describe DataMigrate::DatabaseTasks do
       data_migrations_path
     }
     allow(DataMigrate::DataMigrator).to receive(:db_config) { db_config }
-    ActiveRecord::Base.configurations[:test] = db_config
     ActiveRecord::Base.establish_connection(db_config)
+    if Rails.version >= '6.1'
+      config_obj = ActiveRecord::DatabaseConfigurations::DatabaseConfig.new('test', 'test')
+      allow(ActiveRecord::Base.configurations).to receive(:configs_for).with(env_name: 'test').and_return([ config_obj ])
+    else
+      ActiveRecord::Base.configurations[:test] = db_config
+    end
   end
 
   describe :schema_file do
@@ -59,7 +64,6 @@ describe DataMigrate::DatabaseTasks do
     end
 
     before do
-      # ActiveRecord::Base.establish_connection(db_config)
       ActiveRecord::SchemaMigration.create_table
 
       allow(DataMigrate::SchemaMigration).to receive(:migrations_paths) {
