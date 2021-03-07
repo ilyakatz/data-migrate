@@ -39,7 +39,7 @@ describe DataMigrate::DatabaseTasks do
       data_migrations_path
     }
     allow(DataMigrate::DataMigrator).to receive(:db_config) { db_config }
-    allow(ActiveRecord::Base.configurations).to receive(:[]).with(:test).and_return(db_config)
+    ActiveRecord::Base.configurations[:test] = db_config
     ActiveRecord::Base.establish_connection(db_config)
   end
 
@@ -91,10 +91,6 @@ describe DataMigrate::DatabaseTasks do
       skip("Not implemented for Rails lower than 6")
     else
       describe :load_schema_current do
-        before do
-          allow(ActiveRecord::Base.configurations.configs_for(env_name: 'test')).to receive(:migrations_paths).and_return(migration_path)
-        end
-
         it "loads the current schema file" do
           allow(subject).to receive(:schema_location).and_return("spec/db/data/schema/")
 

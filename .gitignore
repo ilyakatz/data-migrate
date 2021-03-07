@@ -8,3 +8,4 @@ spec/db/data_schema.rb
 .vscode/
 .DS_Store
 .idea/
+vendor/
