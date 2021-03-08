@@ -41,7 +41,7 @@ describe DataMigrate::DatabaseTasks do
     allow(DataMigrate::DataMigrator).to receive(:db_config) { db_config }
     ActiveRecord::Base.establish_connection(db_config)
     if Rails.version >= '6.1'
-      config_obj = ActiveRecord::DatabaseConfigurations::DatabaseConfig.new('test', 'test')
+      config_obj = ActiveRecord::DatabaseConfigurations::HashConfig.new('test', 'test', {adapter: 'sqlite3'})
       allow(ActiveRecord::Base.configurations).to receive(:configs_for).with(env_name: 'test').and_return([ config_obj ])
     else
       ActiveRecord::Base.configurations[:test] = db_config
