@@ -42,7 +42,7 @@ module DataMigrate
       # @param (String) filename
       # @return (MatchData)
       def match(filename)
-        /(\d{14})_(.+)\.rb/.match(filename)
+        /(\d{14})_(.+)\.rb$/.match(filename)
       end
 
       def needs_migration?

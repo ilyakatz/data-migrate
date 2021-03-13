@@ -82,6 +82,12 @@ describe DataMigrate::DataMigrator do
       end
     end
 
+    context "when the file doesn't end in .rb" do
+      it "returns nil" do
+        expect(subject.match("20091231235959_some_name.rb.un~")).to be_nil
+      end
+    end
+
     context "when the file matches" do
       it "returns a valid MatchData object" do
         match_data = subject.match("20091231235959_some_name.rb")
