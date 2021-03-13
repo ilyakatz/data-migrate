@@ -1,5 +1,10 @@
 # Changelog
 
+# 6.7.0
+
+Add configuration for which database name is to be used for database migrations [lewhit](https://github.com/lewhit)
+Add tests for Rails 6.1 [lewhit](https://github.com/lewhit)
+
 ## 6.6.2
 ## 6.6.1
 
