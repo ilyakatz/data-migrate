@@ -121,7 +121,7 @@ You can override this setting in `config/initializers/data_migrate.rb`
 
 ```ruby
 DataMigrate.configure do |config|
-  config.data_migrations_path = "db/awesomepath/"
+  config.data_migrations_path = 'db/awesomepath/'
   config.db_configuration = {
     'host' => '127.0.0.1',
     'database' => 'awesome_database',
@@ -129,6 +129,7 @@ DataMigrate.configure do |config|
     'username' => 'root',
     'password' => nil,
   }
+  config.spec_name = 'primary'
 end
 
 ```

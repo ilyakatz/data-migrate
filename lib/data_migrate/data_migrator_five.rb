@@ -42,7 +42,7 @@ module DataMigrate
       # @param (String) filename
       # @return (MatchData)
       def match(filename)
-        /(\d{14})_(.+)\.rb/.match(filename)
+        /(\d{14})_(.+)\.rb$/.match(filename)
       end
 
       def needs_migration?
@@ -75,8 +75,13 @@ module DataMigrate
       end
 
       def db_config
-        ActiveRecord::Base.configurations[Rails.env || "development"] ||
-          ENV["DATABASE_URL"]
+        env = Rails.env || "development"
+        ar_config = if (Rails::VERSION::MAJOR == 6 && Rails::VERSION::MINOR >= 1) || Rails::VERSION::MAJOR > 6
+                      ActiveRecord::Base.configurations.configs_for(env_name: env).first
+                    else
+                      ActiveRecord::Base.configurations[env]
+                    end
+        ar_config || ENV["DATABASE_URL"]
       end
     end
 
