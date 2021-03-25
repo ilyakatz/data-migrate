@@ -15,7 +15,13 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = "data_migrate"
 
-  s.add_dependency('rails', '>= 5.0')
+  %w[
+    activerecord
+    railties
+  ].each do |rails_gem|
+    s.add_dependency(rails_gem, '>= 5.0')
+  end
+
   s.add_development_dependency "appraisal"
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec"
