@@ -1,9 +1,11 @@
 # Changelog
+## 7.0.1
+Use SchemaMigrations.migration_paths in main rake task [lewhit](https://github.com/lewhit)
 
 ## 6.8.0
 
 Specify database name for migrations_paths [lewhit](https://github.com/lewhit)
-# 6.7.0
+## 6.7.0
 
 Add configuration for which database name is to be used for database migrations [lewhit](https://github.com/lewhit)
 Add tests for Rails 6.1 [lewhit](https://github.com/lewhit)
