@@ -1,6 +1,6 @@
 # Changelog
 ## 7.0.1
-Use SchemaMigrations.migration_paths in main rake task [lewhit](https://github.com/lewhit)
+Use SchemaMigration.migrations_paths in main rake task [lewhit](https://github.com/lewhit)
 
 ## 6.8.0
 
