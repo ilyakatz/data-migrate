@@ -31,7 +31,7 @@ module DataMigrate
     def versions
       @versions ||= begin
         versions = []
-        Dir.foreach(DataMigrate::DataMigrator.full_migrations_path) do |file|
+        Dir.glob(File.join(DataMigrate::DataMigrator.full_migrations_path, '**', '*.rb')) do |file|
           match_data = DataMigrate::DataMigrator.match(file)
           versions << match_data[1].to_i if match_data
         end
