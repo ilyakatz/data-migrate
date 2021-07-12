@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class <%= migration_class_name %> < <%= migration_base_class_name %>
   def up
   end
