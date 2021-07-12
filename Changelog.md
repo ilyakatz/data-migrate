@@ -1,4 +1,9 @@
 # Changelog
+
+## 7.0.2
+
+Remove magic comment in migration files [y-yagi](https://github.com/y-yagi)
+User frozen string [jonnay](https://github.com/jonnay)
 ## 7.0.1
 Use SchemaMigration.migrations_paths in main rake task [lewhit](https://github.com/lewhit)
 
