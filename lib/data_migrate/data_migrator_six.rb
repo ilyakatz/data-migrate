@@ -19,27 +19,24 @@ module DataMigrate
       self.class.get_all_versions(connection)
     end
 
-    # does not work with rails7 anymore
-    #class << self
-    #   alias_method :migrations_status_orig, :migrations_status
-    #
-    #   def migrations_status
-    #     migrations_status_orig([DataMigrate.config.data_migrations_path])
-    #   end
-    #
-    #   def current_version(connection = ActiveRecord::Base.connection)
-    #     get_all_versions(connection).max || 0
-    #   end
-    #
-    #   def get_all_versions(connection = ActiveRecord::Base.connection)
-    #     if table_exists?(connection, schema_migrations_table_name)
-    #       DataMigrate::DataSchemaMigration.all.map { |x| x.version.to_i }.sort
-    #     else
-    #       []
-    #     end
-    #   end
-    # end
     class << self
+      alias_method :migrations_status_orig, :migrations_status
+
+      def migrations_status
+        migrations_status_orig([DataMigrate.config.data_migrations_path])
+      end
+
+      def current_version(connection = ActiveRecord::Base.connection)
+        get_all_versions(connection).max || 0
+      end
+
+      def get_all_versions(connection = ActiveRecord::Base.connection)
+        if table_exists?(connection, schema_migrations_table_name)
+          DataMigrate::DataSchemaMigration.all.map { |x| x.version.to_i }.sort
+        else
+          []
+        end
+      end
 
       def schema_migrations_table_name
         ActiveRecord::Base.table_name_prefix + "data_migrations" +
