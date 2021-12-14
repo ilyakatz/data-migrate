@@ -1,5 +1,5 @@
 module DataMigrate
-  class Migration < ::ActiveRecord::Migration[7.0]
+  class Migration < ::ActiveRecord::Migration
 
     class << self
       def check_pending!(connection = ::ActiveRecord::Base.connection)
