@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 if Rails::VERSION::MAJOR == 6
-  require File.join(File.dirname(__FILE__), "data_migrate", "data_migrator_five")
+  require File.join(File.dirname(__FILE__), "data_migrate", "data_migrator_six")
 elsif Rails::VERSION::MAJOR == 5 && Rails::VERSION::MINOR == 2
   require File.join(File.dirname(__FILE__), "data_migrate", "data_migrator_five")
 else

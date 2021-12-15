@@ -11,8 +11,8 @@ module DataMigrate
       )
     end
 
-    def self.run(direction, migration_paths, version)
-      ActiveRecord::Migrator.run(direction, migration_paths, version)
+    def self.run(direction, version)
+      DataMigrate::DataMigrator.migration_context.run(direction, version)
     end
 
     def self.sort_migrations(set1, set2 = nil)
@@ -21,7 +21,8 @@ module DataMigrate
     end
 
     def self.migrations_paths
-      Rails.application.config.paths["db/migrate"].to_a
+      # Rails.application.config.paths["db/migrate"].to_a
+      DataMigrate.config.migrations_path
     end
 
     def self.sort_string(migration)

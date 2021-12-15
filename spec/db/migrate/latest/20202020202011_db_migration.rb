@@ -1,4 +1,4 @@
-class DbMigration < ActiveRecord::Migration
+class DbMigration < ActiveRecord::Migration[7.0]
   def up
     puts "Doing schema migration"
   end

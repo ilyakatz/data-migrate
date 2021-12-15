@@ -13,7 +13,7 @@ describe DataMigrate::SchemaMigration do
         "spec/db/migrate/5.0"
       end
     else
-      "spec/db/migrate/4.2"
+      "spec/db/migrate/latest"
     end
   }
 
@@ -31,6 +31,7 @@ describe DataMigrate::SchemaMigration do
   before do
     ActiveRecord::Base.establish_connection(db_config)
     ActiveRecord::SchemaMigration.create_table
+    DataMigrate.config.data_migrations_path = migration_path
   end
 
   after do
@@ -53,16 +54,16 @@ describe DataMigrate::SchemaMigration do
   describe :run do
     it do
       expect {
-        subject.run(:up, migration_path, 20202020202011)
+        subject.run(:up, 20202020202011)
       }.to output(/20202020202011 DbMigration: migrating/).to_stdout
       versions = ActiveRecord::SchemaMigration.normalized_versions
       expect(versions.first).to eq("20202020202011")
     end
 
     it "undo migration" do
-      subject.run(:up, migration_path, 20202020202011)
+      subject.run(:up, 20202020202011)
       expect {
-        subject.run(:down, migration_path, 20202020202011)
+        subject.run(:down, 20202020202011)
       }.to output(/Undoing DbMigration/).to_stdout
       versions = ActiveRecord::SchemaMigration.normalized_versions
       expect(versions.count).to eq(0)
@@ -91,6 +92,7 @@ describe DataMigrate::SchemaMigration do
         end
 
         it 'lists schema migration paths' do
+          byebug
           expect(subject.migrations_paths.size).to eq(2)
           expect(subject.migrations_paths).to eq(paths)
         end

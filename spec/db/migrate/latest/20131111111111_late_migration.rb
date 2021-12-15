@@ -1,4 +1,4 @@
-class LateMigration < ActiveRecord::Migration
+class LateMigration < ActiveRecord::Migration[7.0]
   def up
     puts "Doing schema LateMigration"
   end

@@ -15,9 +15,9 @@ module DataMigrate
       end
     end
 
-    def load_migrated(connection = ActiveRecord::Base.connection)
-      self.class.get_all_versions(connection)
-    end
+    # def load_migrated(connection = ActiveRecord::Base.connection)
+    #   get_all_versions(connection)
+    # end
 
     # does not work with rails7 anymore
     #class << self
@@ -40,6 +40,17 @@ module DataMigrate
     #   end
     # end
     class << self
+      def migration_context
+        context = ActiveRecord::MigrationContext.new DataMigrate.config.data_migrations_path, DataMigrate::DataSchemaMigration
+      end
+
+      def migrations_status
+        migration_context.migrations_status
+      end
+
+      def migrate(*args)
+        migration_context.migrate(*args)
+      end
 
       def schema_migrations_table_name
         ActiveRecord::Base.table_name_prefix + "data_migrations" +

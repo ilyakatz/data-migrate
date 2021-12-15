@@ -23,7 +23,7 @@ module DataMigrate
           Rails::VERSION::MAJOR == 6
           DataMigrate::MigrationContext.new(migrations_paths).migrate(target_version)
         else
-          DataMigrate::DataMigrator.migrate(migrations_paths, ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
+          DataMigrate::DataMigrator.migrate(ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
         end
       end
 
