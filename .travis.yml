@@ -1,16 +1,9 @@
 language: ruby
 rvm:
-  - 2.6
   - 2.7
+  - 3.0
 script: bundle exec rspec
 gemfile:
-  - gemfiles/rails_5.1.gemfile
-  - gemfiles/rails_5.2.gemfile
   - gemfiles/rails_6.0.gemfile
   - gemfiles/rails_6.1.gemfile
-matrix:
-  exclude:
-    - rvm: 2.4.4
-      gemfile: gemfiles/rails_6.0.gemfile
-    - rvm: 2.4.4
-      gemfile: gemfiles/rails_6.1.gemfile
+  - gemfiles/rails_7.0.gemfile
