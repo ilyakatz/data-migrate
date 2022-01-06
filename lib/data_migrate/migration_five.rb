@@ -3,7 +3,7 @@ module DataMigrate
 
     class << self
       def check_pending!(connection = ::ActiveRecord::Base.connection)
-        raise ActiveRecord::PendingMigrationError if DataMigrator::Migrator.needs_migration?(connection)
+        raise ActiveRecord::PendingMigrationError if DataMigrator::DataMigrator.needs_migration?(connection)
       end
 
       def migrate(direction)
