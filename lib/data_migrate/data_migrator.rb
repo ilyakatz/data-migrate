@@ -1,66 +1,39 @@
 # frozen_string_literal: true
 
 require "active_record"
+require "data_migrate/config"
 
 module DataMigrate
   class DataMigrator < ActiveRecord::Migrator
-
-    def record_version_state_after_migrating(version)
-      if down?
-        migrated.delete(version)
-        DataMigrate::DataSchemaMigration.where(version: version.to_s).delete_all
-      else
-        migrated << version
-        DataMigrate::DataSchemaMigration.create!(version: version.to_s)
-      end
+    def self.migrations_paths
+      [DataMigrate.config.data_migrations_path]
     end
 
-    def load_migrated(connection = ActiveRecord::Base.connection)
-      self.class.get_all_versions(connection)
+    def self.assure_data_schema_table
+      ActiveRecord::Base.establish_connection(db_config)
+      DataMigrate::DataSchemaMigration.create_table
+    end
+
+    def initialize(direction, migrations, target_version = nil)
+      @direction         = direction
+      @target_version    = target_version
+      @migrated_versions = nil
+      @migrations        = migrations
+
+      validate(@migrations)
+
+      DataMigrate::DataSchemaMigration.create_table
+      ActiveRecord::InternalMetadata.create_table
+    end
+
+    def load_migrated
+      @migrated_versions =
+        DataMigrate::DataSchemaMigration.normalized_versions.map(&:to_i).sort
     end
 
     class << self
-      alias_method :migrations_status_orig, :migrations_status
-
-      def migrations_status
-        migrations_status_orig([DataMigrate.config.data_migrations_path])
-      end
-
-      def current_version(connection = ActiveRecord::Base.connection)
-        get_all_versions(connection).max || 0
-      end
-
-      def get_all_versions(connection = ActiveRecord::Base.connection)
-        if table_exists?(connection, schema_migrations_table_name)
-          DataMigrate::DataSchemaMigration.all.map { |x| x.version.to_i }.sort
-        else
-          []
-        end
-      end
-
-      def schema_migrations_table_name
-        ActiveRecord::Base.table_name_prefix + "data_migrations" +
-          ActiveRecord::Base.table_name_suffix
-      end
-
-      def migrations_path
-        DataMigrate.config.data_migrations_path
-      end
-
-      ##
-      # Provides the full migrations_path filepath
-      # @return (String)
-      def full_migrations_path
-        File.join(Rails.root, *migrations_path.split(File::SEPARATOR))
-      end
-
-      def assure_data_schema_table
-        ActiveRecord::Base.establish_connection(db_config)
-        sm_table = DataMigrate::DataMigrator.schema_migrations_table_name
-
-        unless table_exists?(ActiveRecord::Base.connection, sm_table)
-          create_table(sm_table)
-        end
+      def current_version
+        DataMigrate::MigrationContext.new(migrations_paths).current_version
       end
 
       ##
@@ -72,29 +45,51 @@ module DataMigrate
         /(\d{14})_(.+)\.rb$/.match(filename)
       end
 
-      private
-
-      def create_table(sm_table)
-        ActiveRecord::Base.connection.create_table(sm_table, id: false) do |schema_migrations_table|
-          schema_migrations_table.string :version, primary_key: true
-        end
+      def needs_migration?
+        DataMigrate::DatabaseTasks.pending_migrations.count.positive?
+      end
+      ##
+      # Provides the full migrations_path filepath
+      # @return (String)
+      def full_migrations_path
+        File.join(Rails.root, *migrations_paths.split(File::SEPARATOR))
       end
 
-      def table_exists?(connection, table_name)
-        # Avoid the warning that table_exists? prints in Rails 5.0 due a
-        # change in behavior between Rails 5.0 and Rails 5.1 of this method
-        # with respect to database views.
-        if ActiveRecord.version >= Gem::Version.new("5.0") &&
-           ActiveRecord.version < Gem::Version.new("5.1")
-          connection.data_source_exists?(table_name)
-        else
-          connection.table_exists?(schema_migrations_table_name)
-        end
+      def migrations_status
+        DataMigrate::MigrationContext.new(migrations_paths).migrations_status
+      end
+
+      # TODO: this was added to be backward compatible, need to re-evaluate
+      def migrations(_migrations_paths)
+        #DataMigrate::MigrationContext.new(migrations_paths).migrations
+        DataMigrate::MigrationContext.new(_migrations_paths).migrations
+      end
+
+      #TODO: this was added to be backward compatible, need to re-evaluate
+      def run(direction, migration_paths, version)
+        DataMigrate::MigrationContext.new(migration_paths).run(direction, version)
+      end
+
+      def rollback(migrations_path, steps)
+        DataMigrate::MigrationContext.new(migrations_path).rollback(steps)
       end
 
       def db_config
-        ActiveRecord::Base.configurations[Rails.env || "development"] ||
-          ENV["DATABASE_URL"]
+        env = Rails.env || "development"
+        ar_config = ActiveRecord::Base.configurations.configs_for(env_name: env).first
+        ar_config || ENV["DATABASE_URL"]
+      end
+    end
+
+    private
+
+    def record_version_state_after_migrating(version)
+      if down?
+        migrated.delete(version)
+        DataMigrate::DataSchemaMigration.where(version: version.to_s).delete_all
+      else
+        migrated << version
+        DataMigrate::DataSchemaMigration.create!(version: version.to_s)
       end
     end
   end

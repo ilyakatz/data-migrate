@@ -4,19 +4,7 @@ require "spec_helper"
 
 describe DataMigrate::DatabaseTasks do
   let(:subject) { DataMigrate::DatabaseTasks }
-  let(:migration_path) {
-    if Rails::VERSION::MAJOR == 6
-      "spec/db/migrate/6.0"
-    elsif Rails::VERSION::MAJOR == 5
-      if Rails::VERSION::MINOR == 2
-        "spec/db/migrate/5.2"
-      else
-        "spec/db/migrate/5.0"
-      end
-    else
-      "spec/db/migrate/4.2"
-    end
-  }
+  let(:migration_path) { "spec/db/migrate/6.0" }
   let(:data_migrations_path) {
     DataMigrate.config.data_migrations_path
   }
@@ -98,9 +86,6 @@ describe DataMigrate::DatabaseTasks do
       end
 
       it "loads the current schema file" do
-        if Rails::VERSION::MAJOR < 6
-          skip("Not implemented for Rails lower than 6")
-        end
         allow(subject).to receive(:schema_location).and_return("spec/db/data/schema/")
 
         subject.load_schema_current
@@ -109,10 +94,6 @@ describe DataMigrate::DatabaseTasks do
       end
 
       it "loads schema file that has not been update with latest data migrations" do
-        if Rails::VERSION::MAJOR < 6
-          skip("Not implemented for Rails lower than 6")
-        end
-
         allow(subject).to receive(:schema_location).and_return("spec/db/data/partial_schema/")
 
         subject.load_schema_current

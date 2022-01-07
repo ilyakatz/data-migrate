@@ -3,19 +3,7 @@
 require "spec_helper"
 
 describe DataMigrate::SchemaMigration do
-  let(:migration_path) {
-    if Rails::VERSION::MAJOR == 6
-      "spec/db/migrate/6.0"
-    elsif Rails::VERSION::MAJOR == 5
-      if Rails::VERSION::MINOR == 2
-        "spec/db/migrate/5.2"
-      else
-        "spec/db/migrate/5.0"
-      end
-    else
-      "spec/db/migrate/4.2"
-    end
-  }
+  let(:migration_path) { "spec/db/migrate/6.0" }
 
   let(:subject) { DataMigrate::SchemaMigration }
   let(:db_config) do
@@ -31,6 +19,7 @@ describe DataMigrate::SchemaMigration do
   before do
     ActiveRecord::Base.establish_connection(db_config)
     ActiveRecord::SchemaMigration.create_table
+    ActiveRecord::Migration.verbose = true
   end
 
   after do
@@ -69,31 +58,29 @@ describe DataMigrate::SchemaMigration do
     end
   end
 
-  if Rails.version > '6'
-    describe :migrations_paths do
-      context 'when a db_name is configured' do
-        let(:paths) { ['spec/db/migrate/6.0', 'spec/db/components/migrate/6.0'] }
+  describe :migrations_paths do
+    context 'when a db_name is configured' do
+      let(:paths) { ['spec/db/migrate/6.0', 'spec/db/components/migrate/6.0'] }
 
-        if Rails.version > '6.1'
-          before do
-            allow(ActiveRecord::Base.configurations.configs_for(env_name: 'test', name: 'primary')).to receive(:migrations_paths).and_return(paths)
-            DataMigrate.configure do |config|
-              config.spec_name = 'primary'
-            end
-          end
-        else
-          before do
-            allow(ActiveRecord::Base.configurations.configs_for(env_name: 'test', spec_name: 'primary')).to receive(:migrations_paths).and_return(paths)
-            DataMigrate.configure do |config|
-              config.spec_name = 'primary'
-            end
+      if Rails.version > '6.1'
+        before do
+          allow(ActiveRecord::Base.configurations.configs_for(env_name: 'test', name: 'primary')).to receive(:migrations_paths).and_return(paths)
+          DataMigrate.configure do |config|
+            config.spec_name = 'primary'
           end
         end
-
-        it 'lists schema migration paths' do
-          expect(subject.migrations_paths.size).to eq(2)
-          expect(subject.migrations_paths).to eq(paths)
+      else
+        before do
+          allow(ActiveRecord::Base.configurations.configs_for(env_name: 'test', spec_name: 'primary')).to receive(:migrations_paths).and_return(paths)
+          DataMigrate.configure do |config|
+            config.spec_name = 'primary'
+          end
         end
+      end
+
+      it 'lists schema migration paths' do
+        expect(subject.migrations_paths.size).to eq(2)
+        expect(subject.migrations_paths).to eq(paths)
       end
     end
   end

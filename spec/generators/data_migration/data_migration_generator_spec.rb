@@ -8,8 +8,12 @@ describe DataMigrate::Generators::DataMigrationGenerator do
   describe :next_migration_number do
     it "next migration" do
       Timecop.freeze("2016-12-03 22:15:26 -0800") do
-        expect(ActiveRecord::Base).to receive(:timestamped_migrations) { true }
-        expect(subject.next_migration_number(1)).to eq("20161204061526")
+        if Rails::VERSION::MAJOR == 6
+          expect(ActiveRecord::Base).to receive(:timestamped_migrations) { true }
+        else
+          expect(ActiveRecord).to receive(:timestamped_migrations) { true }
+        end
+        expect(subject.next_migration_number(1).to_i).to eq(20161204061526)
       end
     end
   end

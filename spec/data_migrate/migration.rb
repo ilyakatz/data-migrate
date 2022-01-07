@@ -1,10 +1,6 @@
 require 'spec_helper'
 
-if Rails::VERSION::MAJOR >= 5
-  subject = DataMigrate::MigrationFive
-else
-  subject = DataMigrate::Migration
-end
+subject = DataMigrate::Migration
 
 describe subject do
   it "uses correct table name" do
