@@ -13,14 +13,32 @@ module DataMigrate
         "data_schema.rb"
       end
 
-      def dump_filename(namespace, format = ActiveRecord::Base.schema_format)
-        filename = if namespace == "primary"
-          schema_file_type(format)
-        else
-          "#{namespace}_#{schema_file_type(format)}"
-        end
+      if Rails::VERSION::MAJOR == 6
+        def dump_filename(namespace, format = ActiveRecord::Base.schema_format)
+          filename = if namespace == "primary"
+            schema_file_type(format)
+          else
+            "#{namespace}_#{schema_file_type(format)}"
+          end
 
-        ENV["DATA_SCHEMA"] || File.join(schema_location, filename)
+          ENV["DATA_SCHEMA"] || File.join(schema_location, filename)
+        end
+      else
+        def schema_dump_path(db_config, format = ActiveRecord.schema_format)
+          return ENV["DATA_SCHEMA"] if ENV["DATA_SCHEMA"]
+
+          filename = if db_config.name == "primary"
+            schema_file_type(format)
+          else
+            "#{db_config.name}_#{schema_file_type(format)}"
+          end
+
+          if File.dirname(filename) == schema_location
+            filename
+          else
+            File.join(schema_location, filename)
+          end
+        end
       end
 
       def schema_location

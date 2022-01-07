@@ -272,10 +272,10 @@ namespace :data do
 
     desc "Display status of data migrations"
     task :status => :environment do
-      config = ActiveRecord::Base.configurations[Rails.env || 'development']
+      config = ActiveRecord::Base.configurations.configs_for(env_name: Rails.env || 'development').first
       ActiveRecord::Base.establish_connection(config)
       connection = ActiveRecord::Base.connection
-      puts "\ndatabase: #{config['database']}\n\n"
+      puts "\ndatabase: #{config.configuration_hash['database']}\n\n"
       DataMigrate::StatusService.dump(connection)
     end
   end
@@ -359,9 +359,10 @@ def sort_string migration
 end
 
 def connect_to_database
-  config = ActiveRecord::Base.configurations[Rails.env || 'development']
+  config = ActiveRecord::Base.configurations.configs_for(env_name: Rails.env || 'development').first
   ActiveRecord::Base.establish_connection(config)
 
+  config = config.configuration_hash
   unless DataMigrate::DataSchemaMigration.table_exists?
     puts 'Data migrations table does not exist yet.'
     config = nil
