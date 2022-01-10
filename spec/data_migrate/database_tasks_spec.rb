@@ -26,6 +26,7 @@ describe DataMigrate::DatabaseTasks do
     # Rails.application.config.paths["db"].first
     # @see https://github.com/rails/rails/blob/a7d49ef78c36df2d1ca876451f30915ada1079a5/activerecord/lib/active_record/tasks/database_tasks.rb#L54
     allow(subject).to receive(:db_dir).and_return("db")
+    allow(ActiveRecord::Tasks::DatabaseTasks).to receive(:db_dir).and_return("db")
   end
 
   before do

@@ -17,9 +17,9 @@ module DataMigrate
       end
 
       def migrate
-        DataMigrate::DataMigrator.assure_data_schema_table
-
         target_version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
+
+        DataMigrate::DataMigrator.assure_data_schema_table
         DataMigrate::MigrationContext.new(migrations_paths).migrate(target_version)
       end
 

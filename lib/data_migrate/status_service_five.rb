@@ -32,7 +32,11 @@ module DataMigrate
       end
 
       # output
-      stream.puts "\ndatabase: #{ActiveRecord::Base.connection_config[:database]}\n\n"
+      if ActiveRecord.version >= Gem::Version.new('7.0')
+        stream.puts "\ndatabase: #{ActiveRecord::Base.connection_db_config.configuration_hash[:database]}\n\n"
+      else
+        stream.puts "\ndatabase: #{ActiveRecord::Base.connection_config[:database]}\n\n"
+      end
       stream.puts "#{'Status'.center(8)}  #{'Migration ID'.ljust(14)}  Migration Name"
       stream.puts "-" * 50
       db_list.each do |status, version, name|
