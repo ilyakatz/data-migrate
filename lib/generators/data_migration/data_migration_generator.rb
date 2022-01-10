@@ -27,13 +27,7 @@ module DataMigrate
       end
 
       def migration_base_class_name
-        if ActiveRecord.version >= Gem::Version.new("5.0")
-          "ActiveRecord::Migration[#{ActiveRecord::Migration.current_version}]"
-        elsif ActiveRecord.version >= Gem::Version.new("5.2")
-          "DataMigrate::MigrationContext"
-        else
-          "ActiveRecord::Migration"
-        end
+        "ActiveRecord::Migration[#{ActiveRecord::Migration.current_version}]"
       end
 
       def data_migrations_file_path

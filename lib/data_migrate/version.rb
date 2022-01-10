@@ -1,3 +1,3 @@
 module DataMigrate
-  VERSION = "7.0.2".freeze
+  VERSION = "7.1.0".freeze
 end

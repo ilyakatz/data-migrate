@@ -5,16 +5,10 @@ require "spec_helper"
 describe DataMigrate::DatabaseTasks do
   let(:subject) { DataMigrate::DatabaseTasks }
   let(:migration_path) {
-    if Rails::VERSION::MAJOR == 6
-      "spec/db/migrate/6.0"
-    elsif Rails::VERSION::MAJOR == 5
-      if Rails::VERSION::MINOR == 2
-        "spec/db/migrate/5.2"
-      else
-        "spec/db/migrate/5.0"
-      end
+    if Rails::VERSION::MAJOR == 5
+      "spec/db/migrate/5.2"
     else
-      "spec/db/migrate/4.2"
+      "spec/db/migrate/6.0"
     end
   }
   let(:data_migrations_path) {
@@ -32,6 +26,7 @@ describe DataMigrate::DatabaseTasks do
     # Rails.application.config.paths["db"].first
     # @see https://github.com/rails/rails/blob/a7d49ef78c36df2d1ca876451f30915ada1079a5/activerecord/lib/active_record/tasks/database_tasks.rb#L54
     allow(subject).to receive(:db_dir).and_return("db")
+    allow(ActiveRecord::Tasks::DatabaseTasks).to receive(:db_dir).and_return("db")
   end
 
   before do
