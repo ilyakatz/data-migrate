@@ -7,7 +7,7 @@ module DataMigrate
       end
 
       def dump
-        if ActiveRecord::Base.dump_schema_after_migration
+        if dump_schema_after_migration?
           filename = DataMigrate::DatabaseTasks.schema_file
           ActiveRecord::Base.establish_connection(DataMigrate.config.db_configuration) if DataMigrate.config.db_configuration
           File.open(filename, "w:utf-8") do |file|
@@ -30,6 +30,14 @@ module DataMigrate
             puts "  %4d %s" % [pending_migration[:version], pending_migration[:name]]
           end
           abort message
+        end
+      end
+
+      def dump_schema_after_migration?
+        if ActiveRecord.respond_to?(:dump_schema_after_migration)
+          ActiveRecord.dump_schema_after_migration
+        else
+          ActiveRecord::Base.dump_schema_after_migration
         end
       end
     end

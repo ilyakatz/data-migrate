@@ -13,7 +13,7 @@ describe DataMigrate::Generators::DataMigrationGenerator do
         else
           expect(ActiveRecord::Base).to receive(:timestamped_migrations) { true }
         end
-        expect(subject.next_migration_number(1)).to eq("20161204061526")
+        expect(subject.next_migration_number(1).to_s).to eq("20161204061526")
       end
     end
   end

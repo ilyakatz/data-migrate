@@ -66,22 +66,27 @@ describe DataMigrate::SchemaMigration do
   if Rails.version > '6'
     describe :migrations_paths do
       context 'when a db_name is configured' do
+        let(:config) { double(:config) }
         let(:paths) { ['spec/db/migrate/6.0', 'spec/db/components/migrate/6.0'] }
+        let(:config_options) do
+          if Rails.version > '6.1'
+            { env_name: 'test', name: 'primary' }
+          else
+            { env_name: 'test', spec_name: 'primary' }
+          end
+        end
 
-        if Rails.version > '6.1'
-          before do
-            allow(ActiveRecord::Base.configurations.configs_for(env_name: 'test', name: 'primary')).to receive(:migrations_paths).and_return(paths)
-            DataMigrate.configure do |config|
-              config.spec_name = 'primary'
-            end
+        before do
+          DataMigrate.configure do |config|
+            config.spec_name = 'primary'
           end
-        else
-          before do
-            allow(ActiveRecord::Base.configurations.configs_for(env_name: 'test', spec_name: 'primary')).to receive(:migrations_paths).and_return(paths)
-            DataMigrate.configure do |config|
-              config.spec_name = 'primary'
-            end
-          end
+
+          allow(ActiveRecord::Base.configurations)
+            .to receive(:configs_for)
+            .with(config_options)
+            .and_return(config)
+
+          allow(config).to receive(:migrations_paths).and_return(paths)
         end
 
         it 'lists schema migration paths' do
