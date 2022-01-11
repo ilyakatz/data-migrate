@@ -23,6 +23,20 @@ module DataMigrate
         ENV["DATA_SCHEMA"] || File.join(schema_location, filename)
       end
 
+      def schema_dump_path(db_config, format = ActiveRecord.schema_format)
+        return ENV["DATA_SCHEMA"] if ENV["DATA_SCHEMA"]
+
+        filename = if db_config.primary?
+          schema_file_type(format)
+        else
+          [db_config.name, schema_file_type(format)].join("_")
+        end
+
+        return unless filename
+
+        File.dirname(filename) == schema_location ? filename : File.join(schema_location, filename)
+      end
+
       def schema_location
         db_dir
       end
