@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.0.0.rc1
+Add support for Rails 7
+Removed support for Rails versions below 5.2. Now are supported only versions Rails 5.2 and up
+
 ## 7.0.2
 
 Remove magic comment in migration files [y-yagi](https://github.com/y-yagi)
