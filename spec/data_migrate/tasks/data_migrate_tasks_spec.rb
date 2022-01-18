@@ -115,4 +115,50 @@ describe DataMigrate::Tasks::DataMigrateTasks do
       end
     end
   end
+
+  describe :status do
+    let(:db_config) do
+      {
+        adapter: "sqlite3",
+        database: "spec/db/test.db"
+      }
+    end
+
+    before do
+      if Rails.version >= '6.1'
+        hash_config = ActiveRecord::DatabaseConfigurations::HashConfig.new('test', 'test', db_config)
+        config_obj = ActiveRecord::DatabaseConfigurations.new([hash_config])
+        allow(ActiveRecord::Base).to receive(:configurations).and_return(config_obj)
+      else
+        ActiveRecord::Base.configurations[:test] = db_config
+      end
+
+      allow(Rails).to receive(:root) { '.' }
+
+      if Rails::VERSION::MAJOR == 5
+        allow(DataMigrate::Tasks::DataMigrateTasks).to receive(:schema_migrations_path) { 'spec/db/migrate/5.2' }
+      else
+        allow(DataMigrate::Tasks::DataMigrateTasks).to receive(:schema_migrations_path) { 'spec/db/migrate/6.0' }
+      end
+
+      DataMigrate::Tasks::DataMigrateTasks.migrate
+    end
+
+    after do
+      ActiveRecord::Migration.drop_table("data_migrations")
+    end
+
+    it "should display data migration status" do
+      expect {
+        DataMigrate::Tasks::DataMigrateTasks.status
+      }.to output(/up     20091231235959  Some name/).to_stdout
+    end
+
+    it "should display schema and data migration status" do
+      expect {
+        DataMigrate::Tasks::DataMigrateTasks.status_with_schema
+      }.to output(match(/up      data   20091231235959  Some name/)
+        .and match(/down    schema  20131111111111  Late migration/)).to_stdout
+    end
+  end
 end
