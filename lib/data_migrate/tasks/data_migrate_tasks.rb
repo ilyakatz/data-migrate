@@ -7,7 +7,7 @@ module DataMigrate
       end
 
       def dump
-        if ActiveRecord::Base.dump_schema_after_migration
+        if dump_schema_after_migration?
           filename = DataMigrate::DatabaseTasks.schema_file
           ActiveRecord::Base.establish_connection(DataMigrate.config.db_configuration) if DataMigrate.config.db_configuration
           File.open(filename, "w:utf-8") do |file|
@@ -17,14 +17,10 @@ module DataMigrate
       end
 
       def migrate
-        DataMigrate::DataMigrator.assure_data_schema_table
         target_version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
-        if (Rails::VERSION::MAJOR == 5 && Rails::VERSION::MINOR == 2) ||
-          Rails::VERSION::MAJOR == 6
-          DataMigrate::MigrationContext.new(migrations_paths).migrate(target_version)
-        else
-          DataMigrate::DataMigrator.migrate(migrations_paths, ENV["VERSION"] ? ENV["VERSION"].to_i : nil)
-        end
+
+        DataMigrate::DataMigrator.assure_data_schema_table
+        DataMigrate::MigrationContext.new(migrations_paths).migrate(target_version)
       end
 
       def abort_if_pending_migrations(migrations, message)
@@ -34,6 +30,14 @@ module DataMigrate
             puts "  %4d %s" % [pending_migration[:version], pending_migration[:name]]
           end
           abort message
+        end
+      end
+
+      def dump_schema_after_migration?
+        if ActiveRecord.respond_to?(:dump_schema_after_migration)
+          ActiveRecord.dump_schema_after_migration
+        else
+          ActiveRecord::Base.dump_schema_after_migration
         end
       end
     end
