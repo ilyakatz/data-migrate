@@ -104,7 +104,11 @@ module DataMigrate
       private
 
       def connect_to_database
-        config = ActiveRecord::Base.configurations[Rails.env || 'development']
+        config = if ActiveRecord.version < Gem::Version.new('6.1')
+          ActiveRecord::Base.configurations[Rails.env || 'development']
+        else
+          ActiveRecord::Base.configurations.find_db_config(Rails.env || 'development').configuration_hash
+        end
         ActiveRecord::Base.establish_connection(config)
 
         unless DataMigrate::DataSchemaMigration.table_exists?
