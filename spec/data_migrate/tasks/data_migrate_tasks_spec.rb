@@ -125,12 +125,12 @@ describe DataMigrate::Tasks::DataMigrateTasks do
     end
 
     before do
-      if Rails.version >= '6.1'
+      if Rails::VERSION::MAJOR == 5
+        ActiveRecord::Base.configurations['test'] = db_config
+      else
         hash_config = ActiveRecord::DatabaseConfigurations::HashConfig.new('test', 'test', db_config)
         config_obj = ActiveRecord::DatabaseConfigurations.new([hash_config])
         allow(ActiveRecord::Base).to receive(:configurations).and_return(config_obj)
-      else
-        ActiveRecord::Base.configurations[:test] = db_config
       end
 
       allow(Rails).to receive(:root) { '.' }
