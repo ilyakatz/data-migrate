@@ -8,7 +8,7 @@ module DataMigrate
     private_class_method :new
 
     class << self
-      def dump(connection = ActiveRecord::Base.connection, stream = STDOUT)
+      def dump(connection = ActiveRecord::Base.connection, stream = $stdout)
         new(connection).dump(stream)
         stream
       end

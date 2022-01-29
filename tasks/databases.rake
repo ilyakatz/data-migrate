@@ -114,49 +114,7 @@ namespace :db do
     namespace :status do
       desc "Display status of data and schema migrations"
       task :with_data => :environment do
-        config = connect_to_database
-        next unless config
-
-        db_list_data = ActiveRecord::Base.connection.select_values(
-          "SELECT version FROM #{DataMigrate::DataSchemaMigration.table_name}"
-        )
-        db_list_schema = ActiveRecord::Base.connection.select_values(
-          "SELECT version FROM #{ActiveRecord::SchemaMigration.schema_migrations_table_name}"
-        )
-        file_list = []
-
-        Dir.foreach(File.join(Rails.root, data_migrations_path)) do |file|
-          # only files matching "20091231235959_some_name.rb" pattern
-          if match_data = /(\d{14})_(.+)\.rb/.match(file)
-            status = db_list_data.delete(match_data[1]) ? 'up' : 'down'
-            file_list << [status, match_data[1], match_data[2], 'data']
-          end
-        end
-
-        Dir.foreach(File.join(Rails.root, 'db', 'migrate')) do |file|
-          # only files matching "20091231235959_some_name.rb" pattern
-          if match_data = /(\d{14})_(.+)\.rb/.match(file)
-            status = db_list_schema.delete(match_data[1]) ? 'up' : 'down'
-            file_list << [status, match_data[1], match_data[2], 'schema']
-          end
-        end
-
-        file_list.sort!{|a,b| "#{a[1]}_#{a[3] == 'data' ? 1 : 0}" <=> "#{b[1]}_#{b[3] == 'data' ? 1 : 0}" }
-
-        # output
-        puts "\ndatabase: #{config['database']}\n\n"
-        puts "#{"Status".center(8)} #{"Type".center(8)}  #{"Migration ID".ljust(14)} Migration Name"
-        puts "-" * 60
-        file_list.each do |file|
-          puts "#{file[0].center(8)} #{file[3].center(8)} #{file[1].ljust(14)}  #{file[2].humanize}"
-        end
-        db_list_schema.each do |version|
-          puts "#{'up'.center(8)}  #{version.ljust(14)}  *** NO SCHEMA FILE ***"
-        end
-        db_list_data.each do |version|
-          puts "#{'up'.center(8)}  #{version.ljust(14)}  *** NO DATA FILE ***"
-        end
-        puts
+        DataMigrate::Tasks::DataMigrateTasks.status_with_schema
       end
     end
   end # END OF MIGRATE NAME SPACE
@@ -272,11 +230,7 @@ namespace :data do
 
     desc "Display status of data migrations"
     task :status => :environment do
-      config = ActiveRecord::Base.configurations[Rails.env || 'development']
-      ActiveRecord::Base.establish_connection(config)
-      connection = ActiveRecord::Base.connection
-      puts "\ndatabase: #{config['database']}\n\n"
-      DataMigrate::StatusService.dump(connection)
+      DataMigrate::Tasks::DataMigrateTasks.status
     end
   end
 
@@ -356,21 +310,6 @@ end
 
 def sort_string migration
   "#{migration[:version]}_#{migration[:kind] == :data ? 1 : 0}"
-end
-
-def connect_to_database
-  config = ActiveRecord::Base.configurations[Rails.env || 'development']
-  ActiveRecord::Base.establish_connection(config)
-
-  unless DataMigrate::DataSchemaMigration.table_exists?
-    puts 'Data migrations table does not exist yet.'
-    config = nil
-  end
-  unless ActiveRecord::SchemaMigration.table_exists?
-    puts 'Schema migrations table does not exist yet.'
-    config = nil
-  end
-  config
 end
 
 def past_migrations(sort=nil)
