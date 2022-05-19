@@ -38,20 +38,6 @@ table to track all migrations.
 
 Support Rails 5.2 through 7.0
 
-### Important notes for older versions
-
-#### v2
-
-If you upgraded to Rails 4 while using `data_migrate` prior to version 2,
-the gem wrote data migration versions into
-`schema_migrations` table. After the fix, it was corrected to write into
-`data_migrations`.
-
-If you need to use these old migrations, add the following configuration
-
-It is recommended to move all legacy migrations from `schema_migrations` table into `data_migrations` table
-
-This may cause some unintended consequences. See [#22](https://github.com/ilyakatz/data-migrate/issues/22)
 
 #### v1
 
