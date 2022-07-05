@@ -31,7 +31,7 @@ module DataMigrate
       end
 
       def data_migrations_file_path
-        File.join(data_migrations_path, "#{file_name}.rb")
+        File.join(data_migrations_path, "#{file_name}_data.rb")
       end
 
       def data_migrations_path

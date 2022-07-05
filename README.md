@@ -65,6 +65,8 @@ You can generate a data migration as you would a schema migration:
 
     rails g data_migration add_this_to_that
 
+This will create a data migration file with the given class name, plus automatically append `Data` to the class namespace.
+
 ### Rake Tasks
 
     $> rake -T data

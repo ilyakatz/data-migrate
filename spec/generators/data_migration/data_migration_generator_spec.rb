@@ -27,7 +27,7 @@ describe DataMigrate::Generators::DataMigrationGenerator do
 
   describe :create_data_migration do
     let(:subject) { DataMigrate::Generators::DataMigrationGenerator.new(['my_migration']) }
-    let(:data_migrations_file_path) { 'abc/my_migration.rb' }
+    let(:data_migrations_file_path) { 'abc/my_migration_data.rb' }
 
     context 'when custom data migrations path has a trailing slash' do
       before do
