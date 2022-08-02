@@ -1,10 +1,5 @@
 # Changelog
 
-## 8.1.0
-
-Avoid globally accessible functions for all rake tasks [berniechiu](https://github.com/berniechiu)
-fixed `db:migrate:with_data` to compare data schema versions correctly [cadactive](https://github.com/cadactive)
-
 ## 8.0.0.rc2
 
 Bug fixes [gdott9](https://github.com/gdott9)
