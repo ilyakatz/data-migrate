@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.1.1
+
+Revert 8.1.0 changes
+
 ## 8.1.0
 
 Avoid globally accessible functions for all rake tasks [berniechiu](https://github.com/berniechiu)

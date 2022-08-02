@@ -47,40 +47,6 @@ module DataMigrate
           Kernel.abort message
         end
       end
-
-      def pending_migrations
-        sort_migrations(
-          pending_schema_migrations,
-          pending_data_migrations
-        )
-      end
-
-      def sort_migrations set_1, set_2=nil
-        migrations = set_1 + (set_2 || [])
-        migrations.sort{|a,b|  sort_string(a) <=> sort_string(b)}
-      end
-
-      def sort_string migration
-        "#{migration[:version]}_#{migration[:kind] == :data ? 1 : 0}"
-      end
-
-      def data_migrations_path
-        ::DataMigrate.config.data_migrations_path
-      end
-
-      def run_migration(migration, direction)
-        if migration[:kind] == :data
-          ::ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
-          ::DataMigrate::DataMigrator.run(direction, data_migrations_path, migration[:version])
-        else
-          ::ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
-          ::DataMigrate::SchemaMigration.run(
-            direction,
-            ::Continuation::SchemaMigration.migrations_paths,
-            migration[:version]
-          )
-        end
-      end
     end
 
     # This overrides ActiveRecord::Tasks::DatabaseTasks
@@ -155,5 +121,6 @@ module DataMigrate
 
       sort == "asc" ? sort_migrations(migrations) : sort_migrations(migrations).reverse
     end
+
   end
 end
