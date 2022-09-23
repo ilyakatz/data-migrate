@@ -12,10 +12,11 @@ module DataMigrate
   end
 
   class Config
-    attr_accessor :data_migrations_path, :db_configuration, :spec_name
+    attr_accessor :data_migrations_gen_path, :data_migrations_path, :db_configuration, :spec_name
 
     def initialize
       @data_migrations_path = "db/data/"
+      @data_migrations_gen_path = "db/data/"
       @db_configuration = nil
       @spec_name = nil
     end
