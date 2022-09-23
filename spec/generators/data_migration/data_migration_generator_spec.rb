@@ -36,7 +36,7 @@ describe DataMigrate::Generators::DataMigrationGenerator do
 
     context 'when custom data migrations path has a trailing slash' do
       before do
-        DataMigrate.config.data_migrations_path = 'abc/'
+        DataMigrate.config.data_migrations_gen_path = 'abc/'
       end
 
       it 'returns correct file path' do
@@ -50,7 +50,7 @@ describe DataMigrate::Generators::DataMigrationGenerator do
 
     context 'when custom data migrations path does not have a trailing slash' do
       before do
-        DataMigrate.config.data_migrations_path = 'abc'
+        DataMigrate.config.data_migrations_gen_path = 'abc'
       end
 
       it 'returns correct file path' do
