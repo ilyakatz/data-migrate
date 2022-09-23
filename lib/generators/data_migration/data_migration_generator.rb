@@ -39,7 +39,7 @@ module DataMigrate
       end
 
       def data_migrations_path
-        DataMigrate.config.data_migrations_path
+        DataMigrate.config.data_migrations_gen_path || DataMigrate.config.data_migrations_path
       end
     end
   end
