@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.2.0
+
+Delegate to anonymous subclass of AR::SchemaMigration [foxondo](https://github.com/foxondo)
+
 ## 8.1.1
 
 Revert 8.1.0 changes

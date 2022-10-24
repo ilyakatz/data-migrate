@@ -1,15 +1,14 @@
 module DataMigrate
-  class DataSchemaMigration < ::ActiveRecord::SchemaMigration
-
+  class DataSchemaMigration
     class << self
-      def table_name
-        ActiveRecord::Base.table_name_prefix + 'data_migrations' + ActiveRecord::Base.table_name_suffix
-      end
+      delegate :table_name, :primary_key, :create_table, :normalized_versions, :create, :create!, :table_exists?, :where, to: :instance
 
-      def primary_key
-        "version"
+      def instance
+        @instance ||= Class.new(::ActiveRecord::SchemaMigration) do
+          define_singleton_method(:table_name) { ActiveRecord::Base.table_name_prefix + 'data_migrations' + ActiveRecord::Base.table_name_suffix }
+          define_singleton_method(:primary_key) { "version" }
+        end
       end
     end
   end
 end
-
