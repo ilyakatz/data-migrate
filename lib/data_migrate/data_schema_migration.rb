@@ -1,7 +1,7 @@
 module DataMigrate
   class DataSchemaMigration
     class << self
-      delegate :table_name, :primary_key, :create_table, :normalized_versions, :create, :create!, :table_exists?, :where, to: :instance
+      delegate :table_name, :primary_key, :create_table, :normalized_versions, :create, :create!, :table_exists?, :exists?, :where, to: :instance
 
       def instance
         @instance ||= Class.new(::ActiveRecord::SchemaMigration) do
