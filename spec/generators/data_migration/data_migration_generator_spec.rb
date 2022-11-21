@@ -4,7 +4,8 @@ require 'rails/generators/migration'
 require 'generators/data_migration/data_migration_generator'
 
 describe DataMigrate::Generators::DataMigrationGenerator do
-  let(:subject) { DataMigrate::Generators::DataMigrationGenerator }
+  subject { DataMigrate::Generators::DataMigrationGenerator }
+
   describe :next_migration_number do
     it "next migration" do
       Timecop.freeze("2016-12-03 22:15:26 -0800") do
@@ -19,14 +20,18 @@ describe DataMigrate::Generators::DataMigrationGenerator do
   end
 
   describe :migration_base_class_name do
-    let(:subject) { DataMigrate::Generators::DataMigrationGenerator.new(['my_migration']) }
+    subject { generator.send(:migration_base_class_name) }
+
+    let(:generator) { DataMigrate::Generators::DataMigrationGenerator.new(['my_migration']) }
+
     it "returns the correct base class name" do
-      expect(subject.send(:migration_base_class_name)).to eq("ActiveRecord::Migration[#{ActiveRecord::Migration.current_version}]")
+      is_expected.to eq("ActiveRecord::Migration[#{ActiveRecord::Migration.current_version}]")
     end
   end
 
   describe :create_data_migration do
-    let(:subject) { DataMigrate::Generators::DataMigrationGenerator.new(['my_migration']) }
+    subject { DataMigrate::Generators::DataMigrationGenerator.new(['my_migration']) }
+
     let(:data_migrations_file_path) { 'abc/my_migration.rb' }
 
     context 'when custom data migrations path has a trailing slash' do
@@ -35,7 +40,7 @@ describe DataMigrate::Generators::DataMigrationGenerator do
       end
 
       it 'returns correct file path' do
-        expect(subject).to receive(:migration_template).with(
+        is_expected.to receive(:migration_template).with(
           'data_migration.rb', data_migrations_file_path
         )
 
@@ -49,11 +54,45 @@ describe DataMigrate::Generators::DataMigrationGenerator do
       end
 
       it 'returns correct file path' do
-        expect(subject).to receive(:migration_template).with(
+        is_expected.to receive(:migration_template).with(
           'data_migration.rb', data_migrations_file_path
         )
 
         subject.create_data_migration
+      end
+    end
+  end
+
+  describe ".source_root" do
+    subject { described_class.source_root }
+
+    let(:default_source_root) do
+      File.expand_path(
+        File.dirname(Bundler.root.join("lib", "generators", "data_migration", "templates", "data_migration.rb"))
+      )
+    end
+
+    it { is_expected.to eq default_source_root }
+
+    context "when DateMigrate.config.data_template_path is set" do
+      before do
+        @before = DataMigrate.config.data_template_path
+        DataMigrate.configure do |config|
+          config.data_template_path = data_template_path
+        end
+      end
+
+      let(:data_template_path) { "lib/awesome/templates/data_migration.rb" }
+      let(:expected_source_root) { File.expand_path(File.dirname(Bundler.root.join(data_template_path))) }
+
+      after do
+        DataMigrate.configure do |config|
+          config.data_template_path = @before
+        end
+      end
+
+      it "reads directory from config data template path" do
+        is_expected.to eq expected_source_root
       end
     end
   end
