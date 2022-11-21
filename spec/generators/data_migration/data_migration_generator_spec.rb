@@ -68,7 +68,7 @@ describe DataMigrate::Generators::DataMigrationGenerator do
 
     let(:default_source_root) do
       File.expand_path(
-        File.dirname(Bundler.root.join("lib", "generators", "data_migration", "templates", "data_migration.rb"))
+        File.dirname(File.join(DataMigrate.root, "lib", "generators", "data_migration", "templates", "data_migration.rb"))
       )
     end
 
@@ -83,7 +83,7 @@ describe DataMigrate::Generators::DataMigrationGenerator do
       end
 
       let(:data_template_path) { "lib/awesome/templates/data_migration.rb" }
-      let(:expected_source_root) { File.expand_path(File.dirname(Bundler.root.join(data_template_path))) }
+      let(:expected_source_root) { File.expand_path(File.dirname(File.join(DataMigrate.root, data_template_path))) }
 
       after do
         DataMigrate.configure do |config|
