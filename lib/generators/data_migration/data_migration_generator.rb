@@ -14,7 +14,7 @@ module DataMigrate
 
       def create_data_migration
         set_local_assigns!
-        migration_template "data_migration.rb", data_migrations_file_path
+        migration_template template_path, data_migrations_file_path
       end
 
       protected
@@ -24,6 +24,10 @@ module DataMigrate
           @migration_action = $1
           @table_name       = $2.pluralize
         end
+      end
+
+      def template_path
+        DataMigrate.config.data_template_path
       end
 
       def migration_base_class_name

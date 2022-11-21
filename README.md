@@ -108,6 +108,7 @@ You can override this setting in `config/initializers/data_migrate.rb`
 ```ruby
 DataMigrate.configure do |config|
   config.data_migrations_path = 'db/awesomepath/'
+  config.data_template_path = Rails.root.join("lib", "awesomepath", "custom_data_migration.rb")
   config.db_configuration = {
     'host' => '127.0.0.1',
     'database' => 'awesome_database',
