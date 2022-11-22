@@ -20,6 +20,6 @@ end
 
 module DataMigrate
   def self.root
-    File.dirname(__dir__)
+    File.dirname(__FILE__)
   end
 end
