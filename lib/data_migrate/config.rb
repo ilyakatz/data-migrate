@@ -22,5 +22,11 @@ module DataMigrate
       @db_configuration = nil
       @spec_name = nil
     end
+
+    def data_template_path=(value)
+      @data_template_path = value.tap do |path|
+        raise ArgumentError, "File not found: '#{path}'" unless path == DEFAULT_DATA_TEMPLATE_PATH || File.exists?(path)
+      end
+    end
   end
 end

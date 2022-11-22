@@ -39,7 +39,9 @@ describe DataMigrate::Config do
       end
     end
 
-    let(:data_template_path) { "lib/awesome/templates/data_migration.rb" }
+    let(:data_template_path) do
+      File.join(DataMigrate.root, "generators", "data_migration", "templates", "data_migration.rb")
+    end
 
     after do
       DataMigrate.configure do |config|
@@ -49,6 +51,16 @@ describe DataMigrate::Config do
 
     it "equals the custom data template path" do
       is_expected.to eq data_template_path
+    end
+
+    context "when path does not exist" do
+      subject { DataMigrate.config.data_template_path = invalid_path }
+
+      let(:invalid_path) { "lib/awesome/templates/data_migration.rb" }
+
+      it "checks that file exists on setting config var" do
+        expect { subject }.to raise_error { ArgumentError.new("File not found: '#{data_template_path}'") }
+      end
     end
   end
 end
