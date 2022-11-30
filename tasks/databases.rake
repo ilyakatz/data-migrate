@@ -22,7 +22,7 @@ namespace :db do
                               []
                             end
 
-        current_data_version = ActiveRecord::Migrator.current_version
+        current_data_version = DataMigrate::DataMigrator.current_version
         data_migrations = if target_version > current_data_version
                             pending_data_migrations.keep_if{ |m| m[:version] <= target_version }.map{ |m| m.merge(:direction =>:up) }
                           elsif target_version < current_data_version
