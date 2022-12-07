@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.3.0
+
+Add delegation to exists? for use by third parties [foxondo](https://github.com/foxondo)
+
 ## 8.2.0
 
 Delegate to anonymous subclass of AR::SchemaMigration [foxondo](https://github.com/foxondo)
