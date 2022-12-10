@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.4.0
+
+Avoid Globally Accessible Functions for All Rake Tasks [berniechiu](https://github.com/berniechiu)
+
 ## 8.3.0
 
 Add delegation to exists? for use by third parties [foxondo](https://github.com/foxondo)
