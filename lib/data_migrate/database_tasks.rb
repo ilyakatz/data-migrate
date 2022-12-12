@@ -76,7 +76,7 @@ module DataMigrate
           ::ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
           ::DataMigrate::SchemaMigration.run(
             direction,
-            ::Continuation::SchemaMigration.migrations_paths,
+            ::DataMigrate::SchemaMigration.migrations_paths,
             migration[:version]
           )
         end
