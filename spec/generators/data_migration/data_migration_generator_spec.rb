@@ -57,4 +57,21 @@ describe DataMigrate::Generators::DataMigrationGenerator do
       end
     end
   end
+  
+  describe :create_data_migration_spec do
+    let(:subject) { DataMigrate::Generators::DataMigrationGenerator.new(['my_migration']) }
+    let(:data_migrations_spec_path) { 'spec/abc/my_migration_spec.rb' }
+    
+    before do
+      DataMigrate.config.data_migrations_path = 'abc/'
+    end
+    
+    it 'returns correct file path' do
+      expect(subject).to receive(:migration_template).with(
+        'data_migration_spec.rb', data_migrations_spec_path
+      )
+
+      subject.create_data_migration_spec
+    end
+  end
 end
