@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.5.0
+
+Allow custom templates [bazay](https://github.com/bazay)
+
 ## 8.4.0
 
 Avoid Globally Accessible Functions for All Rake Tasks [berniechiu](https://github.com/berniechiu)
