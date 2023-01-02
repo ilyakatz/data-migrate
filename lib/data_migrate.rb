@@ -19,4 +19,7 @@ else
 end
 
 module DataMigrate
+  def self.root
+    File.dirname(__FILE__)
+  end
 end
