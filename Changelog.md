@@ -1,5 +1,9 @@
 # Changelog
 
+## 8.6.0
+
+Ruby 3.2 support [mehanoid](https://github.com/mehanoid)
+
 ## 8.5.0
 
 Allow custom templates [bazay](https://github.com/bazay)
