@@ -6,7 +6,7 @@ require "data_migrate/config"
 module DataMigrate
   class DataMigrator < ActiveRecord::Migrator
     def self.migrations_paths
-      [DataMigrate.config.data_migrations_path]
+      Array.wrap(DataMigrate.config.data_migrations_path)
     end
 
     def self.assure_data_schema_table
