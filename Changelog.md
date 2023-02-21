@@ -1,5 +1,10 @@
 # Changelog
 
+## 9.0.0
+
+Ruby 3.2 support [mehanoid](https://github.com/mehanoid)
+Rails 5.2 is no longer supported
+
 ## 8.5.0
 
 Allow custom templates [bazay](https://github.com/bazay)
