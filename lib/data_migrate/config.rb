@@ -12,11 +12,12 @@ module DataMigrate
   end
 
   class Config
-    attr_accessor :data_migrations_path, :data_template_path, :db_configuration, :spec_name
+    attr_accessor :data_migrations_table_name, :data_migrations_path, :data_template_path, :db_configuration, :spec_name
 
     DEFAULT_DATA_TEMPLATE_PATH = "data_migration.rb"
 
     def initialize
+      @data_migrations_table_name = "data_migrations"
       @data_migrations_path = "db/data/"
       @data_template_path = DEFAULT_DATA_TEMPLATE_PATH
       @db_configuration = nil
