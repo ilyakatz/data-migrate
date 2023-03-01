@@ -115,6 +115,7 @@ You can override this setting in `config/initializers/data_migrate.rb`
 
 ```ruby
 DataMigrate.configure do |config|
+  config.data_migrations_table_name = 'my_migrations_database_name'
   config.data_migrations_path = 'db/awesomepath/'
   config.data_template_path = Rails.root.join("lib", "awesomepath", "custom_data_migration.rb")
   config.db_configuration = {
