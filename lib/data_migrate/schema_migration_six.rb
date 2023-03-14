@@ -3,7 +3,7 @@ module DataMigrate
   # to allow data/schema combiation tasks
   class SchemaMigration
     def self.pending_schema_migrations
-      all_migrations = DataMigrate::MigrationContext.new(migrations_paths).migrations
+      all_migrations = DataMigrate::MigrationContext.new(migrations_paths, ActiveRecord::Base.connection.schema_migration).migrations
       sort_migrations(
         ActiveRecord::Migrator.new(:up, all_migrations, ActiveRecord::Base.connection.schema_migration).
         pending_migrations.

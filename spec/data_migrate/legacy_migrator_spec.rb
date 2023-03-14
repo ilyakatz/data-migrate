@@ -16,7 +16,7 @@ describe DataMigrate::LegacyMigrator do
 
   before do
     ActiveRecord::Base.establish_connection(db_config)
-    ActiveRecord::SchemaMigration.create_table
+    ActiveRecord::Base.connection.schema_migration.create_table
     DataMigrate::DataSchemaMigration.create_table
   end
 

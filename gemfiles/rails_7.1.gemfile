@@ -2,7 +2,7 @@
 
 source "http://rubygems.org"
 
-gem "rails", "~> 5.2.3"
 gem "sqlite3", "~> 1.4"
+gem "rails", git: "https://github.com/rails/rails.git", branch: "main"
 
 gemspec path: "../"

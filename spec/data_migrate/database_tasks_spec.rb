@@ -60,7 +60,7 @@ describe DataMigrate::DatabaseTasks do
     end
 
     before do
-      ActiveRecord::SchemaMigration.create_table
+      ActiveRecord::Base.connection.schema_migration.create_table
 
       allow(DataMigrate::SchemaMigration).to receive(:migrations_paths) {
         migration_path

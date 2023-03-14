@@ -23,7 +23,7 @@ module DataMigrate
       validate(@migrations)
 
       DataMigrate::DataSchemaMigration.create_table
-      ActiveRecord::InternalMetadata.create_table
+      ActiveRecord::Base.connection.internal_metadata.create_table
     end
 
     def load_migrated

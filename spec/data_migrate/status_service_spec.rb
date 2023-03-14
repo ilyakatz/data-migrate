@@ -38,7 +38,7 @@ describe DataMigrate::StatusService do
         to receive(:db_config) { db_config }.at_least(:once)
       ActiveRecord::Base.establish_connection(db_config)
 
-      ActiveRecord::SchemaMigration.create_table
+      ActiveRecord::Base.connection.schema_migration.create_table
       DataMigrate::DataMigrator.assure_data_schema_table
 
       ActiveRecord::Base.connection.execute <<-SQL

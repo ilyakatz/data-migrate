@@ -18,7 +18,7 @@ describe DataMigrate::DataMigrator do
     before do
       allow(subject).to receive(:db_config) { db_config }.at_least(:once)
       ActiveRecord::Base.establish_connection(db_config)
-      ::ActiveRecord::SchemaMigration.create_table
+      ::ActiveRecord::Base.connection.schema_migration.create_table
       DataMigrate::DataSchemaMigration.create_table
     end
 
@@ -63,7 +63,7 @@ describe DataMigrate::DataMigrator do
     before do
       allow(subject).to receive(:db_config) { db_config }.at_least(:once)
       ActiveRecord::Base.establish_connection(db_config)
-      ::ActiveRecord::SchemaMigration.create_table
+      ::ActiveRecord::Base.connection.schema_migration.create_table
       DataMigrate::DataSchemaMigration.create_table
     end
 

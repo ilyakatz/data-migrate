@@ -9,3 +9,4 @@ spec/db/data_schema.rb
 .DS_Store
 .idea/
 vendor/
+/.tool-versions
