@@ -3,14 +3,7 @@
 require "spec_helper"
 
 describe DataMigrate::SchemaMigration do
-  let(:migration_path) {
-    if Rails::VERSION::MAJOR == 5
-      "spec/db/migrate/5.2"
-    else
-      "spec/db/migrate/6.0"
-    end
-  }
-
+  let(:migration_path) { "spec/db/migrate" }
   let(:subject) { DataMigrate::SchemaMigration }
   let(:db_config) do
     {
@@ -67,7 +60,7 @@ describe DataMigrate::SchemaMigration do
     describe :migrations_paths do
       context 'when a db_name is configured' do
         let(:config) { double(:config) }
-        let(:paths) { ['spec/db/migrate/6.0', 'spec/db/components/migrate/6.0'] }
+        let(:paths) { ['spec/db/migrate'] }
         let(:config_options) do
           if Rails.version > '6.1'
             { env_name: 'test', name: 'primary' }

@@ -34,8 +34,7 @@ describe DataMigrate::StatusService do
     end
 
     before do
-      allow(DataMigrate::DataMigrator).
-        to receive(:db_config) { db_config }.at_least(:once)
+      # allow(DataMigrate::DataMigrator).to receive(:db_config) { db_config }.at_least(:once)
       ActiveRecord::Base.establish_connection(db_config)
 
       ActiveRecord::SchemaMigration.create_table

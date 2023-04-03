@@ -7,7 +7,7 @@ module DataMigrate
       sort_migrations(
         ActiveRecord::Migrator.new(:up, all_migrations, ActiveRecord::Base.connection.schema_migration).
         pending_migrations.
-        map {|m| { version: m.version, kind: :schema }}
+        map { |m| { version: m.version, kind: :schema } }
       )
     end
 
@@ -17,12 +17,12 @@ module DataMigrate
 
     def self.sort_migrations(set1, set2 = nil)
       migrations = set1 + (set2 || [])
-      migrations.sort {|a, b|  sort_string(a) <=> sort_string(b)}
+      migrations.sort { |a, b|  sort_string(a) <=> sort_string(b) }
     end
 
     def self.migrations_paths
       spec_name = DataMigrate.config.spec_name
-      if spec_name && Rails.version > '6.1'
+      if spec_name && Rails.version > "6.1"
         ActiveRecord::Base.configurations.configs_for(env_name: Rails.env, name: spec_name).migrations_paths
       elsif spec_name
         ActiveRecord::Base.configurations.configs_for(env_name: Rails.env, spec_name: spec_name).migrations_paths
