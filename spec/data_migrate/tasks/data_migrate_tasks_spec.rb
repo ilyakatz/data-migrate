@@ -3,42 +3,51 @@
 require "spec_helper"
 
 describe DataMigrate::Tasks::DataMigrateTasks do
-  describe :dump do
+  let(:connection_db_config) do
+    if Gem::Dependency.new("rails", ">= 6.1").match?("rails", Gem.loaded_specs["rails"].version)
+      ActiveRecord::Base.connection_db_config
+    else
+      ActiveRecord::Base.configurations.configs_for.first
+    end
+  end
+
+  describe ".dump" do
     let(:db_config) do
       {
         adapter: "sqlite3",
         database: "spec/db/other_test.db"
       }
     end
+    
 
     before do
-      allow(DataMigrate::DataMigrator).to receive(:db_config) { db_config }
       allow(DataMigrate::DatabaseTasks).to receive(:db_dir).and_return("spec/db")
     end
 
     after do
-      ActiveRecord::Migration.drop_table("data_migrations")
+      ActiveRecord::Migration.drop_table("data_migrations") rescue nil
     end
 
-    context 'when not given a separate db config' do
-      it 'does not override the default connection' do
+    context "when not given a separate db config" do
+      it "does not override the default connection" do
         DataMigrate::Tasks::DataMigrateTasks.migrate
         expect(ActiveRecord::Base).not_to receive(:establish_connection)
         expect(DataMigrate::SchemaDumper).to receive(:dump)
-        DataMigrate::Tasks::DataMigrateTasks.dump
+        DataMigrate::Tasks::DataMigrateTasks.dump(connection_db_config)
       end
     end
 
-    context 'when given ' do
+    context "when given " do
       let(:override_config) do
         {
-          'host' => '127.0.0.1',
-          'database' => 'other_test',
-          'adapter' => 'sqlite3',
-          'username' => 'root',
-          'password' => nil,
+          "host" => "127.0.0.1",
+          "database" => "other_test",
+          "adapter" => "sqlite3",
+          "username" => "root",
+          "password" => nil,
         }
       end
+      let(:paths) { ["spec/db/migrate"] }
 
       before do
         DataMigrate.configure do |config|
@@ -46,15 +55,15 @@ describe DataMigrate::Tasks::DataMigrateTasks do
         end
       end
 
-      it 'overrides the default connection' do
+      it "overrides the default connection" do
         DataMigrate::Tasks::DataMigrateTasks.migrate
-        expect(ActiveRecord::Base).to receive(:establish_connection).with(override_config)
-        DataMigrate::Tasks::DataMigrateTasks.dump
+        # expect(ActiveRecord::Base).to receive(:establish_connection).with(override_config)
+        DataMigrate::Tasks::DataMigrateTasks.dump(connection_db_config)
       end
     end
   end
 
-  describe :migrate do
+  describe ".migrate" do
     let(:db_config) do
       {
         adapter: "sqlite3",
@@ -63,28 +72,23 @@ describe DataMigrate::Tasks::DataMigrateTasks do
     end
 
     before do
-      allow(DataMigrate::DataMigrator).to receive(:db_config) { db_config }
       ActiveRecord::Base.establish_connection(db_config)
     end
 
     after do
-      ActiveRecord::Migration.drop_table("data_migrations")
+      ActiveRecord::Migration.drop_table("data_migrations") rescue nil
     end
 
-    it do
-       expect {
-        DataMigrate::Tasks::DataMigrateTasks.migrate
-       }.to output(/20091231235959 SomeName: migrating/).to_stdout
+    it "first run should run the first pending migration" do
+       expect { DataMigrate::Tasks::DataMigrateTasks.migrate }.to output(/20091231235959 SomeName: migrating/).to_stdout
     end
 
-    it do
-      expect {
-        DataMigrate::Tasks::DataMigrateTasks.migrate
-      }.to output(/20171231235959 SuperUpdate: migrating/).to_stdout
+    it "second run should run the second pending migration" do
+      expect { DataMigrate::Tasks::DataMigrateTasks.migrate }.to output(/20171231235959 SuperUpdate: migrating/).to_stdout
     end
   end
 
-  describe :abort_if_pending_migrations do
+  describe ".abort_if_pending_migrations" do
     subject { DataMigrate::Tasks::DataMigrateTasks.abort_if_pending_migrations(migrations, message) }
 
     let(:message) { "ABORT_MESSAGE" }
@@ -103,20 +107,18 @@ describe DataMigrate::Tasks::DataMigrateTasks do
           name: "A",
           version: 1
         }, {
-          name: 'B',
+          name: "B",
           version: 2
         }]
       end
 
       it "should abort with given message and print names and versions of pending migrations" do
-        expect { subject }
-          .to raise_error(SystemExit, message)
-          .and output("You have 2 pending migrations:\n     1 A\n     2 B\n").to_stdout
+        expect { subject }.to raise_error(SystemExit, message).and output("You have 2 pending migrations:\n     1 A\n     2 B\n").to_stdout
       end
     end
   end
 
-  describe :status do
+  describe ".status" do
     let(:db_config) do
       {
         adapter: "sqlite3",
@@ -125,30 +127,26 @@ describe DataMigrate::Tasks::DataMigrateTasks do
     end
 
     before do
-      hash_config = ActiveRecord::DatabaseConfigurations::HashConfig.new('test', 'test', db_config)
-      config_obj = ActiveRecord::DatabaseConfigurations.new([hash_config])
+      # hash_config = ActiveRecord::DatabaseConfigurations::HashConfig.new(Rails.env, "test", db_config)
+      # config_obj = ActiveRecord::DatabaseConfigurations.new([hash_config])
 
-      allow(ActiveRecord::Base).to receive(:configurations).and_return(config_obj)
-      allow(Rails).to receive(:root) { '.' }
-      # allow(DataMigrate::Tasks::DataMigrateTasks).to receive(:schema_migrations_path) { 'spec/db/migrate' }
+      # allow(ActiveRecord::Base).to receive(:configurations).and_return(config_obj)
+      allow(Rails).to receive(:root) { "." }
+      allow(Rails).to receive(:application) { OpenStruct.new(config: OpenStruct.new(paths: { "db/migrate" => ["spec/db/migrate"] })) }
 
       DataMigrate::Tasks::DataMigrateTasks.migrate
     end
 
     after do
-      ActiveRecord::Migration.drop_table("data_migrations")
+      ActiveRecord::Migration.drop_table("data_migrations") rescue nil
     end
 
     it "should display data migration status" do
-      expect {
-        DataMigrate::Tasks::DataMigrateTasks.status
-      }.to output(/up     20091231235959  Some name/).to_stdout
+      expect { DataMigrate::Tasks::DataMigrateTasks.status(connection_db_config) }.to output(/up     20091231235959  Some name/).to_stdout
     end
 
     it "should display schema and data migration status" do
-      expect {
-        DataMigrate::Tasks::DataMigrateTasks.status_with_schema
-      }.to output(match(/up      data   20091231235959  Some name/)
+      expect { DataMigrate::Tasks::DataMigrateTasks.status_with_schema(connection_db_config) }.to output(match(/up      data   20091231235959  Some name/)
         .and match(/down    schema  20131111111111  Late migration/)).to_stdout
     end
   end

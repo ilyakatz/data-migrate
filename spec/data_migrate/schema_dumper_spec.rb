@@ -14,10 +14,8 @@ describe DataMigrate::SchemaDumper do
     %w[20091231235959 20101231235959 20111231235959]
   end
 
-  describe :dump do
+  describe ".dump" do
     before do
-      allow(DataMigrate::DataMigrator).
-        to receive(:db_config) { db_config }.at_least(:once)
       ActiveRecord::Base.establish_connection(db_config)
 
       ActiveRecord::SchemaMigration.create_table
@@ -25,7 +23,7 @@ describe DataMigrate::SchemaDumper do
 
       ActiveRecord::Base.connection.execute <<-SQL
         INSERT INTO #{DataMigrate::DataSchemaMigration.table_name}
-        VALUES #{fixture_file_timestamps.map { |t| "(#{t})" }.join(', ')}
+        VALUES #{fixture_file_timestamps.map { |t| "(#{t})" }.join(", ")}
       SQL
     end
 

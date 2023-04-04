@@ -11,6 +11,14 @@ describe DataMigrate::StatusService do
   end
   let(:service) { DataMigrate::StatusService }
 
+  let(:connection_db_config) do
+    if Gem::Dependency.new("rails", ">= 6.1").match?("rails", Gem.loaded_specs["rails"].version)
+      ActiveRecord::Base.connection_db_config
+    else
+      ActiveRecord::Base.configurations.configs_for.first
+    end
+  end
+
   context "table does not exists" do
     before do
       ActiveRecord::Base.establish_connection(db_config)
@@ -20,7 +28,7 @@ describe DataMigrate::StatusService do
       allow_any_instance_of(service).to receive(:table_name) { "bogus"}
       stream = StringIO.new
 
-      service.dump(ActiveRecord::Base.connection, stream)
+      service.dump(connection_db_config, stream)
 
       stream.rewind
       expected = "Data migrations table does not exist"
@@ -42,7 +50,7 @@ describe DataMigrate::StatusService do
 
       ActiveRecord::Base.connection.execute <<-SQL
         INSERT INTO #{DataMigrate::DataSchemaMigration.table_name}
-        VALUES #{fixture_file_timestamps.map { |t| "(#{t})" }.join(', ')}
+        VALUES #{fixture_file_timestamps.map { |t| "(#{t})" }.join(", ")}
       SQL
 
       allow_any_instance_of(service).to receive(:root_folder) { "./" }
@@ -54,7 +62,7 @@ describe DataMigrate::StatusService do
 
     it "shows successfully executed migration" do
       stream = StringIO.new
-      service.dump(ActiveRecord::Base.connection, stream)
+      service.dump(connection_db_config, stream)
       stream.rewind
 
       expected = "   up     20091231235959  Some name"
@@ -63,7 +71,7 @@ describe DataMigrate::StatusService do
 
     it "excludes files without .rb extension" do
       stream = StringIO.new
-      service.dump(ActiveRecord::Base.connection, stream)
+      service.dump(connection_db_config, stream)
       stream.rewind
 
       expected = "20181128000207  Excluded file"
@@ -72,7 +80,7 @@ describe DataMigrate::StatusService do
 
     it "shows missing file migration" do
       stream = StringIO.new
-      service.dump(ActiveRecord::Base.connection, stream)
+      service.dump(connection_db_config, stream)
       stream.rewind
 
       expected = "   up     20101231235959  ********** NO FILE **********"
@@ -82,7 +90,7 @@ describe DataMigrate::StatusService do
 
     it "shows migration that has not run yet" do
       stream = StringIO.new
-      service.dump(ActiveRecord::Base.connection, stream)
+      service.dump(connection_db_config, stream)
       stream.rewind
 
       expected = "  down    20171231235959  Super update"
@@ -92,7 +100,7 @@ describe DataMigrate::StatusService do
 
     it "outputs migrations in chronological order" do
       stream = StringIO.new
-      service.dump(ActiveRecord::Base.connection, stream)
+      service.dump(connection_db_config, stream)
       stream.rewind
       s = stream.read
       expect(s.index("20091231235959")).to be < s.index("20111231235959")

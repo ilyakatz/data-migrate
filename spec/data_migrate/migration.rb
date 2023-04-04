@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe DataMigrate::Migration do
   it "uses correct table name" do

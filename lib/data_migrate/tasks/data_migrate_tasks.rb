@@ -13,7 +13,7 @@ module DataMigrate
 
       def dump(db_config)
         if dump_schema_after_migration?
-          filename = DataMigrate::DatabaseTasks.dump_filename(db_config.name, ActiveRecord::Base.schema_format)
+          filename = DataMigrate::DatabaseTasks.dump_filename(db_config_name(db_config), ActiveRecord::Base.schema_format)
 
           File.open(filename, "w:utf-8") do |file|
             DataMigrate::SchemaDumper.dump(ActiveRecord::Base.connection, file)
@@ -46,12 +46,12 @@ module DataMigrate
         end
       end
 
-      def status
-        puts "\ndatabase: #{ActiveRecord::Base.connection_db_config.database}\n\n"
+      def status(db_config)
+        puts "\ndatabase: #{db_config_name(db_config)}\n\n"
         DataMigrate::StatusService.dump(ActiveRecord::Base.connection)
       end
 
-      def status_with_schema
+      def status_with_schema(db_config)
         db_list_data = ActiveRecord::Base.connection.select_values("SELECT version FROM #{DataMigrate::DataSchemaMigration.table_name}")
         db_list_schema = ActiveRecord::SchemaMigration.all.pluck(:version)
         file_list = []
@@ -77,13 +77,23 @@ module DataMigrate
         file_list.sort! { |a,b| "#{a[1]}_#{a[3] == 'data' ? 1 : 0}" <=> "#{b[1]}_#{b[3] == 'data' ? 1 : 0}" }
 
         # output
-        puts "\ndatabase: #{ActiveRecord::Base.connection_db_config.database}\n\n"
+        puts "\ndatabase: #{db_config_name(db_config)}\n\n"
         puts "#{"Status".center(8)} #{"Type".center(8)}  #{"Migration ID".ljust(14)} Migration Name"
         puts "-" * 60
         file_list.each { |file| puts "#{file[0].center(8)} #{file[3].center(8)} #{file[1].ljust(14)}  #{file[2].humanize}" }
         db_list_schema.each { |version| puts "#{'up'.center(8)}  #{version.ljust(14)}  *** NO SCHEMA FILE ***" }
         db_list_data.each { |version| puts "#{'up'.center(8)}  #{version.ljust(14)}  *** NO DATA FILE ***" }
         puts
+      end
+
+      private
+
+      def db_config_name(db_config)
+        if Gem::Dependency.new("rails", '~> 7.0').match?("rails", Gem.loaded_specs["rails"].version)
+          db_config.name
+        elsif Gem::Dependency.new("rails", '~> 6.0').match?("rails", Gem.loaded_specs["rails"].version)
+          db_config.spec_name
+        end
       end
     end
   end

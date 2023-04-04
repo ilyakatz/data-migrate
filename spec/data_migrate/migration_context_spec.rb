@@ -20,7 +20,7 @@ describe DataMigrate::DataMigrator do
     }
   end
 
-  describe :migrate do
+  describe "migrate" do
     before do
       ActiveRecord::Base.establish_connection(db_config)
       ActiveRecord::SchemaMigration.create_table

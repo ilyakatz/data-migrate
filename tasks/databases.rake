@@ -122,7 +122,7 @@ namespace :db do
       task with_data: :environment do
         ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env).each do |db_config|
           ActiveRecord::Base.establish_connection(db_config)
-          DataMigrate::Tasks::DataMigrateTasks.status_with_schema
+          DataMigrate::Tasks::DataMigrateTasks.status_with_schema(db_config)
         end
       end
     end
@@ -247,7 +247,7 @@ namespace :data do
     task status: :environment do
       ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env).each do |db_config|
         ActiveRecord::Base.establish_connection(db_config)
-        DataMigrate::Tasks::DataMigrateTasks.status
+        DataMigrate::Tasks::DataMigrateTasks.status(db_config)
       end
     end
   end

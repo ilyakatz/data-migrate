@@ -13,8 +13,8 @@ module DataMigrate
         "data_schema.rb"
       end
 
-      def dump_filename(db_config_name, format = ActiveRecord::Base.schema_format)
-        filename = if ActiveRecord::Base.configurations.primary?(db_config_name)
+      def dump_filename(db_config_name, format = ActiveRecord::Base.schema_format) # db_config
+        filename = if db_config_name == "primary" # db_config.name
           schema_file_type(format)
         else
           "#{db_config_name}_#{schema_file_type(format)}"

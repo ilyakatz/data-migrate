@@ -10,13 +10,11 @@ describe DataMigrate::DataMigrator do
   end
 
   before do
-    allow(DataMigrate::DataMigrator).to receive(:db_config) { db_config }
     ActiveRecord::Base.establish_connection(db_config)
   end
 
-  describe :load_migrated do
+  describe ".load_migrated" do
     before do
-      allow(subject).to receive(:db_config) { db_config }.at_least(:once)
       ActiveRecord::Base.establish_connection(db_config)
       ::ActiveRecord::SchemaMigration.create_table
       DataMigrate::DataSchemaMigration.create_table
@@ -27,7 +25,7 @@ describe DataMigrate::DataMigrator do
       ActiveRecord::Migration.drop_table("schema_migrations")
     end
 
-    it do
+    it "loads migrated versions" do
       subject.assure_data_schema_table
       DataMigrate::DataSchemaMigration.create(version: 20090000000000)
       ::ActiveRecord::SchemaMigration.create(version: 20100000000000)
@@ -40,9 +38,8 @@ describe DataMigrate::DataMigrator do
     end
   end
 
-  describe :assure_data_schema_table do
+  describe ".assure_data_schema_table" do
     before do
-      allow(subject).to receive(:db_config) { db_config }.at_least(:once)
       ActiveRecord::Base.establish_connection(db_config)
     end
 
@@ -50,18 +47,15 @@ describe DataMigrate::DataMigrator do
       ActiveRecord::Migration.drop_table("data_migrations")
     end
 
-    it do
+    it "creates the data_migrations table" do
       ActiveRecord::Migration.drop_table("data_migrations") rescue nil
       subject.assure_data_schema_table
-      expect(
-        ActiveRecord::Base.connection.table_exists?("data_migrations")
-      ).to eq true
+      expect(ActiveRecord::Base.connection.table_exists?("data_migrations")).to eq true
     end
   end
 
   describe "#migrations_status" do
     before do
-      allow(subject).to receive(:db_config) { db_config }.at_least(:once)
       ActiveRecord::Base.establish_connection(db_config)
       ::ActiveRecord::SchemaMigration.create_table
       DataMigrate::DataSchemaMigration.create_table
@@ -75,7 +69,7 @@ describe DataMigrate::DataMigrator do
     end
   end
 
-  describe :match do
+  describe ".match" do
     context "when the file does not match" do
       it "returns nil" do
         expect(subject.match("not_a_data_migration_file")).to be_nil

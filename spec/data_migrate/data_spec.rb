@@ -27,12 +27,7 @@ describe DataMigrate::Data do
     end
   end
 
-  describe :define do
-    before do
-      allow(DataMigrate::DataMigrator).
-        to receive(:db_config) { db_config }
-    end
-
+  describe ".define" do
     after do
       ActiveRecord::Migration.drop_table("data_migrations")
     end
@@ -45,8 +40,7 @@ describe DataMigrate::Data do
 
     context "when a version is supplied" do
       before do
-        allow(DataMigrate::DataMigrator).
-          to receive(:full_migrations_path).and_return(@temp_dir)
+        allow(DataMigrate::DataMigrator).to receive(:full_migrations_path).and_return(@temp_dir)
       end
 
       it "sets the current version to the supplied version" do
@@ -57,9 +51,7 @@ describe DataMigrate::Data do
         expect(DataMigrate::DataMigrator.current_version).to eq version.to_i
       end
 
-      it "creates entries for migration versions that come " \
-         "before the supplied version" do
-
+      it "creates entries for migration versions that come before the supplied version" do
         version = fixture_file_timestamps[1]
 
         subject.define(version: version)
@@ -69,11 +61,8 @@ describe DataMigrate::Data do
           FROM #{DataMigrate::DataSchemaMigration.table_name}
         SQL
 
-        db_list_data = ActiveRecord::Base.connection.
-          select_values(sql_select).map(&:to_i)
-        expect(db_list_data).to match_array(
-          [fixture_file_timestamps[0], fixture_file_timestamps[1]].map(&:to_i)
-        )
+        db_list_data = ActiveRecord::Base.connection.select_values(sql_select).map(&:to_i)
+        expect(db_list_data).to match_array([fixture_file_timestamps[0], fixture_file_timestamps[1]].map(&:to_i))
 
         # The last remaining migration (fixture_file_timestamps[2]) was
         # not included as part of the supplied version and so should not

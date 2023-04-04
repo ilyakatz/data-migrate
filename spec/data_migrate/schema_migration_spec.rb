@@ -24,7 +24,7 @@ describe DataMigrate::SchemaMigration do
     ActiveRecord::Migration.drop_table("schema_migrations")
   end
 
-  describe :pending_schema_migrations do
+  describe ".pending_schema_migrations" do
     it "list sorted schema migrations" do
       expect(subject).to receive(:migrations_paths) {
         migration_path
@@ -37,55 +37,53 @@ describe DataMigrate::SchemaMigration do
     end
   end
 
-  describe :run do
-    it do
-      expect {
-        subject.run(:up, migration_path, 20202020202011)
-      }.to output(/20202020202011 DbMigration: migrating/).to_stdout
+  describe ".run" do
+    it "can run up task" do
+      expect { subject.run(:up, migration_path, 20202020202011) }.to output(/20202020202011 DbMigration: migrating/).to_stdout
       versions = ActiveRecord::SchemaMigration.normalized_versions
       expect(versions.first).to eq("20202020202011")
     end
 
-    it "undo migration" do
+    it "can run down task" do
       subject.run(:up, migration_path, 20202020202011)
-      expect {
-        subject.run(:down, migration_path, 20202020202011)
-      }.to output(/Undoing DbMigration/).to_stdout
+      expect { subject.run(:down, migration_path, 20202020202011) }.to output(/Undoing DbMigration/).to_stdout
       versions = ActiveRecord::SchemaMigration.normalized_versions
       expect(versions.count).to eq(0)
     end
   end
 
-  if Rails.version > '6'
-    describe :migrations_paths do
-      context 'when a db_name is configured' do
-        let(:config) { double(:config) }
-        let(:paths) { ['spec/db/migrate'] }
-        let(:config_options) do
-          if Rails.version > '6.1'
-            { env_name: 'test', name: 'primary' }
-          else
-            { env_name: 'test', spec_name: 'primary' }
-          end
+  describe ".migrations_paths" do
+    context "when a db_name is configured" do
+      let(:config) { double(:config) }
+      let(:paths) { ["spec/db/migrate", "spec/db/migrate/other"] }
+      let(:specification_name) { "primary" }
+      let(:config_options) do
+        if Gem::Dependency.new("rails", "~> 6.0").match?("rails", Gem.loaded_specs["rails"].version)
+          { env_name: Rails.env, spec_name: specification_name }
+        elsif Gem::Dependency.new("rails", "~> 7.0").match?("rails", Gem.loaded_specs["rails"].version)
+          { env_name: Rails.env, name: specification_name }
+        end
+      end
+
+      before do
+        @spec_name = DataMigrate.config.spec_name
+        DataMigrate.configure do |config|
+          config.spec_name = specification_name
         end
 
-        before do
-          DataMigrate.configure do |config|
-            config.spec_name = 'primary'
-          end
+        allow(ActiveRecord::Base.configurations).to receive(:configs_for).with(config_options).and_return(config)
+        allow(config).to receive(:migrations_paths).and_return(paths)
+      end
 
-          allow(ActiveRecord::Base.configurations)
-            .to receive(:configs_for)
-            .with(config_options)
-            .and_return(config)
-
-          allow(config).to receive(:migrations_paths).and_return(paths)
+      after do
+        DataMigrate.configure do |config|
+          config.spec_name = @spec_name
         end
+      end
 
-        it 'lists schema migration paths' do
-          expect(subject.migrations_paths.size).to eq(2)
-          expect(subject.migrations_paths).to eq(paths)
-        end
+      it "lists schema migration paths" do
+        expect(subject.migrations_paths.size).to eq(paths.count)
+        expect(subject.migrations_paths).to eq(paths)
       end
     end
   end
