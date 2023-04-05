@@ -32,7 +32,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "timecop"
   s.add_development_dependency "rubocop"
   s.add_development_dependency "overcommit"
-  s.add_development_dependency "byebug"
 
 
   s.files         = `git ls-files`.split("\n")

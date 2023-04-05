@@ -4,7 +4,6 @@ require "sqlite3"
 require "data_migrate"
 require "pry"
 require "timecop"
-require "byebug"
 
 RSpec.configure do |config|
   config.mock_with :rspec do |mocks|
