@@ -4,15 +4,7 @@ require "spec_helper"
 
 describe DataMigrate::Data do
   let(:subject) { DataMigrate::Data }
-  let(:db_config) do
-    {
-      adapter: "sqlite3",
-      database: "spec/db/test.db"
-    }
-  end
-  let(:fixture_file_timestamps) do
-    %w[20091231235959 20101231235959 20111231235959]
-  end
+  let(:fixture_file_timestamps) { %w[20091231235959 20101231235959 20111231235959] }
 
   around do |example|
     Dir.mktmpdir do |temp_dir|

@@ -24,7 +24,7 @@ describe DataMigrate::DatabaseTasks do
   before do
     allow(DataMigrate::Tasks::DataMigrateTasks).to receive(:migrations_paths) { data_migrations_path }
     ActiveRecord::Base.establish_connection(db_config)
-    if Gem::Dependency.new("rails", ">= 6.1").match?("rails", Gem.loaded_specs["rails"].version)
+    if Gem::Dependency.new("rails", ">= 6.1").match?("rails", Gem.loaded_specs["rails"].version) # LOOK AT THIS IN SOURCE
       hash_config = ActiveRecord::DatabaseConfigurations::HashConfig.new("test", "test", db_config)
       config_obj = ActiveRecord::DatabaseConfigurations.new([hash_config])
       allow(ActiveRecord::Base).to receive(:configurations).and_return(config_obj)
@@ -35,11 +35,8 @@ describe DataMigrate::DatabaseTasks do
 
   context "migrations" do
     after do
-      begin
-        ActiveRecord::Migration.drop_table("data_migrations")
-      rescue ActiveRecord::StatementInvalid
-      end
-      ActiveRecord::Migration.drop_table("schema_migrations")
+      ActiveRecord::Migration.drop_table("data_migrations") rescue nil
+      ActiveRecord::Migration.drop_table("schema_migrations") rescue nil
     end
 
     before do
@@ -47,20 +44,19 @@ describe DataMigrate::DatabaseTasks do
 
       allow(DataMigrate::SchemaMigration).to receive(:migrations_paths) { migration_path }
       allow(DataMigrate::DatabaseTasks).to receive(:data_migrations_path) { data_migrations_path }.at_least(:once)
-      # allow(DataMigrate::DatabaseTasks).to receive(:schema_migrations_path) { migration_path }.at_least(:once)
     end
 
     describe ".past_migrations" do
       it "returns past migration records" do
         subject.forward
-        m = subject.past_migrations
-        expect(m.count).to eq 1
-        expect(m.first[:version]).to eq 20091231235959
+        migrations = subject.past_migrations
+        expect(migrations.count).to eq 1
+        expect(migrations.first[:version]).to eq 20091231235959
       end
 
       it "shows nothing without any migrations" do
-        m = subject.past_migrations
-        expect(m.count).to eq 0
+        migrations = subject.past_migrations
+        expect(migrations.count).to eq 0
       end
     end
 

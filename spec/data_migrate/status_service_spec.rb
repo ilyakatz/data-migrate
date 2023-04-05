@@ -1,16 +1,11 @@
 # frozen_string_literal: true
+
 require "spec_helper"
 
 describe DataMigrate::StatusService do
-  let(:subject) { DataMigrate::SchemaDumper }
-  let(:db_config) do
-    {
-      adapter: "sqlite3",
-      database: "spec/db/test.db"
-    }
-  end
-  let(:service) { DataMigrate::StatusService }
-
+  let(:subject) { DataMigrate::StatusService }
+  let(:stream) { StringIO.new }
+  let(:stream_data) { stream.read }
   let(:connection_db_config) do
     if Gem::Dependency.new("rails", ">= 6.1").match?("rails", Gem.loaded_specs["rails"].version)
       ActiveRecord::Base.connection_db_config
@@ -21,89 +16,52 @@ describe DataMigrate::StatusService do
 
   context "table does not exists" do
     before do
-      ActiveRecord::Base.establish_connection(db_config)
+      allow_any_instance_of(subject).to receive(:table_name) { "bogus" }
+
+      subject.dump(connection_db_config, stream)
+      stream.rewind
     end
 
     it "show error message" do
-      allow_any_instance_of(service).to receive(:table_name) { "bogus"}
-      stream = StringIO.new
-
-      service.dump(connection_db_config, stream)
-
-      stream.rewind
-      expected = "Data migrations table does not exist"
-      expect(stream.read).to include expected
+      expect(stream_data).to include("Data migrations table does not exist")
     end
   end
 
   context "table exists" do
-    let(:fixture_file_timestamps) do
-      %w[20091231235959 20101231235959 20111231235959]
-    end
+    let(:fixture_file_timestamps) { %w[20091231235959 20101231235959 20111231235959] }
 
     before do
-      # allow(DataMigrate::DataMigrator).to receive(:db_config) { db_config }.at_least(:once)
-      ActiveRecord::Base.establish_connection(db_config)
-
       ActiveRecord::SchemaMigration.create_table
-      DataMigrate::DataMigrator.assure_data_schema_table
+      DataMigrate::DataSchemaMigration.create_table
+      DataMigrate::DataSchemaMigration.create(fixture_file_timestamps.map { |t| { version: t } })
 
-      ActiveRecord::Base.connection.execute <<-SQL
-        INSERT INTO #{DataMigrate::DataSchemaMigration.table_name}
-        VALUES #{fixture_file_timestamps.map { |t| "(#{t})" }.join(", ")}
-      SQL
-
-      allow_any_instance_of(service).to receive(:root_folder) { "./" }
+      subject.dump(connection_db_config, stream)
+      stream.rewind
     end
 
     after do
-      ActiveRecord::Migration.drop_table("data_migrations")
+      ActiveRecord::Migration.drop_table("data_migrations") rescue nil
+      ActiveRecord::Migration.drop_table("schema_migrations") rescue nil
     end
 
     it "shows successfully executed migration" do
-      stream = StringIO.new
-      service.dump(connection_db_config, stream)
-      stream.rewind
-
-      expected = "   up     20091231235959  Some name"
-      expect(stream.read).to include expected
+      expect(stream_data).to include("   up     20091231235959  Some name")
     end
 
     it "excludes files without .rb extension" do
-      stream = StringIO.new
-      service.dump(connection_db_config, stream)
-      stream.rewind
-
-      expected = "20181128000207  Excluded file"
-      expect(stream.read).to_not include expected
+      expect(stream_data).to_not include("20181128000207  Excluded file")
     end
 
     it "shows missing file migration" do
-      stream = StringIO.new
-      service.dump(connection_db_config, stream)
-      stream.rewind
-
-      expected = "   up     20101231235959  ********** NO FILE **********"
-      s = stream.read
-      expect(s).to include expected
+      expect(stream_data).to include("   up     20101231235959  ********** NO FILE **********")
     end
 
     it "shows migration that has not run yet" do
-      stream = StringIO.new
-      service.dump(connection_db_config, stream)
-      stream.rewind
-
-      expected = "  down    20171231235959  Super update"
-      s = stream.read
-      expect(s).to include expected
+      expect(stream_data).to include("  down    20171231235959  Super update")
     end
 
     it "outputs migrations in chronological order" do
-      stream = StringIO.new
-      service.dump(connection_db_config, stream)
-      stream.rewind
-      s = stream.read
-      expect(s.index("20091231235959")).to be < s.index("20111231235959")
+      expect(stream_data.index("20091231235959")).to be < stream_data.index("20111231235959")
     end
   end
 end

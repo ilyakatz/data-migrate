@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DataMigrate
   class Railtie < ::Rails::Railtie
     generators = config.respond_to?(:app_generators) ? config.app_generators : config.generators

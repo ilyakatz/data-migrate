@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DataMigrate
   include ActiveSupport::Configurable
   class << self

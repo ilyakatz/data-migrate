@@ -4,33 +4,20 @@ require "spec_helper"
 
 describe DataMigrate::SchemaDumper do
   let(:subject) { DataMigrate::SchemaDumper }
-  let(:db_config) do
-    {
-      adapter: "sqlite3",
-      database: "spec/db/test.db"
-    }
+  let(:fixture_file_timestamps) { %w[20091231235959 20101231235959 20111231235959] }
+
+  before do
+    ActiveRecord::SchemaMigration.create_table
+    DataMigrate::DataSchemaMigration.create_table
+    DataMigrate::DataSchemaMigration.create(fixture_file_timestamps.map { |t| { version: t } })
   end
-  let(:fixture_file_timestamps) do
-    %w[20091231235959 20101231235959 20111231235959]
+
+  after do
+    ActiveRecord::Migration.drop_table("data_migrations") rescue nil
+    ActiveRecord::Migration.drop_table("schema_migrations") rescue nil
   end
 
   describe ".dump" do
-    before do
-      ActiveRecord::Base.establish_connection(db_config)
-
-      ActiveRecord::SchemaMigration.create_table
-      DataMigrate::DataMigrator.assure_data_schema_table
-
-      ActiveRecord::Base.connection.execute <<-SQL
-        INSERT INTO #{DataMigrate::DataSchemaMigration.table_name}
-        VALUES #{fixture_file_timestamps.map { |t| "(#{t})" }.join(", ")}
-      SQL
-    end
-
-    after do
-      ActiveRecord::Migration.drop_table("data_migrations")
-    end
-
     it "writes the define method with the version key to the stream" do
       stream = StringIO.new
       DataMigrate::SchemaDumper.dump(ActiveRecord::Base.connection, stream)

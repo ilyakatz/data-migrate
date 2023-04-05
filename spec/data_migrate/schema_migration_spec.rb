@@ -3,32 +3,24 @@
 require "spec_helper"
 
 describe DataMigrate::SchemaMigration do
-  let(:migration_path) { "spec/db/migrate" }
   let(:subject) { DataMigrate::SchemaMigration }
-  let(:db_config) do
-    {
-      adapter: "sqlite3",
-      database: "spec/db/test.db"
-    }
-  end
-  let(:fixture_file_timestamps) do
-    %w[20091231235959 20101231235959 20111231235959]
-  end
+  let(:migration_path) { "spec/db/migrate" }
+  let(:fixture_file_timestamps) { %w[20091231235959 20101231235959 20111231235959] }
 
   before do
-    ActiveRecord::Base.establish_connection(db_config)
     ActiveRecord::SchemaMigration.create_table
+    DataMigrate::DataSchemaMigration.create_table
   end
 
   after do
-    ActiveRecord::Migration.drop_table("schema_migrations")
+    ActiveRecord::Migration.drop_table("data_migrations") rescue nil
+    ActiveRecord::Migration.drop_table("schema_migrations") rescue nil
   end
 
   describe ".pending_schema_migrations" do
     it "list sorted schema migrations" do
-      expect(subject).to receive(:migrations_paths) {
-        migration_path
-      }
+      expect(subject).to receive(:migrations_paths) { migration_path }
+
       migrations = subject.pending_schema_migrations
 
       expect(migrations.count).to eq 2
@@ -40,14 +32,19 @@ describe DataMigrate::SchemaMigration do
   describe ".run" do
     it "can run up task" do
       expect { subject.run(:up, migration_path, 20202020202011) }.to output(/20202020202011 DbMigration: migrating/).to_stdout
+
       versions = ActiveRecord::SchemaMigration.normalized_versions
+
       expect(versions.first).to eq("20202020202011")
     end
 
     it "can run down task" do
       subject.run(:up, migration_path, 20202020202011)
+
       expect { subject.run(:down, migration_path, 20202020202011) }.to output(/Undoing DbMigration/).to_stdout
+
       versions = ActiveRecord::SchemaMigration.normalized_versions
+
       expect(versions.count).to eq(0)
     end
   end
@@ -66,7 +63,8 @@ describe DataMigrate::SchemaMigration do
       end
 
       before do
-        @spec_name = DataMigrate.config.spec_name
+        @original_config_spec_name = DataMigrate.config.spec_name
+
         DataMigrate.configure do |config|
           config.spec_name = specification_name
         end
@@ -77,7 +75,7 @@ describe DataMigrate::SchemaMigration do
 
       after do
         DataMigrate.configure do |config|
-          config.spec_name = @spec_name
+          config.spec_name = @original_config_spec_name
         end
       end
 

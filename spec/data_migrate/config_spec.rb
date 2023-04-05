@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 describe DataMigrate::Config do
@@ -11,46 +13,47 @@ describe DataMigrate::Config do
 
   describe "data migration path configured" do
     subject { DataMigrate.config.data_migrations_path }
+    let(:data_migrations_path) { "db/awesome/" }
+
     before do
-      @before = DataMigrate.config.data_migrations_path
+      @original_data_migrations_path = DataMigrate.config.data_migrations_path
+
       DataMigrate.configure do |config|
-        config.data_migrations_path = "db/awesome/"
+        config.data_migrations_path = data_migrations_path
       end
     end
 
     after do
       DataMigrate.configure do |config|
-        config.data_migrations_path = @before
+        config.data_migrations_path = @original_data_migrations_path
       end
     end
 
     it "equals the custom data migration path" do
-      is_expected.to eq "db/awesome/"
+      is_expected.to eq(data_migrations_path)
     end
   end
 
   describe "data template path configured" do
     subject { DataMigrate.config.data_template_path }
+    let(:data_template_path) { File.join(DataMigrate.root, "generators", "data_migration", "templates", "data_migration.rb") }
 
     before do
-      @before = DataMigrate.config.data_template_path
+      @original_data_migrations_path = DataMigrate.config.data_template_path
+
       DataMigrate.configure do |config|
         config.data_template_path = data_template_path
       end
     end
 
-    let(:data_template_path) do
-      File.join(DataMigrate.root, "generators", "data_migration", "templates", "data_migration.rb")
-    end
-
     after do
       DataMigrate.configure do |config|
-        config.data_template_path = @before
+        config.data_template_path = @original_data_migrations_path
       end
     end
 
     it "equals the custom data template path" do
-      is_expected.to eq data_template_path
+      is_expected.to eq(data_template_path)
     end
 
     context "when path does not exist" do

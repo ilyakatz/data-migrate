@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "data_migrate/tasks/data_migrate_tasks"
 
 namespace :db do
@@ -175,11 +177,7 @@ namespace :db do
       desc "Load both schema.rb and data_schema.rb file into the database"
       task with_data: :environment do
         Rake::Task["db:schema:load"].invoke
-
-        DataMigrate::DatabaseTasks.load_schema_current(
-          :ruby,
-          ENV["DATA_SCHEMA"]
-        )
+        DataMigrate::DatabaseTasks.load_schema_current(:ruby, ENV["DATA_SCHEMA"])
       end
     end
   end
@@ -189,11 +187,7 @@ namespace :db do
       desc "Load both structure.sql and data_schema.rb file into the database"
       task with_data: :environment do
         Rake::Task["db:structure:load"].invoke
-
-        DataMigrate::DatabaseTasks.load_schema_current(
-          :ruby,
-          ENV["DATA_SCHEMA"]
-        )
+        DataMigrate::DatabaseTasks.load_schema_current(:ruby, ENV["DATA_SCHEMA"])
       end
     end
   end
@@ -301,10 +295,7 @@ namespace :data do
   namespace :schema do
     desc "Load data_schema.rb file into the database"
     task load: :environment do
-      DataMigrate::DatabaseTasks.load_schema_current(
-        :ruby,
-        ENV["DATA_SCHEMA"]
-      )
+      DataMigrate::DatabaseTasks.load_schema_current(:ruby, ENV["DATA_SCHEMA"])
     end
   end
 end
