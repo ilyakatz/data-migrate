@@ -36,7 +36,7 @@ table to track all migrations.
 
 ## Rails Support
 
-Support Rails 6.1 through 7.0
+Support Rails 6.0 through 7.0
 
 
 #### v1
