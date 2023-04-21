@@ -65,7 +65,7 @@ module DataMigrate
         end
 
         DataMigrate::SchemaMigration.migrations_paths.map do |path|
-          Dir.children(path) if Dir.exists?(path)
+          Dir.children(path) if Dir.exist?(path)
         end.flatten.compact.each do |file|
           # only files matching "20091231235959_some_name.rb" pattern
           if match_data = /(\d{14})_(.+)\.rb/.match(file)
