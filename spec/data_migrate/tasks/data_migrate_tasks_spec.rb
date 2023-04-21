@@ -21,7 +21,7 @@ describe DataMigrate::Tasks::DataMigrateTasks do
     ActiveRecord::Migration.drop_table("schema_migrations") rescue nil
   end
 
-  describe ".dump" do
+  describe :dump do
     before do
       allow(DataMigrate::DatabaseTasks).to receive(:db_dir).and_return("spec/db")
       DataMigrate::Tasks::DataMigrateTasks.migrate
@@ -54,7 +54,7 @@ describe DataMigrate::Tasks::DataMigrateTasks do
         end
       end
 
-      it "overrides the default connection" do
+      it 'overrides the default connection' do
         expect(ActiveRecord::Base).to receive(:establish_connection).with(override_config)
 
         DataMigrate::Tasks::DataMigrateTasks.dump(connection_db_config)

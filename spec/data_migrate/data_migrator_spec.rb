@@ -28,7 +28,6 @@ describe DataMigrate::DataMigrator do
       ::ActiveRecord::SchemaMigration.create(version: 20100000000000)
       DataMigrate::DataSchemaMigration.create(version: 20110000000000)
       ::ActiveRecord::SchemaMigration.create(version: 20120000000000)
-
       migrated = subject.new(:up, []).load_migrated
       expect(migrated.count).to eq 2
       expect(migrated).to include 20090000000000

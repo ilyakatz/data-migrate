@@ -43,6 +43,7 @@ describe DataMigrate::Generators::DataMigrationGenerator do
         is_expected.to receive(:migration_template).with(
           'data_migration.rb', data_migrations_file_path
         )
+
         subject.create_data_migration
       end
     end
@@ -56,6 +57,7 @@ describe DataMigrate::Generators::DataMigrationGenerator do
         is_expected.to receive(:migration_template).with(
           'data_migration.rb', data_migrations_file_path
         )
+
         subject.create_data_migration
       end
     end

@@ -177,6 +177,7 @@ namespace :db do
       desc "Load both schema.rb and data_schema.rb file into the database"
       task with_data: :environment do
         Rake::Task["db:schema:load"].invoke
+
         DataMigrate::DatabaseTasks.load_schema_current(
           :ruby,
           ENV["DATA_SCHEMA"]
@@ -190,6 +191,7 @@ namespace :db do
       desc "Load both structure.sql and data_schema.rb file into the database"
       task with_data: :environment do
         Rake::Task["db:structure:load"].invoke
+
         DataMigrate::DatabaseTasks.load_schema_current(
           :ruby,
           ENV["DATA_SCHEMA"]
@@ -244,7 +246,7 @@ namespace :data do
     end
 
     desc "Display status of data migrations"
-    task status: :environment do
+    task :status => :environment do
       ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env).each do |db_config|
         ActiveRecord::Base.establish_connection(db_config)
         DataMigrate::Tasks::DataMigrateTasks.status(db_config)

@@ -69,6 +69,7 @@ describe DataMigrate::DatabaseTasks do
     end
 
     describe :forward do
+
       it "run forward default amount of times" do
         subject.forward
         versions = DataMigrate::DataSchemaMigration.normalized_versions
