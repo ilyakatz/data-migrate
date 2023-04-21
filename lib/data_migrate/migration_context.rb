@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module DataMigrate
   class MigrationContext < ActiveRecord::MigrationContext
     def initialize(migrations_paths = "db/data")
