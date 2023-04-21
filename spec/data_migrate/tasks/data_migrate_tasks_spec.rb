@@ -43,7 +43,7 @@ describe DataMigrate::Tasks::DataMigrateTasks do
           'database' => 'other_test',
           'adapter' => 'sqlite3',
           'username' => 'root',
-          'password' => nil
+          'password' => nil,
         }
       end
       let(:paths) { ["spec/db/migrate"] }
@@ -62,7 +62,7 @@ describe DataMigrate::Tasks::DataMigrateTasks do
     end
   end
 
-  describe ".migrate" do
+  describe :migrate do
     it "first run should run the first pending migration" do
       expect { DataMigrate::Tasks::DataMigrateTasks.migrate }.to output(/20091231235959 SomeName: migrating/).to_stdout
     end
@@ -72,7 +72,7 @@ describe DataMigrate::Tasks::DataMigrateTasks do
     end
   end
 
-  describe ".abort_if_pending_migrations" do
+  describe :abort_if_pending_migrations do
     subject { DataMigrate::Tasks::DataMigrateTasks.abort_if_pending_migrations(migrations, message) }
 
     let(:message) { "ABORT_MESSAGE" }

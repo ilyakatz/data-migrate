@@ -9,7 +9,7 @@ describe DataMigrate::Generators::DataMigrationGenerator do
   describe :next_migration_number do
     it "next migration" do
       Timecop.freeze("2016-12-03 22:15:26 -0800") do
-        if ActiveRecord.version >= Gem::Version.new("7.0")
+        if ActiveRecord.version >= Gem::Version.new('7.0')
           expect(ActiveRecord).to receive(:timestamped_migrations) { true }
         else
           expect(ActiveRecord::Base).to receive(:timestamped_migrations) { true }
@@ -22,7 +22,7 @@ describe DataMigrate::Generators::DataMigrationGenerator do
   describe :migration_base_class_name do
     subject { generator.send(:migration_base_class_name) }
 
-    let(:generator) { DataMigrate::Generators::DataMigrationGenerator.new(["my_migration"]) }
+    let(:generator) { DataMigrate::Generators::DataMigrationGenerator.new(['my_migration']) }
 
     it "returns the correct base class name" do
       is_expected.to eq("ActiveRecord::Migration[#{ActiveRecord::Migration.current_version}]")
@@ -32,15 +32,17 @@ describe DataMigrate::Generators::DataMigrationGenerator do
   describe :create_data_migration do
     subject { DataMigrate::Generators::DataMigrationGenerator.new(['my_migration']) }
 
-    let(:data_migrations_file_path) { "abc/my_migration.rb" }
+    let(:data_migrations_file_path) { 'abc/my_migration.rb' }
 
-    context "when custom data migrations path has a trailing slash" do
+    context 'when custom data migrations path has a trailing slash' do
       before do
         DataMigrate.config.data_migrations_path = 'abc/'
       end
 
-      it "returns correct file path" do
-        is_expected.to receive(:migration_template).with("data_migration.rb", data_migrations_file_path)
+      it 'returns correct file path' do
+        is_expected.to receive(:migration_template).with(
+          'data_migration.rb', data_migrations_file_path
+        )
         subject.create_data_migration
       end
     end
@@ -63,8 +65,8 @@ describe DataMigrate::Generators::DataMigrationGenerator do
     subject { described_class.source_root }
 
     let(:default_source_root) do
-      File.expand_path(File.dirname(
-        File.join(DataMigrate.root, "generators", "data_migration", "templates", "data_migration.rb"))
+      File.expand_path(
+        File.dirname(File.join(DataMigrate.root, "generators", "data_migration", "templates", "data_migration.rb"))
       )
     end
 

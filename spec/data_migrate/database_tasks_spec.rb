@@ -54,7 +54,7 @@ describe DataMigrate::DatabaseTasks do
       }.at_least(:once)
     end
 
-    describe ".past_migrations" do
+    describe :past_migrations do
       it "returns past migration records" do
         subject.forward
         migrations = subject.past_migrations
@@ -68,7 +68,7 @@ describe DataMigrate::DatabaseTasks do
       end
     end
 
-    describe ".forward" do
+    describe :forward do
       it "run forward default amount of times" do
         subject.forward
         versions = DataMigrate::DataSchemaMigration.normalized_versions

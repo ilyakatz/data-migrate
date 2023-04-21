@@ -12,9 +12,7 @@ module DataMigrate
       def dump(db_config)
         if dump_schema_after_migration?
           filename = DataMigrate::DatabaseTasks.dump_filename(spec_name(db_config), ActiveRecord::Base.schema_format)
-
           ActiveRecord::Base.establish_connection(DataMigrate.config.db_configuration) if DataMigrate.config.db_configuration
-
           File.open(filename, "w:utf-8") do |file|
             DataMigrate::SchemaDumper.dump(ActiveRecord::Base.connection, file)
           end

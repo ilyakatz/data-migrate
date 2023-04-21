@@ -16,7 +16,7 @@ describe DataMigrate::StatusService do
 
   context "table does not exists" do
     before do
-      allow_any_instance_of(subject).to receive(:table_name) { "bogus" }
+      allow_any_instance_of(subject).to receive(:table_name) { "bogus"}
 
       subject.dump(connection_db_config, stream)
       stream.rewind

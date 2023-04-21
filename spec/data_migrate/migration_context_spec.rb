@@ -21,7 +21,6 @@ describe DataMigrate::DataMigrator do
       context.migrate(nil)
       context.migrations_status
       versions = DataMigrate::DataSchemaMigration.normalized_versions
-
       expect(versions.count).to eq(2)
       expect(versions).to include("20091231235959")
       expect(versions).to include("20171231235959")
@@ -31,14 +30,12 @@ describe DataMigrate::DataMigrator do
       context.migrate(nil)
       context.run(:down, 20171231235959)
       versions = DataMigrate::DataSchemaMigration.normalized_versions
-
       expect(versions.count).to eq(1)
       expect(versions).to include("20091231235959")
     end
 
     it "does not do anything if migration is undone twice" do
       context.migrate(nil)
-
       expect {
         context.run(:down, 20171231235959)
       }.to output(/Undoing SuperUpdate/).to_stdout
@@ -50,7 +47,6 @@ describe DataMigrate::DataMigrator do
     it "runs a specific migration" do
       context.run(:up, 20171231235959)
       versions = DataMigrate::DataSchemaMigration.normalized_versions
-
       expect(versions.count).to eq(1)
       expect(versions).to include("20171231235959")
     end
@@ -65,18 +61,20 @@ describe DataMigrate::DataMigrator do
     end
 
     it "alerts for an invalid specific migration" do
-      expect { context.run(:up, 201712312) }.to raise_error(ActiveRecord::UnknownMigrationVersionError, /No migration with version number 201712312/)
+      expect {
+        context.run(:up, 201712312)
+      }.to raise_error(
+        ActiveRecord::UnknownMigrationVersionError,
+        /No migration with version number 201712312/
+      )
     end
 
     it "rolls back latest migration" do
       context.migrate(nil)
-
       expect {
         context.rollback
       }.to output(/Undoing SuperUpdate/).to_stdout
-
       versions = DataMigrate::DataSchemaMigration.normalized_versions
-
       expect(versions.count).to eq(1)
       expect(versions).to include("20091231235959")
     end
@@ -84,25 +82,19 @@ describe DataMigrate::DataMigrator do
     it "rolls back 2 migrations" do
       context.migrate(nil)
       schema_context.migrate(nil)
-
       expect {
         context.rollback(2)
       }.to output(/Undoing SomeName/).to_stdout
-
       versions = DataMigrate::DataSchemaMigration.normalized_versions
-
       expect(versions.count).to eq(0)
     end
 
     it "rolls back 2 migrations" do
       context.migrate(nil)
-
       expect {
         context.rollback(2)
       }.to output(/Undoing SomeName/).to_stdout
-
       versions = DataMigrate::DataSchemaMigration.normalized_versions
-
       expect(versions.count).to eq(0)
     end
   end

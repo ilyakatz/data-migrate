@@ -36,7 +36,7 @@ describe DataMigrate::DataMigrator do
     end
   end
 
-  describe ".assure_data_schema_table" do
+  describe :assure_data_schema_table do
     it "creates the data_migrations table" do
       ActiveRecord::Migration.drop_table("data_migrations") rescue nil
       subject.assure_data_schema_table
@@ -55,7 +55,7 @@ describe DataMigrate::DataMigrator do
     end
   end
 
-  describe ".match" do
+  describe :match do
     context "when the file does not match" do
       it "returns nil" do
         expect(subject.match("not_a_data_migration_file")).to be_nil

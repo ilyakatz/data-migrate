@@ -19,7 +19,7 @@ describe DataMigrate::SchemaMigration do
     ActiveRecord::Migration.drop_table("schema_migrations") rescue nil
   end
 
-  describe ".pending_schema_migrations" do
+  describe :pending_schema_migrations do
     it "list sorted schema migrations" do
       expect(subject).to receive(:migrations_paths) {
         migration_path
@@ -33,14 +33,12 @@ describe DataMigrate::SchemaMigration do
     end
   end
 
-  describe ".run" do
+  describe :run do
     it "can run up task" do
       expect {
         subject.run(:up, migration_path, 20202020202011)
       }.to output(/20202020202011 DbMigration: migrating/).to_stdout
-
       versions = ActiveRecord::SchemaMigration.normalized_versions
-
       expect(versions.first).to eq("20202020202011")
     end
 
@@ -57,8 +55,8 @@ describe DataMigrate::SchemaMigration do
     end
   end
 
-  describe ".migrations_paths" do
-    context "when a db_name is configured" do
+  describe :migrations_paths do
+    context 'when a db_name is configured' do
       let(:config) { double(:config) }
       let(:paths) { ['spec/db/migrate', 'spec/db/migrate/other'] }
       let(:specification_name) { "primary" }
@@ -90,7 +88,7 @@ describe DataMigrate::SchemaMigration do
         end
       end
 
-      it "lists schema migration paths" do
+      it 'lists schema migration paths' do
         expect(subject.migrations_paths.size).to eq(paths.count)
         expect(subject.migrations_paths).to eq(paths)
       end

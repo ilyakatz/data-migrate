@@ -21,7 +21,7 @@ describe DataMigrate::Data do
     end
   end
 
-  describe ".define" do
+  describe :define do
     after do
       ActiveRecord::Migration.drop_table("data_migrations")
     end
@@ -48,6 +48,7 @@ describe DataMigrate::Data do
 
       it "creates entries for migration versions that come " \
          "before the supplied version" do
+
         version = fixture_file_timestamps[1]
 
         subject.define(version: version)
