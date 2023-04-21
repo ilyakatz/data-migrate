@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "data_migrate/tasks/data_migrate_tasks"
+require 'data_migrate/tasks/data_migrate_tasks'
 
 namespace :db do
   namespace :migrate do
@@ -16,22 +16,22 @@ namespace :db do
         migrations = []
 
         if target_version.nil?
-          migrations = DataMigrate::DatabaseTasks.pending_migrations.map { |m| m.merge(direction: :up) }
+          migrations = DataMigrate::DatabaseTasks.pending_migrations.map{ |m| m.merge(:direction =>:up) }
         else
           current_schema_version = ActiveRecord::Migrator.current_version
           schema_migrations = if target_version > current_schema_version
-                                DataMigrate::DatabaseTasks.pending_schema_migrations.keep_if{ |m| m[:version] <= target_version }.map{ |m| m.merge(direction: :up) }
+                                DataMigrate::DatabaseTasks.pending_schema_migrations.keep_if{ |m| m[:version] <= target_version }.map{ |m| m.merge(:direction =>:up) }
                               elsif target_version < current_schema_version
-                                DataMigrate::DatabaseTasks.past_migrations.keep_if{ |m| m[:version] > target_version }.map{ |m| m.merge(direction: :down) }
+                                DataMigrate::DatabaseTasks.past_migrations.keep_if{ |m| m[:version] > target_version }.map{ |m| m.merge(:direction =>:down) }
                               else # ==
                                 []
                               end
 
           current_data_version = DataMigrate::DataMigrator.current_version
           data_migrations = if target_version > current_data_version
-                              DataMigrate::DatabaseTasks.pending_data_migrations.keep_if{ |m| m[:version] <= target_version }.map{ |m| m.merge(direction: :up) }
+                              DataMigrate::DatabaseTasks.pending_data_migrations.keep_if{ |m| m[:version] <= target_version }.map{ |m| m.merge(:direction =>:up) }
                             elsif target_version < current_data_version
-                              DataMigrate::DatabaseTasks.past_migrations.keep_if{ |m| m[:version] > target_version }.map{ |m| m.merge(direction: :down) }
+                              DataMigrate::DatabaseTasks.past_migrations.keep_if{ |m| m[:version] > target_version }.map{ |m| m.merge(:direction =>:down) }
                             else # ==
                               []
                             end
@@ -62,8 +62,8 @@ namespace :db do
     end
 
     namespace :redo do
-      desc "Rollbacks the database one migration and re migrate up (options: STEP=x, VERSION=x)."
-      task with_data: :environment do
+      desc 'Rollbacks the database one migration and re migrate up (options: STEP=x, VERSION=x).'
+      task :with_data => :environment do
       DataMigrate::DataMigrator.assure_data_schema_table
         if ENV["VERSION"]
           Rake::Task["db:migrate:down:with_data"].invoke
@@ -77,7 +77,7 @@ namespace :db do
 
     namespace :up do
       desc 'Runs the "up" for a given migration VERSION. (options both=false)'
-      task with_data: :environment do
+      task :with_data => :environment do
         version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
         raise "VERSION is required" unless version
         DataMigrate::DataMigrator.assure_data_schema_table
@@ -99,7 +99,7 @@ namespace :db do
 
     namespace :down do
       desc 'Runs the "down" for a given migration VERSION. (option BOTH=false)'
-      task with_data: :environment do
+      task :with_data => :environment do
         version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
         raise "VERSION is required" unless version
         DataMigrate::DataMigrator.assure_data_schema_table
@@ -121,7 +121,7 @@ namespace :db do
 
     namespace :status do
       desc "Display status of data and schema migrations"
-      task with_data: :environment do
+      task :with_data => :environment do
         ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env).each do |db_config|
           ActiveRecord::Base.establish_connection(db_config)
           DataMigrate::Tasks::DataMigrateTasks.status_with_schema(db_config)
@@ -131,9 +131,9 @@ namespace :db do
   end # END OF MIGRATE NAME SPACE
 
   namespace :rollback do
-    desc "Rolls the schema back to the previous version (specify steps w/ STEP=n)."
-    task with_data: :environment do
-      step = ENV["STEP"] ? ENV["STEP"].to_i : 1
+    desc 'Rolls the schema back to the previous version (specify steps w/ STEP=n).'
+    task :with_data => :environment do
+      step = ENV['STEP'] ? ENV['STEP'].to_i : 1
       DataMigrate::DataMigrator.assure_data_schema_table
       DataMigrate::DatabaseTasks.past_migrations[0..(step - 1)].each do | past_migration |
         DataMigrate::DatabaseTasks.run_migration(past_migration, :down)
@@ -146,7 +146,7 @@ namespace :db do
 
   namespace :forward do
     desc "Pushes the schema to the next version (specify steps w/ STEP=n)."
-    task with_data: :environment do
+    task :with_data => :environment do
       DataMigrate::DataMigrator.assure_data_schema_table
       step = ENV["STEP"] ? ENV["STEP"].to_i : 1
       DataMigrate::DatabaseTasks.forward(step)
@@ -157,7 +157,7 @@ namespace :db do
 
   namespace :version do
     desc "Retrieves the current schema version numbers for data and schema migrations"
-    task with_data: :environment do
+    task :with_data => :environment do
       DataMigrate::DataMigrator.assure_data_schema_table
       puts "Current Schema version: #{ActiveRecord::Migrator.current_version}"
       puts "Current Data version: #{DataMigrate::DataMigrator.current_version}"
@@ -194,8 +194,8 @@ namespace :db do
 end
 
 namespace :data do
-  desc "Migrate data migrations (options: VERSION=x, VERBOSE=false)"
-  task migrate: :environment do
+  desc 'Migrate data migrations (options: VERSION=x, VERBOSE=false)'
+  task :migrate => :environment do
     original_db_config = ActiveRecord::Base.connection_db_config
     ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env).each do |db_config|
       ActiveRecord::Base.establish_connection(db_config)
@@ -207,8 +207,8 @@ namespace :data do
   end
 
   namespace :migrate do
-    desc "Rollbacks the database one migration and re migrate up (options: STEP=x, VERSION=x)."
-    task redo: :environment do
+    desc 'Rollbacks the database one migration and re migrate up (options: STEP=x, VERSION=x).'
+    task :redo => :environment do
       DataMigrate::DataMigrator.assure_data_schema_table
       if ENV["VERSION"]
         Rake::Task["data:migrate:down"].invoke
@@ -220,7 +220,7 @@ namespace :data do
     end
 
     desc 'Runs the "up" for a given migration VERSION.'
-    task up: :environment do
+    task :up => :environment do
       DataMigrate::DataMigrator.assure_data_schema_table
       version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
       raise "VERSION is required" unless version
@@ -229,7 +229,7 @@ namespace :data do
     end
 
     desc 'Runs the "down" for a given migration VERSION.'
-    task down: :environment do
+    task :down => :environment do
       version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
       raise "VERSION is required" unless version
       DataMigrate::DataMigrator.assure_data_schema_table
@@ -246,20 +246,20 @@ namespace :data do
     end
   end
 
-  desc "Rolls the schema back to the previous version (specify steps w/ STEP=n)."
-  task rollback: :environment do
+  desc 'Rolls the schema back to the previous version (specify steps w/ STEP=n).'
+  task :rollback => :environment do
     DataMigrate::DataMigrator.assure_data_schema_table
-    step = ENV["STEP"] ? ENV["STEP"].to_i : 1
+    step = ENV['STEP'] ? ENV['STEP'].to_i : 1
     DataMigrate::DataMigrator.rollback(DataMigrate::DatabaseTasks.data_migrations_path, step)
     Rake::Task["data:dump"].invoke
   end
 
-  desc "Pushes the schema to the next version (specify steps w/ STEP=n)."
-  task forward: :environment do
+  desc 'Pushes the schema to the next version (specify steps w/ STEP=n).'
+  task :forward => :environment do
     DataMigrate::DataMigrator.assure_data_schema_table
-    step = ENV["STEP"] ? ENV["STEP"].to_i : 1
+    step = ENV['STEP'] ? ENV['STEP'].to_i : 1
     # TODO: No worky for .forward
-    # DataMigrate::DataMigrator.forward("db/data/", step)
+    # DataMigrate::DataMigrator.forward('db/data/', step)
     migrations = DataMigrate::DatabaseTasks.pending_data_migrations.reverse.pop(step).reverse
     migrations.each do | pending_migration |
       DataMigrate::DataMigrator.run(:up, DataMigrate::DatabaseTasks.data_migrations_path, pending_migration[:version])
@@ -268,7 +268,7 @@ namespace :data do
   end
 
   desc "Retrieves the current schema version number for data migrations"
-  task version: :environment do
+  task :version => :environment do
     DataMigrate::DataMigrator.assure_data_schema_table
     puts "Current data version: #{DataMigrate::DataMigrator.current_version}"
   end
@@ -295,7 +295,10 @@ namespace :data do
   namespace :schema do
     desc "Load data_schema.rb file into the database"
     task load: :environment do
-      DataMigrate::DatabaseTasks.load_schema_current(:ruby, ENV["DATA_SCHEMA"])
+      DataMigrate::DatabaseTasks.load_schema_current(
+        :ruby,
+        ENV["DATA_SCHEMA"]
+      )
     end
   end
 end

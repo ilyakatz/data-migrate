@@ -36,14 +36,14 @@ describe DataMigrate::Tasks::DataMigrateTasks do
       end
     end
 
-    context "when given a separate db config" do
+    context 'when given a separate db config' do
       let(:override_config) do
         {
-          "host" => "127.0.0.1",
-          "database" => "other_test",
-          "adapter" => "sqlite3",
-          "username" => "root",
-          "password" => nil
+          'host' => '127.0.0.1',
+          'database' => 'other_test',
+          'adapter' => 'sqlite3',
+          'username' => 'root',
+          'password' => nil
         }
       end
       let(:paths) { ["spec/db/migrate"] }
@@ -91,7 +91,7 @@ describe DataMigrate::Tasks::DataMigrateTasks do
           name: "A",
           version: 1
         }, {
-          name: "B",
+          name: 'B',
           version: 2
         }]
       end

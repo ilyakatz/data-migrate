@@ -53,7 +53,7 @@ describe DataMigrate::Config do
     end
 
     it "equals the custom data template path" do
-      is_expected.to eq(data_template_path)
+      is_expected.to eq data_template_path
     end
 
     context "when path does not exist" do

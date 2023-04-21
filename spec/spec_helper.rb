@@ -1,9 +1,9 @@
-require "rspec"
-require "rails"
-require "sqlite3"
-require "data_migrate"
-require "pry"
-require "timecop"
+require 'rspec'
+require 'rails'
+require 'sqlite3'
+require 'data_migrate'
+require 'pry'
+require 'timecop'
 
 RSpec.configure do |config|
   config.mock_with :rspec do |mocks|

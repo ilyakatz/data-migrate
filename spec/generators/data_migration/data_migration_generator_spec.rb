@@ -1,12 +1,12 @@
-require "spec_helper"
-require "rails/generators"
-require "rails/generators/migration"
-require "generators/data_migration/data_migration_generator"
+require 'spec_helper'
+require 'rails/generators'
+require 'rails/generators/migration'
+require 'generators/data_migration/data_migration_generator'
 
 describe DataMigrate::Generators::DataMigrationGenerator do
   subject { DataMigrate::Generators::DataMigrationGenerator }
 
-  describe ".next_migration_number" do
+  describe :next_migration_number do
     it "next migration" do
       Timecop.freeze("2016-12-03 22:15:26 -0800") do
         if ActiveRecord.version >= Gem::Version.new("7.0")
@@ -19,7 +19,7 @@ describe DataMigrate::Generators::DataMigrationGenerator do
     end
   end
 
-  describe ".migration_base_class_name" do
+  describe :migration_base_class_name do
     subject { generator.send(:migration_base_class_name) }
 
     let(:generator) { DataMigrate::Generators::DataMigrationGenerator.new(["my_migration"]) }
@@ -29,14 +29,14 @@ describe DataMigrate::Generators::DataMigrationGenerator do
     end
   end
 
-  describe ".create_data_migration" do
-    subject { DataMigrate::Generators::DataMigrationGenerator.new(["my_migration"]) }
+  describe :create_data_migration do
+    subject { DataMigrate::Generators::DataMigrationGenerator.new(['my_migration']) }
 
     let(:data_migrations_file_path) { "abc/my_migration.rb" }
 
     context "when custom data migrations path has a trailing slash" do
       before do
-        DataMigrate.config.data_migrations_path = "abc/"
+        DataMigrate.config.data_migrations_path = 'abc/'
       end
 
       it "returns correct file path" do
@@ -45,13 +45,15 @@ describe DataMigrate::Generators::DataMigrationGenerator do
       end
     end
 
-    context "when custom data migrations path does not have a trailing slash" do
+    context 'when custom data migrations path does not have a trailing slash' do
       before do
-        DataMigrate.config.data_migrations_path = "abc"
+        DataMigrate.config.data_migrations_path = 'abc'
       end
 
-      it "returns correct file path" do
-        is_expected.to receive(:migration_template).with("data_migration.rb", data_migrations_file_path)
+      it 'returns correct file path' do
+        is_expected.to receive(:migration_template).with(
+          'data_migration.rb', data_migrations_file_path
+        )
         subject.create_data_migration
       end
     end
@@ -60,7 +62,11 @@ describe DataMigrate::Generators::DataMigrationGenerator do
   describe ".source_root" do
     subject { described_class.source_root }
 
-    let(:default_source_root) { File.expand_path(File.dirname(File.join(DataMigrate.root, "generators", "data_migration", "templates", "data_migration.rb"))) }
+    let(:default_source_root) do
+      File.expand_path(File.dirname(
+        File.join(DataMigrate.root, "generators", "data_migration", "templates", "data_migration.rb"))
+      )
+    end
 
     it { is_expected.to eq default_source_root }
 
@@ -72,7 +78,9 @@ describe DataMigrate::Generators::DataMigrationGenerator do
         end
       end
 
-      let(:data_template_path) { File.join(DataMigrate.root, "generators", "data_migration", "templates", "data_migration.rb") }
+      let(:data_template_path) do
+        File.join(DataMigrate.root, "generators", "data_migration", "templates", "data_migration.rb")
+      end
       let(:expected_source_root) { File.dirname(data_template_path) }
 
       after do

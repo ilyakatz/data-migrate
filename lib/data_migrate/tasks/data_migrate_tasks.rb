@@ -53,8 +53,8 @@ module DataMigrate
 
       def status_with_schema(db_config)
         db_list_data = ActiveRecord::Base.connection.select_values(
-           "SELECT version FROM #{DataMigrate::DataSchemaMigration.table_name}"
-         )
+          "SELECT version FROM #{DataMigrate::DataSchemaMigration.table_name}"
+        )
         db_list_schema = ActiveRecord::SchemaMigration.all.pluck(:version)
         file_list = []
 
@@ -83,14 +83,14 @@ module DataMigrate
         puts "#{"Status".center(8)} #{"Type".center(8)}  #{"Migration ID".ljust(14)} Migration Name"
         puts "-" * 60
         file_list.each do |file|
-           puts "#{file[0].center(8)} #{file[3].center(8)} #{file[1].ljust(14)}  #{file[2].humanize}"
-         end
-         db_list_schema.each do |version|
-           puts "#{'up'.center(8)}  #{version.ljust(14)}  *** NO SCHEMA FILE ***"
-         end
-         db_list_data.each do |version|
-           puts "#{'up'.center(8)}  #{version.ljust(14)}  *** NO DATA FILE ***"
-         end
+          puts "#{file[0].center(8)} #{file[3].center(8)} #{file[1].ljust(14)}  #{file[2].humanize}"
+        end
+        db_list_schema.each do |version|
+          puts "#{'up'.center(8)}  #{version.ljust(14)}  *** NO SCHEMA FILE ***"
+        end
+        db_list_data.each do |version|
+          puts "#{'up'.center(8)}  #{version.ljust(14)}  *** NO DATA FILE ***"
+        end
         puts
       end
 

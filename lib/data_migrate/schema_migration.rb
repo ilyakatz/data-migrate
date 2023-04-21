@@ -9,7 +9,7 @@ module DataMigrate
       sort_migrations(
         ActiveRecord::Migrator.new(:up, all_migrations, ActiveRecord::Base.connection.schema_migration).
         pending_migrations.
-        map { |m| { version: m.version, kind: :schema } }
+        map {|m| { version: m.version, kind: :schema } }
       )
     end
 
@@ -19,7 +19,7 @@ module DataMigrate
 
     def self.sort_migrations(set1, set2 = nil)
       migrations = set1 + (set2 || [])
-      migrations.sort {|a, b|  sort_string(a) <=> sort_string(b) }
+      migrations.sort {|a, b|  sort_string(a) <=> sort_string(b)}
     end
 
     def self.migrations_paths
