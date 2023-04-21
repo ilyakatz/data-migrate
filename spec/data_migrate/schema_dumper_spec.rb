@@ -4,7 +4,9 @@ require "spec_helper"
 
 describe DataMigrate::SchemaDumper do
   let(:subject) { DataMigrate::SchemaDumper }
-  let(:fixture_file_timestamps) { %w[20091231235959 20101231235959 20111231235959] }
+  let(:fixture_file_timestamps) do
+    %w[20091231235959 20101231235959 20111231235959]
+  end
 
   before do
     ActiveRecord::SchemaMigration.create_table

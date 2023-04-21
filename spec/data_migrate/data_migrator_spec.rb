@@ -4,7 +4,12 @@ require "spec_helper"
 
 describe DataMigrate::DataMigrator do
   let(:subject) { DataMigrate::DataMigrator }
-  let(:db_config) { { adapter: "sqlite3", database: "spec/db/test.db" } }
+  let(:db_config) do
+    {
+      adapter: "sqlite3",
+      database: "spec/db/test.db"
+    }
+  end
 
   before do
     ActiveRecord::Base.establish_connection(db_config)
@@ -35,7 +40,9 @@ describe DataMigrate::DataMigrator do
     it "creates the data_migrations table" do
       ActiveRecord::Migration.drop_table("data_migrations") rescue nil
       subject.assure_data_schema_table
-      expect(ActiveRecord::Base.connection.table_exists?("data_migrations")).to eq true
+      expect(
+        ActiveRecord::Base.connection.table_exists?("data_migrations")
+      ).to eq true
     end
   end
 

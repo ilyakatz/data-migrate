@@ -52,15 +52,17 @@ module DataMigrate
       end
 
       def status_with_schema(db_config)
-        db_list_data = ActiveRecord::Base.connection.select_values("SELECT version FROM #{DataMigrate::DataSchemaMigration.table_name}")
+        db_list_data = ActiveRecord::Base.connection.select_values(
+           "SELECT version FROM #{DataMigrate::DataSchemaMigration.table_name}"
+         )
         db_list_schema = ActiveRecord::SchemaMigration.all.pluck(:version)
         file_list = []
 
         Dir.foreach(File.join(Rails.root, migrations_paths)) do |file|
           # only files matching "20091231235959_some_name.rb" pattern
           if match_data = /(\d{14})_(.+)\.rb/.match(file)
-            status = db_list_data.delete(match_data[1]) ? "up" : "down"
-            file_list << [status, match_data[1], match_data[2], "data"]
+            status = db_list_data.delete(match_data[1]) ? 'up' : 'down'
+            file_list << [status, match_data[1], match_data[2], 'data']
           end
         end
 
@@ -69,20 +71,26 @@ module DataMigrate
         end.flatten.compact.each do |file|
           # only files matching "20091231235959_some_name.rb" pattern
           if match_data = /(\d{14})_(.+)\.rb/.match(file)
-            status = db_list_schema.delete(match_data[1]) ? "up" : "down"
-            file_list << [status, match_data[1], match_data[2], "schema"]
+            status = db_list_schema.delete(match_data[1]) ? 'up' : 'down'
+            file_list << [status, match_data[1], match_data[2], 'schema']
           end
         end
 
-        file_list.sort! { |a,b| "#{a[1]}_#{a[3] == 'data' ? 1 : 0}" <=> "#{b[1]}_#{b[3] == 'data' ? 1 : 0}" }
+        file_list.sort!{|a,b| "#{a[1]}_#{a[3] == 'data' ? 1 : 0}" <=> "#{b[1]}_#{b[3] == 'data' ? 1 : 0}" }
 
         # output
         puts "\ndatabase: #{spec_name(db_config)}\n\n"
         puts "#{"Status".center(8)} #{"Type".center(8)}  #{"Migration ID".ljust(14)} Migration Name"
         puts "-" * 60
-        file_list.each { |file| puts "#{file[0].center(8)} #{file[3].center(8)} #{file[1].ljust(14)}  #{file[2].humanize}" }
-        db_list_schema.each { |version| puts "#{'up'.center(8)}  #{version.ljust(14)}  *** NO SCHEMA FILE ***" }
-        db_list_data.each { |version| puts "#{'up'.center(8)}  #{version.ljust(14)}  *** NO DATA FILE ***" }
+        file_list.each do |file|
+           puts "#{file[0].center(8)} #{file[3].center(8)} #{file[1].ljust(14)}  #{file[2].humanize}"
+         end
+         db_list_schema.each do |version|
+           puts "#{'up'.center(8)}  #{version.ljust(14)}  *** NO SCHEMA FILE ***"
+         end
+         db_list_data.each do |version|
+           puts "#{'up'.center(8)}  #{version.ljust(14)}  *** NO DATA FILE ***"
+         end
         puts
       end
 

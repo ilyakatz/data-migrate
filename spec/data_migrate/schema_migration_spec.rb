@@ -5,7 +5,9 @@ require "spec_helper"
 describe DataMigrate::SchemaMigration do
   let(:subject) { DataMigrate::SchemaMigration }
   let(:migration_path) { "spec/db/migrate" }
-  let(:fixture_file_timestamps) { %w[20091231235959 20101231235959 20111231235959] }
+  let(:fixture_file_timestamps) do
+    %w[20091231235959 20101231235959 20111231235959]
+  end
 
   before do
     ActiveRecord::SchemaMigration.create_table
@@ -19,7 +21,9 @@ describe DataMigrate::SchemaMigration do
 
   describe ".pending_schema_migrations" do
     it "list sorted schema migrations" do
-      expect(subject).to receive(:migrations_paths) { migration_path }
+      expect(subject).to receive(:migrations_paths) {
+        migration_path
+      }
 
       migrations = subject.pending_schema_migrations
 
@@ -31,7 +35,9 @@ describe DataMigrate::SchemaMigration do
 
   describe ".run" do
     it "can run up task" do
-      expect { subject.run(:up, migration_path, 20202020202011) }.to output(/20202020202011 DbMigration: migrating/).to_stdout
+      expect {
+        subject.run(:up, migration_path, 20202020202011)
+      }.to output(/20202020202011 DbMigration: migrating/).to_stdout
 
       versions = ActiveRecord::SchemaMigration.normalized_versions
 
@@ -41,7 +47,9 @@ describe DataMigrate::SchemaMigration do
     it "can run down task" do
       subject.run(:up, migration_path, 20202020202011)
 
-      expect { subject.run(:down, migration_path, 20202020202011) }.to output(/Undoing DbMigration/).to_stdout
+      expect {
+        subject.run(:down, migration_path, 20202020202011)
+      }.to output(/Undoing DbMigration/).to_stdout
 
       versions = ActiveRecord::SchemaMigration.normalized_versions
 
@@ -52,7 +60,7 @@ describe DataMigrate::SchemaMigration do
   describe ".migrations_paths" do
     context "when a db_name is configured" do
       let(:config) { double(:config) }
-      let(:paths) { ["spec/db/migrate", "spec/db/migrate/other"] }
+      let(:paths) { ['spec/db/migrate', 'spec/db/migrate/other'] }
       let(:specification_name) { "primary" }
       let(:config_options) do
         if Gem::Dependency.new("rails", "~> 6.0").match?("rails", Gem.loaded_specs["rails"].version)
@@ -69,7 +77,10 @@ describe DataMigrate::SchemaMigration do
           config.spec_name = specification_name
         end
 
-        allow(ActiveRecord::Base.configurations).to receive(:configs_for).with(config_options).and_return(config)
+        allow(ActiveRecord::Base.configurations)
+          .to receive(:configs_for)
+          .with(config_options)
+          .and_return(config)
         allow(config).to receive(:migrations_paths).and_return(paths)
       end
 

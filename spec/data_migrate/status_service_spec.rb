@@ -28,7 +28,9 @@ describe DataMigrate::StatusService do
   end
 
   context "table exists" do
-    let(:fixture_file_timestamps) { %w[20091231235959 20101231235959 20111231235959] }
+    let(:fixture_file_timestamps) do
+      %w[20091231235959 20101231235959 20111231235959]
+    end
 
     before do
       ActiveRecord::SchemaMigration.create_table
@@ -45,19 +47,23 @@ describe DataMigrate::StatusService do
     end
 
     it "shows successfully executed migration" do
-      expect(stream_data).to include("   up     20091231235959  Some name")
+      expected = "   up     20091231235959  Some name"
+      expect(stream_data).to include expected
     end
 
     it "excludes files without .rb extension" do
-      expect(stream_data).to_not include("20181128000207  Excluded file")
+      expected = "20181128000207  Excluded file"
+      expect(stream_data).to_not include expected
     end
 
     it "shows missing file migration" do
-      expect(stream_data).to include("   up     20101231235959  ********** NO FILE **********")
+      expected = "   up     20101231235959  ********** NO FILE **********"
+      expect(stream_data).to include expected
     end
 
     it "shows migration that has not run yet" do
-      expect(stream_data).to include("  down    20171231235959  Super update")
+      expected = "  down    20171231235959  Super update"
+      expect(stream_data).to include expected
     end
 
     it "outputs migrations in chronological order" do

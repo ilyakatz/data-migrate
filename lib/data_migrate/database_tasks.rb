@@ -31,7 +31,10 @@ module DataMigrate
       end
 
       def pending_migrations
-        sort_migrations(pending_schema_migrations, pending_data_migrations)
+        sort_migrations(
+          pending_schema_migrations,
+          pending_data_migrations
+        )
       end
 
       def sort_migrations(*migrations)
@@ -48,11 +51,15 @@ module DataMigrate
 
       def run_migration(migration, direction)
         if migration[:kind] == :data
-          ::ActiveRecord::Migration.write("== %s %s" % ["Data", "=" * 71])
+          ::ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
           ::DataMigrate::DataMigrator.run(direction, data_migrations_path, migration[:version])
         else
-          ::ActiveRecord::Migration.write("== %s %s" % ["Schema", "=" * 69])
-          ::DataMigrate::SchemaMigration.run(direction, ::DataMigrate::SchemaMigration.migrations_paths, migration[:version])
+          ::ActiveRecord::Migration.write("== %s %s" % ['Schema', "=" * 69])
+          ::DataMigrate::SchemaMigration.run(
+             direction,
+             ::DataMigrate::SchemaMigration.migrations_paths,
+             migration[:version]
+           )
         end
       end
 

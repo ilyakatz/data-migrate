@@ -5,7 +5,9 @@ require "spec_helper"
 describe DataMigrate::DatabaseTasks do
   let(:subject) { DataMigrate::DatabaseTasks }
   let(:migration_path) { "spec/db/migrate" }
-  let(:data_migrations_path) { DataMigrate.config.data_migrations_path }
+  let(:data_migrations_path) {
+    DataMigrate.config.data_migrations_path
+  }
   let(:db_config) do
     {
       adapter: "sqlite3",
@@ -22,10 +24,12 @@ describe DataMigrate::DatabaseTasks do
   end
 
   before do
-    allow(DataMigrate::Tasks::DataMigrateTasks).to receive(:migrations_paths) { data_migrations_path }
+    allow(DataMigrate::Tasks::DataMigrateTasks).to receive(:migrations_paths) {
+      data_migrations_path
+    }
     ActiveRecord::Base.establish_connection(db_config)
-    if Gem::Dependency.new("rails", ">= 6.1").match?("rails", Gem.loaded_specs["rails"].version) # LOOK AT THIS IN SOURCE
-      hash_config = ActiveRecord::DatabaseConfigurations::HashConfig.new("test", "test", db_config)
+    if Gem::Dependency.new("rails", ">= 6.1").match?("rails", Gem.loaded_specs["rails"].version)
+      hash_config = ActiveRecord::DatabaseConfigurations::HashConfig.new('test', 'test', db_config)
       config_obj = ActiveRecord::DatabaseConfigurations.new([hash_config])
       allow(ActiveRecord::Base).to receive(:configurations).and_return(config_obj)
     else
@@ -42,8 +46,12 @@ describe DataMigrate::DatabaseTasks do
     before do
       ActiveRecord::SchemaMigration.create_table
 
-      allow(DataMigrate::SchemaMigration).to receive(:migrations_paths) { migration_path }
-      allow(DataMigrate::DatabaseTasks).to receive(:data_migrations_path) { data_migrations_path }.at_least(:once)
+      allow(DataMigrate::SchemaMigration).to receive(:migrations_paths) {
+        migration_path
+      }
+      allow(DataMigrate::DatabaseTasks).to receive(:data_migrations_path) {
+        data_migrations_path
+      }.at_least(:once)
     end
 
     describe ".past_migrations" do

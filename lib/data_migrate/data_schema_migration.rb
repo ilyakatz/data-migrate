@@ -7,7 +7,7 @@ module DataMigrate
 
       def instance
         @instance ||= Class.new(::ActiveRecord::SchemaMigration) do
-          define_singleton_method(:table_name) { ActiveRecord::Base.table_name_prefix + "data_migrations" + ActiveRecord::Base.table_name_suffix }
+          define_singleton_method(:table_name) { ActiveRecord::Base.table_name_prefix + 'data_migrations' + ActiveRecord::Base.table_name_suffix }
           define_singleton_method(:primary_key) { "version" }
         end
       end

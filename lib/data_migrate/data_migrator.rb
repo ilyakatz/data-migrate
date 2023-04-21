@@ -26,7 +26,8 @@ module DataMigrate
     end
 
     def load_migrated
-      @migrated_versions = DataMigrate::DataSchemaMigration.normalized_versions.map(&:to_i).sort
+      @migrated_versions =
+        DataMigrate::DataSchemaMigration.normalized_versions.map(&:to_i).sort
     end
 
     class << self
@@ -46,7 +47,6 @@ module DataMigrate
       def needs_migration?
         DataMigrate::DatabaseTasks.pending_migrations.count.positive?
       end
-
       ##
       # Provides the full migrations_path filepath
       # @return (String)

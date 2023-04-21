@@ -27,8 +27,8 @@ describe DataMigrate::Tasks::DataMigrateTasks do
       DataMigrate::Tasks::DataMigrateTasks.migrate
     end
 
-    context "when not given a separate db config" do
-      it "does not override the default connection" do  
+    context 'when not given a separate db config' do
+      it 'does not override the default connection' do  
         expect(ActiveRecord::Base).not_to receive(:establish_connection)
         expect(DataMigrate::SchemaDumper).to receive(:dump)
 
@@ -37,7 +37,15 @@ describe DataMigrate::Tasks::DataMigrateTasks do
     end
 
     context "when given a separate db config" do
-      let(:override_config) { { "host" => "127.0.0.1", "database" => "other_test", "adapter" => "sqlite3", "username" => "root", "password" => nil } }
+      let(:override_config) do
+        {
+          "host" => "127.0.0.1",
+          "database" => "other_test",
+          "adapter" => "sqlite3",
+          "username" => "root",
+          "password" => nil
+        }
+      end
       let(:paths) { ["spec/db/migrate"] }
 
       before do
@@ -78,11 +86,22 @@ describe DataMigrate::Tasks::DataMigrateTasks do
     end
 
     context "when there are pending migrations" do
-      let(:migrations) { [{ name: "A", version: 1 }, { name: "B", version: 2 }] }
+      let(:migrations) do
+        [{
+          name: "A",
+          version: 1
+        }, {
+          name: "B",
+          version: 2
+        }]
+      end
 
       it "should abort with given message and print names and versions of pending migrations" do
-        expect { subject }.to raise_error(SystemExit, message).and output(match(/You have #{migrations.count} pending migrations:/)
-          .and match(Regexp.new(migrations.map { |m| m.slice(:version, :name).values.join("\\W+") }.join("\\W+")))).to_stdout
+        expect { subject }
+          .to raise_error(SystemExit, message)
+          .and output(match(/You have #{migrations.count} pending migrations:/)
+          .and match(Regexp.new(migrations.map { |m| m.slice(:version, :name)
+          .values.join("\\W+") }.join("\\W+")))).to_stdout
       end
     end
   end
@@ -96,11 +115,15 @@ describe DataMigrate::Tasks::DataMigrateTasks do
     end
 
     it "should display data migration status" do
-      expect { DataMigrate::Tasks::DataMigrateTasks.status(connection_db_config) }.to output(/up     20091231235959  Some name/).to_stdout
+      expect {
+        DataMigrate::Tasks::DataMigrateTasks.status(connection_db_config)
+      }.to output(/up     20091231235959  Some name/).to_stdout
     end
 
     it "should display schema and data migration status" do
-      expect { DataMigrate::Tasks::DataMigrateTasks.status_with_schema(connection_db_config) }.to output(match(/up      data   20091231235959  Some name/)
+      expect {
+        DataMigrate::Tasks::DataMigrateTasks.status_with_schema(connection_db_config)
+      }.to output(match(/up      data   20091231235959  Some name/)
         .and match(/down    schema  20131111111111  Late migration/)).to_stdout
     end
   end

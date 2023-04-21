@@ -39,8 +39,12 @@ describe DataMigrate::DataMigrator do
     it "does not do anything if migration is undone twice" do
       context.migrate(nil)
 
-      expect { context.run(:down, 20171231235959) }.to output(/Undoing SuperUpdate/).to_stdout
-      expect { context.run(:down, 20171231235959) }.not_to output(/Undoing SuperUpdate/).to_stdout
+      expect {
+        context.run(:down, 20171231235959)
+      }.to output(/Undoing SuperUpdate/).to_stdout
+      expect {
+        context.run(:down, 20171231235959)
+      }.not_to output(/Undoing SuperUpdate/).to_stdout
     end
 
     it "runs a specific migration" do
@@ -52,8 +56,12 @@ describe DataMigrate::DataMigrator do
     end
 
     it "does not do anything if migration is ran twice" do
-      expect { context.run(:up, 20171231235959) }.to output(/Doing SuperUpdate/).to_stdout
-      expect { context.run(:down, 20171231235959) }.not_to output(/Doing SuperUpdate/).to_stdout
+      expect {
+        context.run(:up, 20171231235959)
+      }.to output(/Doing SuperUpdate/).to_stdout
+      expect {
+        context.run(:down, 20171231235959)
+      }.not_to output(/Doing SuperUpdate/).to_stdout
     end
 
     it "alerts for an invalid specific migration" do
@@ -63,7 +71,9 @@ describe DataMigrate::DataMigrator do
     it "rolls back latest migration" do
       context.migrate(nil)
 
-      expect { context.rollback }.to output(/Undoing SuperUpdate/).to_stdout
+      expect {
+        context.rollback
+      }.to output(/Undoing SuperUpdate/).to_stdout
 
       versions = DataMigrate::DataSchemaMigration.normalized_versions
 
@@ -75,7 +85,9 @@ describe DataMigrate::DataMigrator do
       context.migrate(nil)
       schema_context.migrate(nil)
 
-      expect { context.rollback(2) }.to output(/Undoing SomeName/).to_stdout
+      expect {
+        context.rollback(2)
+      }.to output(/Undoing SomeName/).to_stdout
 
       versions = DataMigrate::DataSchemaMigration.normalized_versions
 
@@ -85,7 +97,9 @@ describe DataMigrate::DataMigrator do
     it "rolls back 2 migrations" do
       context.migrate(nil)
 
-      expect { context.rollback(2) }.to output(/Undoing SomeName/).to_stdout
+      expect {
+        context.rollback(2)
+      }.to output(/Undoing SomeName/).to_stdout
 
       versions = DataMigrate::DataSchemaMigration.normalized_versions
 

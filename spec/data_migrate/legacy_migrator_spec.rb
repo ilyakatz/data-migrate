@@ -3,7 +3,9 @@
 require "spec_helper"
 
 describe DataMigrate::LegacyMigrator do
-  let(:context) { DataMigrate::MigrationContext.new("spec/db/data") }
+  let(:context) {
+    DataMigrate::MigrationContext.new("spec/db/data")
+  }
 
   before do
     ActiveRecord::SchemaMigration.create_table
@@ -16,7 +18,8 @@ describe DataMigrate::LegacyMigrator do
   end
 
   it "migrate legacy migrations to be in correct table" do
-    # simulate creation of legacy data migration when it was recorded in schema table
+    # simulate creation of legacy data migration when
+    # it was recorded in schema table
     ActiveRecord::SchemaMigration.create(version: "20091231235959")
 
     # create one migration in correct place
@@ -27,7 +30,8 @@ describe DataMigrate::LegacyMigrator do
 
     DataMigrate::LegacyMigrator.new("spec/db/data").migrate
 
-    # after migacy migrator has been run, we should have records of both migrations
+    # after migacy migrator has been run, we should have records
+    # of both migrations
     migrated = DataMigrate::DataMigrator .new(:up, []).load_migrated
     expect(migrated.count).to eq 2
   end
