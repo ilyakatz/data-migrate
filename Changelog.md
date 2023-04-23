@@ -1,5 +1,13 @@
 # Changelog
 
+## 10.0.0.rc1
+
+- Changes by [chaunce](https//:github.com/chaunce)
+- Multiple databases support
+- Refactor to clean things up
+- Deprecate rails 5.2 support for real
+
+
 ## 9.0.0
 
 Ruby 3.2 support [mehanoid](https://github.com/mehanoid)
