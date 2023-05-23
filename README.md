@@ -2,7 +2,7 @@
 
 - [![Version](http://img.shields.io/gem/v/data_migrate.svg?style=flat-square)](https://rubygems.org/gems/data_migrate)
 - [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](http://opensource.org/licenses/MIT)
-- [![Travis](https://img.shields.io/travis/ilyakatz/data-migrate.svg)](https://travis-ci.org/ilyakatz/data-migrate)
+- ![.github/workflows/build.yml](https://github.com/ilyakatz/data-migrate/actions/workflows/.github/workflows/build.yml/badge.svg)
 - [![Reviewed by Hound](https://img.shields.io/badge/Reviewed_by-Hound-8E64B0.svg)](https://houndci.com)
 
 Run data migrations alongside schema migrations.
@@ -12,7 +12,7 @@ migrations, except they should be reserved for data migrations. For
 instance, if you realize you need to titleize all your titles, this
 is the place to do it.
 
-![Travis](./screenshot.png)
+![directory tree example](./screenshot.png)
 
 ## Why should I use this?
 
