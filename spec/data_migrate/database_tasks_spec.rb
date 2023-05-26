@@ -36,11 +36,11 @@ describe DataMigrate::DatabaseTasks do
     allow(DataMigrate::DataMigrator).to receive(:db_config) { db_config }
     ActiveRecord::Base.establish_connection(db_config)
     if Rails.version >= '6.1'
-      hash_config = ActiveRecord::DatabaseConfigurations::HashConfig.new('test', 'test', db_config)
+      hash_config = ActiveRecord::DatabaseConfigurations::HashConfig.new(Rails.env, Rails.env, db_config)
       config_obj = ActiveRecord::DatabaseConfigurations.new([hash_config])
       allow(ActiveRecord::Base).to receive(:configurations).and_return(config_obj)
     else
-      ActiveRecord::Base.configurations[:test] = db_config
+      ActiveRecord::Base.configurations[Rails.env] = db_config
     end
   end
 
