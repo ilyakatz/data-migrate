@@ -70,9 +70,9 @@ describe DataMigrate::SchemaMigration do
         let(:paths) { ['spec/db/migrate/6.0', 'spec/db/components/migrate/6.0'] }
         let(:config_options) do
           if Rails.version > '6.1'
-            { env_name: 'test', name: 'primary' }
+            { env_name: Rails.env, name: 'primary' }
           else
-            { env_name: 'test', spec_name: 'primary' }
+            { env_name: Rails.env, spec_name: 'primary' }
           end
         end
 
