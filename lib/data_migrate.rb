@@ -12,8 +12,8 @@ require File.join(File.dirname(__FILE__), "data_migrate", "tasks/data_migrate_ta
 require File.join(File.dirname(__FILE__), "data_migrate", "legacy_migrator")
 require File.join(File.dirname(__FILE__), "data_migrate", "config")
 
-if Rails::VERSION::MAJOR == 5
-  require File.join(File.dirname(__FILE__), "data_migrate", "schema_migration_five")
+if Gem::Version.new(Rails.version) >= Gem::Version.new("7.1.0.alpha")
+  require File.join(File.dirname(__FILE__), "data_migrate", "schema_migration_seven_one")
 else
   require File.join(File.dirname(__FILE__), "data_migrate", "schema_migration_six")
 end
