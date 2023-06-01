@@ -9,7 +9,6 @@ require File.join(File.dirname(__FILE__), "data_migrate", "status_service_five")
 require File.join(File.dirname(__FILE__), "data_migrate", "migration_context")
 require File.join(File.dirname(__FILE__), "data_migrate", "railtie")
 require File.join(File.dirname(__FILE__), "data_migrate", "tasks/data_migrate_tasks")
-require File.join(File.dirname(__FILE__), "data_migrate", "legacy_migrator")
 require File.join(File.dirname(__FILE__), "data_migrate", "config")
 
 if Gem::Version.new(Rails.version) >= Gem::Version.new("7.1.0.alpha")
