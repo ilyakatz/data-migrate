@@ -5,7 +5,7 @@ module DataMigrate
     def self.pending_schema_migrations
       all_migrations = DataMigrate::MigrationContext.new(migrations_paths).migrations
       sort_migrations(
-        ActiveRecord::Migrator.new(:up, all_migrations, ActiveRecord::Base.connection.schema_migration).
+        ActiveRecord::Migrator.new(:up, all_migrations, ActiveRecord::Base.connection.schema_migration, ActiveRecord::Base.connection.internal_metadata).
         pending_migrations.
         map {|m| { version: m.version, kind: :schema }}
       )

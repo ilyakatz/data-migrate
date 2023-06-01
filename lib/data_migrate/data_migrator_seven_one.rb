@@ -18,11 +18,13 @@ module DataMigrate
       @target_version    = target_version
       @migrated_versions = nil
       @migrations        = migrations
+      @schema_migration  = ActiveRecord::Base.connection.schema_migration
+      @internal_metadata = ActiveRecord::Base.connection.internal_metadata
 
       validate(@migrations)
 
       DataMigrate::DataSchemaMigration.create_table
-      ActiveRecord::InternalMetadata.create_table
+      @internal_metadata.create_table
     end
 
     def load_migrated
@@ -89,7 +91,7 @@ module DataMigrate
     def record_version_state_after_migrating(version)
       if down?
         migrated.delete(version)
-        DataMigrate::DataSchemaMigration.where(version: version.to_s).delete_all
+        DataMigrate::DataSchemaMigration.delete_version(version: version.to_s)
       else
         migrated << version
         DataMigrate::DataSchemaMigration.create!(version: version.to_s)

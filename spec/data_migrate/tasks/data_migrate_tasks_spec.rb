@@ -7,7 +7,7 @@ describe DataMigrate::Tasks::DataMigrateTasks do
     let(:db_config) do
       {
         adapter: "sqlite3",
-        database: "spec/db/other_test.db"
+        database: "spec/db/test.db"
       }
     end
 
@@ -29,11 +29,11 @@ describe DataMigrate::Tasks::DataMigrateTasks do
       end
     end
 
-    context 'when given ' do
+    context 'when given a separate db config' do
       let(:override_config) do
         {
           'host' => '127.0.0.1',
-          'database' => 'other_test',
+          'database' => 'spec/db/other_test.db',
           'adapter' => 'sqlite3',
           'username' => 'root',
           'password' => nil,
