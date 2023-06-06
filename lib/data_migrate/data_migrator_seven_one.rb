@@ -77,11 +77,7 @@ module DataMigrate
 
       def db_config
         env = Rails.env || "development"
-        ar_config = if (Rails::VERSION::MAJOR == 6 && Rails::VERSION::MINOR >= 1) || Rails::VERSION::MAJOR > 6
-                      ActiveRecord::Base.configurations.configs_for(env_name: env).first
-                    else
-                      ActiveRecord::Base.configurations[env]
-                    end
+        ar_config = ActiveRecord::Base.configurations.configs_for(env_name: env).first
         ar_config || ENV["DATABASE_URL"]
       end
     end
