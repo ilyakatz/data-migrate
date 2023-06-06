@@ -1,5 +1,9 @@
 # Changelog
 
+# 10.0.0
+
+Releasing 10.0.0
+
 ## 10.0.0.rc1
 
 - Changes by [chaunce](https//:github.com/chaunce)
