@@ -24,28 +24,3 @@ module DataMigrate
     end
   end
 end
-
-# ActiveRecord::SchemaMigration no longer inherits from ActiveRecord::Base
-# and now has updated method names. See: https://github.com/rails/rails/pull/45908
-# This patch delegates SchemaMigration calls to the updated connection instance.
-class ActiveRecord::SchemaMigration
-  class << self
-    delegate :create_table, :table_exists?, :normalized_versions, to: :schema_migration
-
-    def schema_migration
-      ActiveRecord::Base.connection.schema_migration
-    end
-  end
-
-  def self.schema_migrations_table_name
-    ActiveRecord::Base.connection.schema_migration.table_name
-  end
-
-  def self.create(version:)
-    ActiveRecord::Base.connection.schema_migration.create_version(version)
-  end
-
-  def self.normalize_migration_number(version)
-    ActiveRecord::Base.connection.schema_migration.normalize_migration_number(version)
-  end
-end
