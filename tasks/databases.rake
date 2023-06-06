@@ -1,10 +1,15 @@
+# frozen_string_literal: true
+
 require 'data_migrate/tasks/data_migrate_tasks'
 
 namespace :db do
   namespace :migrate do
     desc "Migrate the database data and schema (options: VERSION=x, VERBOSE=false)."
     task :with_data => :environment do
-      DataMigrate::DataMigrator.assure_data_schema_table
+      original_db_config = ActiveRecord::Base.connection_db_config
+      ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env).each do |db_config|
+        ActiveRecord::Base.establish_connection(db_config)
+        DataMigrate::DataMigrator.assure_data_schema_table
 
       ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
       target_version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
@@ -48,9 +53,12 @@ namespace :db do
       migrations.each do |migration|
         DataMigrate::DatabaseTasks.run_migration(migration, migration[:direction])
       end
+      end
 
       Rake::Task["db:_dump"].invoke
       Rake::Task["data:dump"].invoke
+    ensure
+      ActiveRecord::Base.establish_connection(original_db_config)
     end
 
     namespace :redo do
@@ -114,7 +122,10 @@ namespace :db do
     namespace :status do
       desc "Display status of data and schema migrations"
       task :with_data => :environment do
-        DataMigrate::Tasks::DataMigrateTasks.status_with_schema
+        ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env).each do |db_config|
+          ActiveRecord::Base.establish_connection(db_config)
+          DataMigrate::Tasks::DataMigrateTasks.status_with_schema(db_config)
+        end
       end
     end
   end # END OF MIGRATE NAME SPACE
@@ -193,8 +204,14 @@ end
 namespace :data do
   desc 'Migrate data migrations (options: VERSION=x, VERBOSE=false)'
   task :migrate => :environment do
-    DataMigrate::Tasks::DataMigrateTasks.migrate
+    original_db_config = ActiveRecord::Base.connection_db_config
+    ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env).each do |db_config|
+      ActiveRecord::Base.establish_connection(db_config)
+      DataMigrate::Tasks::DataMigrateTasks.migrate
+    end
     Rake::Task["data:dump"].invoke
+  ensure
+    ActiveRecord::Base.establish_connection(original_db_config)
   end
 
   namespace :migrate do
@@ -230,7 +247,10 @@ namespace :data do
 
     desc "Display status of data migrations"
     task :status => :environment do
-      DataMigrate::Tasks::DataMigrateTasks.status
+      ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env).each do |db_config|
+        ActiveRecord::Base.establish_connection(db_config)
+        DataMigrate::Tasks::DataMigrateTasks.status(db_config)
+      end
     end
   end
 
@@ -269,7 +289,10 @@ namespace :data do
 
   desc "Create a db/data_schema.rb file that stores the current data version"
   task dump: :environment do
-    DataMigrate::Tasks::DataMigrateTasks.dump
+    ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env).each do |db_config|
+      ActiveRecord::Base.establish_connection(db_config)
+      DataMigrate::Tasks::DataMigrateTasks.dump(db_config)
+    end
 
     # Allow this task to be called as many times as required. An example
     # is the migrate:redo task, which calls other two internally

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DataMigrate
   # Helper class to getting access to db schema
   # to allow data/schema combiation tasks
@@ -22,9 +24,9 @@ module DataMigrate
 
     def self.migrations_paths
       spec_name = DataMigrate.config.spec_name
-      if spec_name && Rails.version > '6.1'
+      if spec_name && Gem::Dependency.new("rails", "~> 7.0").match?("rails", Gem.loaded_specs["rails"].version)
         ActiveRecord::Base.configurations.configs_for(env_name: Rails.env, name: spec_name).migrations_paths
-      elsif spec_name
+      elsif spec_name && Gem::Dependency.new("rails", "~> 6.0").match?("rails", Gem.loaded_specs["rails"].version)
         ActiveRecord::Base.configurations.configs_for(env_name: Rails.env, spec_name: spec_name).migrations_paths
       else
         Rails.application.config.paths["db/migrate"].to_a

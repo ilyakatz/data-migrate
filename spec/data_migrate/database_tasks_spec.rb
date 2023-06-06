@@ -4,13 +4,7 @@ require "spec_helper"
 
 describe DataMigrate::DatabaseTasks do
   let(:subject) { DataMigrate::DatabaseTasks }
-  let(:migration_path) {
-    if Rails::VERSION::MAJOR == 5
-      "spec/db/migrate/5.2"
-    else
-      "spec/db/migrate/6.0"
-    end
-  }
+  let(:migration_path) { "spec/db/migrate" }
   let(:data_migrations_path) {
     DataMigrate.config.data_migrations_path
   }
@@ -33,9 +27,8 @@ describe DataMigrate::DatabaseTasks do
     allow(DataMigrate::Tasks::DataMigrateTasks).to receive(:migrations_paths) {
       data_migrations_path
     }
-    allow(DataMigrate::DataMigrator).to receive(:db_config) { db_config }
     ActiveRecord::Base.establish_connection(db_config)
-    if Rails.version >= '6.1'
+    if Gem::Dependency.new("rails", ">= 6.1").match?("rails", Gem.loaded_specs["rails"].version)
       hash_config = ActiveRecord::DatabaseConfigurations::HashConfig.new('test', 'test', db_config)
       config_obj = ActiveRecord::DatabaseConfigurations.new([hash_config])
       allow(ActiveRecord::Base).to receive(:configurations).and_return(config_obj)
@@ -44,19 +37,10 @@ describe DataMigrate::DatabaseTasks do
     end
   end
 
-  describe :schema_file do
-    it "returns the correct data schema file path" do
-      expect(subject.schema_file(nil)).to eq "db/data_schema.rb"
-    end
-  end
-
   context "migrations" do
     after do
-      begin
-        ActiveRecord::Migration.drop_table("data_migrations")
-      rescue ActiveRecord::StatementInvalid
-      end
-      ActiveRecord::Migration.drop_table("schema_migrations")
+      ActiveRecord::Migration.drop_table("data_migrations") rescue nil
+      ActiveRecord::Migration.drop_table("schema_migrations") rescue nil
     end
 
     before do
@@ -68,51 +52,19 @@ describe DataMigrate::DatabaseTasks do
       allow(DataMigrate::DatabaseTasks).to receive(:data_migrations_path) {
         data_migrations_path
       }.at_least(:once)
-      allow(DataMigrate::DatabaseTasks).to receive(:schema_migrations_path) {
-        migration_path
-      }.at_least(:once)
     end
 
     describe :past_migrations do
-      it do
+      it "returns past migration records" do
         subject.forward
-        m = subject.past_migrations
-        expect(m.count).to eq 1
-        expect(m.first[:version]).to eq 20091231235959
+        migrations = subject.past_migrations
+        expect(migrations.count).to eq 1
+        expect(migrations.first[:version]).to eq 20091231235959
       end
 
       it "shows nothing without any migrations" do
-        m = subject.past_migrations
-        expect(m.count).to eq 0
-      end
-    end
-
-    describe :load_schema_current do
-      before do
-        allow(DataMigrate::DataMigrator).to receive(:full_migrations_path).and_return(migration_path)
-      end
-
-      it "loads the current schema file" do
-        if Rails::VERSION::MAJOR < 6
-          skip("Not implemented for Rails lower than 6")
-        end
-        allow(subject).to receive(:schema_location).and_return("spec/db/data/schema/")
-
-        subject.load_schema_current
-        versions = DataMigrate::DataSchemaMigration.normalized_versions
-        expect(versions.count).to eq(2)
-      end
-
-      it "loads schema file that has not been update with latest data migrations" do
-        if Rails::VERSION::MAJOR < 6
-          skip("Not implemented for Rails lower than 6")
-        end
-
-        allow(subject).to receive(:schema_location).and_return("spec/db/data/partial_schema/")
-
-        subject.load_schema_current
-        versions = DataMigrate::DataSchemaMigration.normalized_versions
-        expect(versions.count).to eq(1)
+        migrations = subject.past_migrations
+        expect(migrations.count).to eq 0
       end
     end
 

@@ -36,7 +36,7 @@ table to track all migrations.
 
 ## Rails Support
 
-Support Rails 5.2 through 7.0
+Support Rails 6.0 through 7.0
 
 
 #### v1
@@ -162,9 +162,9 @@ Run tests for a specific version of Rails
 
 ```
 bundle exec appraisal install
-bundle exec appraisal rails-5.1 rspec
-bundle exec appraisal rails-5.2 rspec
 bundle exec appraisal rails-6.0 rspec
+bundle exec appraisal rails-6.1 rspec
+bundle exec appraisal rails-7.0 rspec
 ```
 
 ## Thanks

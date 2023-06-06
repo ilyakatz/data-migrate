@@ -5,13 +5,10 @@ rvm:
   - 3.2
 script: bundle exec rspec
 gemfile:
-  - gemfiles/rails_5.2.gemfile
   - gemfiles/rails_6.0.gemfile
   - gemfiles/rails_6.1.gemfile
   - gemfiles/rails_7.0.gemfile
 jobs:
   exclude:
     - rvm: 3.0
-      gemfile: gemfiles/rails_5.2.gemfile
     - rvm: 3.2
-      gemfile: gemfiles/rails_5.2.gemfile

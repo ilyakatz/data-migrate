@@ -1,48 +1,22 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 describe DataMigrate::DataMigrator do
-  let(:context) {
-    if (Rails::VERSION::MAJOR == 5)
-      DataMigrate::MigrationContext.new("spec/db/data")
-    else
-      DataMigrate::MigrationContext.new("spec/db/data-6.0")
-    end
-  }
-  let(:schema_context) {
-    if (Rails::VERSION::MAJOR == 5)
-      ActiveRecord::MigrationContext.new("spec/db/migrate/5.2")
-    else
-      ActiveRecord::MigrationContext.new("spec/db/migrate/6.0", ActiveRecord::Base.connection.schema_migration)
-    end
-  }
+  let(:context) { DataMigrate::MigrationContext.new("spec/db/data") }
+  let(:schema_context) { ActiveRecord::MigrationContext.new("spec/db/migrate", ActiveRecord::Base.connection.schema_migration) }
+
+  before do
+    ActiveRecord::SchemaMigration.create_table
+    DataMigrate::DataSchemaMigration.create_table
+  end
 
   after do
-    begin
-      ActiveRecord::Migration.drop_table("data_migrations")
-      ActiveRecord::Migration.drop_table("schema_migrations")
-    rescue StandardError
-      nil
-    end
+    ActiveRecord::Migration.drop_table("data_migrations") rescue nil
+    ActiveRecord::Migration.drop_table("schema_migrations") rescue nil
   end
 
-  let(:db_config) do
-    {
-      adapter: "sqlite3",
-      database: "spec/db/test.db"
-    }
-  end
-
-  describe :migrate do
-    before do
-      ActiveRecord::Base.establish_connection(db_config)
-      ActiveRecord::SchemaMigration.create_table
-    end
-
-    after do
-      ActiveRecord::Migration.drop_table("data_migrations")
-      ActiveRecord::Migration.drop_table("schema_migrations")
-    end
-
+  describe "migrate" do
     it "migrates existing file" do
       context.migrate(nil)
       context.migrations_status

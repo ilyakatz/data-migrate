@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "spec_helper"
 
 describe DataMigrate::DataMigrator do
@@ -10,25 +12,18 @@ describe DataMigrate::DataMigrator do
   end
 
   before do
-    allow(DataMigrate::DataMigrator).to receive(:db_config) { db_config }
     ActiveRecord::Base.establish_connection(db_config)
+    ::ActiveRecord::SchemaMigration.create_table
+    DataMigrate::DataSchemaMigration.create_table
   end
 
-  describe :load_migrated do
-    before do
-      allow(subject).to receive(:db_config) { db_config }.at_least(:once)
-      ActiveRecord::Base.establish_connection(db_config)
-      ::ActiveRecord::SchemaMigration.create_table
-      DataMigrate::DataSchemaMigration.create_table
-    end
+  after do
+    ActiveRecord::Migration.drop_table("data_migrations") rescue nil
+    ActiveRecord::Migration.drop_table("schema_migrations") rescue nil
+  end
 
-    after do
-      ActiveRecord::Migration.drop_table("data_migrations")
-      ActiveRecord::Migration.drop_table("schema_migrations")
-    end
-
-    it do
-      subject.assure_data_schema_table
+  describe ".load_migrated" do
+    it "loads migrated versions" do
       DataMigrate::DataSchemaMigration.create(version: 20090000000000)
       ::ActiveRecord::SchemaMigration.create(version: 20100000000000)
       DataMigrate::DataSchemaMigration.create(version: 20110000000000)
@@ -41,16 +36,7 @@ describe DataMigrate::DataMigrator do
   end
 
   describe :assure_data_schema_table do
-    before do
-      allow(subject).to receive(:db_config) { db_config }.at_least(:once)
-      ActiveRecord::Base.establish_connection(db_config)
-    end
-
-    after do
-      ActiveRecord::Migration.drop_table("data_migrations")
-    end
-
-    it do
+    it "creates the data_migrations table" do
       ActiveRecord::Migration.drop_table("data_migrations") rescue nil
       subject.assure_data_schema_table
       expect(
@@ -60,13 +46,6 @@ describe DataMigrate::DataMigrator do
   end
 
   describe "#migrations_status" do
-    before do
-      allow(subject).to receive(:db_config) { db_config }.at_least(:once)
-      ActiveRecord::Base.establish_connection(db_config)
-      ::ActiveRecord::SchemaMigration.create_table
-      DataMigrate::DataSchemaMigration.create_table
-    end
-
     it "returns all migrations statuses" do
       status = subject.migrations_status
       expect(status.length).to eq 2

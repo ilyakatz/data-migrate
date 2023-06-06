@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - chaunce-multiple_connection_support
 
 jobs:
   build:

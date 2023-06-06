@@ -1,19 +1,17 @@
+# frozen_string_literal: true
+
 module DataMigrate
   module Tasks
     module DataMigrateTasks
       extend self
 
-      def schema_migrations_path
-        File.join('db', 'migrate')
-      end
-
       def migrations_paths
         @migrations_paths ||= DataMigrate.config.data_migrations_path
       end
 
-      def dump
+      def dump(db_config)
         if dump_schema_after_migration?
-          filename = DataMigrate::DatabaseTasks.schema_file
+          filename = DataMigrate::DatabaseTasks.dump_filename(spec_name(db_config), ActiveRecord::Base.schema_format)
           ActiveRecord::Base.establish_connection(DataMigrate.config.db_configuration) if DataMigrate.config.db_configuration
           File.open(filename, "w:utf-8") do |file|
             DataMigrate::SchemaDumper.dump(ActiveRecord::Base.connection, file)
@@ -30,7 +28,7 @@ module DataMigrate
 
       def abort_if_pending_migrations(migrations, message)
         if migrations.any?
-          puts "You have #{migrations.size} pending #{migrations.size > 1 ? 'migrations:' : 'migration:'}"
+          puts "You have #{migrations.size} pending #{'migration'.pluralize(migrations.size)}:"
           migrations.each do |pending_migration|
             puts "  %4d %s" % [pending_migration[:version], pending_migration[:name]]
           end
@@ -46,25 +44,16 @@ module DataMigrate
         end
       end
 
-      def status
-        config = connect_to_database
-        return unless config
-
-        connection = ActiveRecord::Base.connection
-        puts "\ndatabase: #{config['database']}\n\n"
-        DataMigrate::StatusService.dump(connection)
+      def status(db_config)
+        puts "\ndatabase: #{spec_name(db_config)}\n\n"
+        DataMigrate::StatusService.dump(ActiveRecord::Base.connection)
       end
 
-      def status_with_schema
-        config = connect_to_database
-        return unless config
-
+      def status_with_schema(db_config)
         db_list_data = ActiveRecord::Base.connection.select_values(
           "SELECT version FROM #{DataMigrate::DataSchemaMigration.table_name}"
         )
-        db_list_schema = ActiveRecord::Base.connection.select_values(
-          "SELECT version FROM #{ActiveRecord::SchemaMigration.schema_migrations_table_name}"
-        )
+        db_list_schema = ActiveRecord::SchemaMigration.all.pluck(:version)
         file_list = []
 
         Dir.foreach(File.join(Rails.root, migrations_paths)) do |file|
@@ -75,7 +64,9 @@ module DataMigrate
           end
         end
 
-        Dir.foreach(File.join(Rails.root, schema_migrations_path)) do |file|
+        DataMigrate::SchemaMigration.migrations_paths.map do |path|
+          Dir.children(path) if Dir.exist?(path)
+        end.flatten.compact.each do |file|
           # only files matching "20091231235959_some_name.rb" pattern
           if match_data = /(\d{14})_(.+)\.rb/.match(file)
             status = db_list_schema.delete(match_data[1]) ? 'up' : 'down'
@@ -86,7 +77,7 @@ module DataMigrate
         file_list.sort!{|a,b| "#{a[1]}_#{a[3] == 'data' ? 1 : 0}" <=> "#{b[1]}_#{b[3] == 'data' ? 1 : 0}" }
 
         # output
-        puts "\ndatabase: #{config['database']}\n\n"
+        puts "\ndatabase: #{spec_name(db_config)}\n\n"
         puts "#{"Status".center(8)} #{"Type".center(8)}  #{"Migration ID".ljust(14)} Migration Name"
         puts "-" * 60
         file_list.each do |file|
@@ -103,23 +94,12 @@ module DataMigrate
 
       private
 
-      def connect_to_database
-        config = if ActiveRecord.version < Gem::Version.new('6.1')
-          ActiveRecord::Base.configurations[Rails.env || 'development']
-        else
-          ActiveRecord::Base.configurations.find_db_config(Rails.env || 'development').configuration_hash
+      def spec_name(db_config)
+        if Gem::Dependency.new("rails", "~> 7.0").match?("rails", Gem.loaded_specs["rails"].version)
+          db_config.name
+        elsif Gem::Dependency.new("rails", "~> 6.0").match?("rails", Gem.loaded_specs["rails"].version)
+          db_config.spec_name
         end
-        ActiveRecord::Base.establish_connection(config)
-
-        unless DataMigrate::DataSchemaMigration.table_exists?
-          puts 'Data migrations table does not exist yet.'
-          config = nil
-        end
-        unless ActiveRecord::SchemaMigration.table_exists?
-          puts 'Schema migrations table does not exist yet.'
-          config = nil
-        end
-        config
       end
     end
   end
