@@ -7,7 +7,7 @@ describe DataMigrate::StatusService do
   let(:stream) { StringIO.new }
   let(:stream_data) { stream.read }
   let(:connection_db_config) do
-    if Gem::Dependency.new("rails", ">= 6.1").match?("rails", Gem.loaded_specs["rails"].version)
+    if Gem::Dependency.new("railties", ">= 6.1").match?("railties", Gem.loaded_specs["railties"].version)
       ActiveRecord::Base.connection_db_config
     else
       ActiveRecord::Base.configurations.configs_for.first
