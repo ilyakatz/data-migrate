@@ -92,11 +92,13 @@ You can generate a data migration as you would a schema migration:
     rake db:version:with_data                      # Retrieves the current schema version numbers for data and schema migrations
 
 
-Tasks work as they would with the 'vanilla' db version. The 'with_data' addition to the 'db' tasks will run the task in the context of both the data and schema migrations. That is, rake db:rollback:with_data will check to see if it was a schema or data migration invoked last, and do that. Tasks invoked in that space also have an additional line of output, indicating if the action is performed on data or schema.
+Tasks work as they would with the 'vanilla' db version. The 'with_data' addition to the 'db' tasks will run the task in the context of both the data and schema migrations. That is, rake db:rollback:with_data will check to see if it was a schema or data migration invoked last, and do that. Tasks invoked in that space also have an additional line of output, indicating if the action is performed on data or schema. 
 
 With 'up' and 'down', you can specify the option 'BOTH', which defaults to false. Using true, will migrate both the data and schema (in the desired direction) if they both match the version provided. Again, going up, schema is given precedence. Down its data.
 
-`rake db:migrate:status:with_data` provides and additional column to indicate which type of migration.
+When using `rake db:migrate:with_data` migrations will be run in ascending order by their version. For example, if you have a data migration with version 20230410000000 and a schema migration with version 20230415000000, expect the data migration to run first.
+
+`rake db:migrate:status:with_data` provides an additional column to indicate which type of migration.
 
 ### Configuration
 
