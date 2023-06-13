@@ -44,9 +44,9 @@ module DataMigrate
     end
 
     def database_name
-      if Gem::Dependency.new("rails", "~> 7.0").match?("rails", Gem.loaded_specs["rails"].version)
+      if Gem::Dependency.new("railties", "~> 7.0").match?("railties", Gem.loaded_specs["railties"].version)
         ActiveRecord::Base.connection_db_config.configuration_hash[:database]
-      elsif Gem::Dependency.new("rails", "~> 6.0").match?("rails", Gem.loaded_specs["rails"].version)
+      elsif Gem::Dependency.new("railties", "~> 6.0").match?("railties", Gem.loaded_specs["railties"].version)
         ActiveRecord::Base.connection_config[:database]
       end
     end

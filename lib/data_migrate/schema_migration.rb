@@ -24,9 +24,9 @@ module DataMigrate
 
     def self.migrations_paths
       spec_name = DataMigrate.config.spec_name
-      if spec_name && Gem::Dependency.new("rails", "~> 7.0").match?("rails", Gem.loaded_specs["rails"].version)
+      if spec_name && Gem::Dependency.new("railties", "~> 7.0").match?("railties", Gem.loaded_specs["railties"].version)
         ActiveRecord::Base.configurations.configs_for(env_name: Rails.env, name: spec_name).migrations_paths
-      elsif spec_name && Gem::Dependency.new("rails", "~> 6.0").match?("rails", Gem.loaded_specs["rails"].version)
+      elsif spec_name && Gem::Dependency.new("railties", "~> 6.0").match?("railties", Gem.loaded_specs["railties"].version)
         ActiveRecord::Base.configurations.configs_for(env_name: Rails.env, spec_name: spec_name).migrations_paths
       else
         Rails.application.config.paths["db/migrate"].to_a

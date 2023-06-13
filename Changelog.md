@@ -1,5 +1,10 @@
 # Changelog
 
+# 10.0.1
+
+- Bug fix for Rails 6 config [chaunce](https//:github.com/chaunce)
+- Railties bug fix by [opti](https://github.com/opti)
+
 # 10.0.0
 
 Releasing 10.0.0

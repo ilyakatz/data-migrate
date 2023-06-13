@@ -6,7 +6,12 @@ namespace :db do
   namespace :migrate do
     desc "Migrate the database data and schema (options: VERSION=x, VERBOSE=false)."
     task :with_data => :environment do
-      original_db_config = ActiveRecord::Base.connection_db_config
+      original_db_config = if Gem::Dependency.new("rails", "~> 7.0").match?("rails", Gem.loaded_specs["rails"].version)
+        ActiveRecord::Base.connection_db_config
+      elsif Gem::Dependency.new("rails", "~> 6.0").match?("rails", Gem.loaded_specs["rails"].version)
+        ActiveRecord::Base.connection_config
+      end
+
       ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env).each do |db_config|
         ActiveRecord::Base.establish_connection(db_config)
         DataMigrate::DataMigrator.assure_data_schema_table
@@ -204,7 +209,12 @@ end
 namespace :data do
   desc 'Migrate data migrations (options: VERSION=x, VERBOSE=false)'
   task :migrate => :environment do
-    original_db_config = ActiveRecord::Base.connection_db_config
+    original_db_config = if Gem::Dependency.new("rails", "~> 7.0").match?("rails", Gem.loaded_specs["rails"].version)
+      ActiveRecord::Base.connection_db_config
+    elsif Gem::Dependency.new("rails", "~> 6.0").match?("rails", Gem.loaded_specs["rails"].version)
+      ActiveRecord::Base.connection_config
+    end
+
     ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env).each do |db_config|
       ActiveRecord::Base.establish_connection(db_config)
       DataMigrate::Tasks::DataMigrateTasks.migrate
