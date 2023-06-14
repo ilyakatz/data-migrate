@@ -6,9 +6,9 @@ namespace :db do
   namespace :migrate do
     desc "Migrate the database data and schema (options: VERSION=x, VERBOSE=false)."
     task :with_data => :environment do
-      original_db_config = if Gem::Dependency.new("rails", "~> 7.0").match?("rails", Gem.loaded_specs["rails"].version)
+      original_db_config = if Gem::Dependency.new("railties", "~> 7.0").match?("railties", Gem.loaded_specs["railties"].version)
         ActiveRecord::Base.connection_db_config
-      elsif Gem::Dependency.new("rails", "~> 6.0").match?("rails", Gem.loaded_specs["rails"].version)
+      elsif Gem::Dependency.new("railties", "~> 6.0").match?("railties", Gem.loaded_specs["railties"].version)
         ActiveRecord::Base.connection_config
       end
 
@@ -209,9 +209,9 @@ end
 namespace :data do
   desc 'Migrate data migrations (options: VERSION=x, VERBOSE=false)'
   task :migrate => :environment do
-    original_db_config = if Gem::Dependency.new("rails", "~> 7.0").match?("rails", Gem.loaded_specs["rails"].version)
+    original_db_config = if Gem::Dependency.new("railties", "~> 7.0").match?("railties", Gem.loaded_specs["railties"].version)
       ActiveRecord::Base.connection_db_config
-    elsif Gem::Dependency.new("rails", "~> 6.0").match?("rails", Gem.loaded_specs["rails"].version)
+    elsif Gem::Dependency.new("railties", "~> 6.0").match?("railties", Gem.loaded_specs["railties"].version)
       ActiveRecord::Base.connection_config
     end
 

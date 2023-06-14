@@ -1,5 +1,10 @@
 # Changelog
 
+# 10.0.2
+
+Change "rails" dependencies to "railties"
+
+
 # 10.0.1
 
 - Bug fix for Rails 6 config [chaunce](https//:github.com/chaunce)
