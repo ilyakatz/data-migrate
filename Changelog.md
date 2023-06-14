@@ -1,5 +1,8 @@
 # Changelog
 
+# 10.0.3 (upcoming)
+
+- Remove all travis references [leoarnold](https//:github.com/leoarnold)
 # 10.0.1
 
 - Bug fix for Rails 6 config [chaunce](https//:github.com/chaunce)
