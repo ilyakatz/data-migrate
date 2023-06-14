@@ -1,16 +1,19 @@
 # Changelog
 
-# 10.0.2
+## 10.0.3 (upcoming)
+
+- Remove all travis references [leoarnold](https//:github.com/leoarnold)
+
+## 10.0.2
 
 Change "rails" dependencies to "railties"
 
-
-# 10.0.1
+## 10.0.1
 
 - Bug fix for Rails 6 config [chaunce](https//:github.com/chaunce)
 - Railties bug fix by [opti](https://github.com/opti)
 
-# 10.0.0
+## 10.0.0
 
 Releasing 10.0.0
 
