@@ -1,8 +1,9 @@
 # Changelog
 
-## 10.0.3 (upcoming)
+## 10.0.3.rc
 
 - Remove all travis references [leoarnold](https//:github.com/leoarnold)
+- Changing to rc because of ongoing discussion how to properly handle multiple database environments
 
 ## 10.0.2
 
@@ -16,6 +17,11 @@ Change "rails" dependencies to "railties"
 ## 10.0.0
 
 Releasing 10.0.0
+
+!!! Breaking changes !!!
+
+- This version introduces a breaking change which may lead to undesired
+behavior in multi-database environments. See https://github.com/ilyakatz/data-migrate/issues/181
 
 ## 10.0.0.rc1
 
