@@ -9,6 +9,10 @@ module DataMigrate
     extend ActiveRecord::Tasks::DatabaseTasks
 
     class << self
+      def schema_file(_format = nil)
+        File.join(db_dir, "data_schema.rb")
+      end
+
       def schema_file_type(_format = nil)
         "data_schema.rb"
       end
