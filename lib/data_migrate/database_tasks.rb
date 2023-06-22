@@ -69,7 +69,7 @@ module DataMigrate
     end
 
     def self.forward(step = 1)
-      DataMigrate::DataMigrator.assure_data_schema_table
+      DataMigrate::DataMigrator.create_data_schema_table
       migrations = pending_migrations.reverse.pop(step).reverse
       migrations.each do | pending_migration |
         if pending_migration[:kind] == :data

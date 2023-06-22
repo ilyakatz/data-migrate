@@ -9,7 +9,7 @@ module DataMigrate
       [DataMigrate.config.data_migrations_path]
     end
 
-    def self.assure_data_schema_table
+    def self.create_data_schema_table
       DataMigrate::DataSchemaMigration.create_table
     end
 
