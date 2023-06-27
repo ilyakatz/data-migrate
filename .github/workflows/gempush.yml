@@ -1,10 +1,8 @@
-name: Ruby Gem
+name: Release Gem
 
 on:
-  push:
-    branches:
-      - main
-      - chaunce-multiple_connection_support
+  release:
+    types: [released]
 
 jobs:
   build:
@@ -13,10 +11,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@master
-      - name: Set up Ruby 2.6
+      - name: Set up Ruby 3.2
         uses: actions/setup-ruby@v1
         with:
-          version: 2.6.x
+          ruby-version: '3.2'
 
       - name: Publish to RubyGems
         run: |
