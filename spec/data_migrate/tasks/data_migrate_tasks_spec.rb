@@ -28,11 +28,11 @@ describe DataMigrate::Tasks::DataMigrateTasks do
     end
 
     context 'when not given a separate db config' do
-      it 'does not override the default connection' do  
+      it 'does not override the default connection' do
         expect(ActiveRecord::Base).not_to receive(:establish_connection)
         expect(DataMigrate::SchemaDumper).to receive(:dump)
 
-        DataMigrate::Tasks::DataMigrateTasks.dump(connection_db_config)
+        DataMigrate::Tasks::DataMigrateTasks.dump
       end
     end
 
@@ -56,8 +56,7 @@ describe DataMigrate::Tasks::DataMigrateTasks do
 
       it 'overrides the default connection' do
         expect(ActiveRecord::Base).to receive(:establish_connection).with(override_config)
-
-        DataMigrate::Tasks::DataMigrateTasks.dump(connection_db_config)
+        DataMigrate::Tasks::DataMigrateTasks.dump
       end
     end
   end
