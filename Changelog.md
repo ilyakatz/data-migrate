@@ -1,20 +1,20 @@
 # Changelog
 
-## 10.0.3.rc
+## [YANKED] 10.0.3.rc
 
 - Remove all travis references [leoarnold](https//:github.com/leoarnold)
 - Changing to rc because of ongoing discussion how to properly handle multiple database environments
 
-## 10.0.2
+## [YANKED] 10.0.2
 
 Change "rails" dependencies to "railties"
 
-## 10.0.1
+## [YANKED] 10.0.1
 
 - Bug fix for Rails 6 config [chaunce](https//:github.com/chaunce)
 - Railties bug fix by [opti](https://github.com/opti)
 
-## 10.0.0
+## [YANKED] 10.0.0
 
 Releasing 10.0.0
 
@@ -23,13 +23,12 @@ Releasing 10.0.0
 - This version introduces a breaking change which may lead to undesired
 behavior in multi-database environments. See https://github.com/ilyakatz/data-migrate/issues/181
 
-## 10.0.0.rc1
+## [YANKED] 10.0.0.rc1
 
 - Changes by [chaunce](https//:github.com/chaunce)
 - Multiple databases support
 - Refactor to clean things up
 - Deprecate rails 5.2 support for real
-
 
 ## 9.0.0
 
