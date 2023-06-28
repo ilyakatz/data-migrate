@@ -69,6 +69,10 @@ module DataMigrate
 
       def schema_dump_path(db_config, format = ActiveRecord.schema_format)
         return ENV["DATA_SCHEMA"] if ENV["DATA_SCHEMA"]
+
+        # We only require a schema.rb file for the primary database
+        return unless db_config.primary?
+
         super.gsub(/(_)?schema\.rb\z/, '\1data_schema.rb')
       end
 
