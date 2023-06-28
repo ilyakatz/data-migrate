@@ -35,10 +35,10 @@ describe DataMigrate::DataMigrator do
     end
   end
 
-  describe :assure_data_schema_table do
+  describe :create_data_schema_table do
     it "creates the data_migrations table" do
       ActiveRecord::Migration.drop_table("data_migrations") rescue nil
-      subject.assure_data_schema_table
+      subject.create_data_schema_table
       expect(
         ActiveRecord::Base.connection.table_exists?("data_migrations")
       ).to eq true

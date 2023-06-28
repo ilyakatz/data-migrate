@@ -28,11 +28,11 @@ describe DataMigrate::Tasks::DataMigrateTasks do
     end
 
     context 'when not given a separate db config' do
-      it 'does not override the default connection' do  
+      it 'does not override the default connection' do
         expect(ActiveRecord::Base).not_to receive(:establish_connection)
         expect(DataMigrate::SchemaDumper).to receive(:dump)
 
-        DataMigrate::Tasks::DataMigrateTasks.dump(connection_db_config)
+        DataMigrate::Tasks::DataMigrateTasks.dump
       end
     end
 
@@ -56,8 +56,7 @@ describe DataMigrate::Tasks::DataMigrateTasks do
 
       it 'overrides the default connection' do
         expect(ActiveRecord::Base).to receive(:establish_connection).with(override_config)
-
-        DataMigrate::Tasks::DataMigrateTasks.dump(connection_db_config)
+        DataMigrate::Tasks::DataMigrateTasks.dump
       end
     end
   end
@@ -116,13 +115,13 @@ describe DataMigrate::Tasks::DataMigrateTasks do
 
     it "should display data migration status" do
       expect {
-        DataMigrate::Tasks::DataMigrateTasks.status(connection_db_config)
+        DataMigrate::Tasks::DataMigrateTasks.status
       }.to output(/up     20091231235959  Some name/).to_stdout
     end
 
     it "should display schema and data migration status" do
       expect {
-        DataMigrate::Tasks::DataMigrateTasks.status_with_schema(connection_db_config)
+        DataMigrate::Tasks::DataMigrateTasks.status_with_schema
       }.to output(match(/up      data   20091231235959  Some name/)
         .and match(/down    schema  20131111111111  Late migration/)).to_stdout
     end

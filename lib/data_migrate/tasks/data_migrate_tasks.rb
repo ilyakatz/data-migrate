@@ -9,9 +9,9 @@ module DataMigrate
         @migrations_paths ||= DataMigrate.config.data_migrations_path
       end
 
-      def dump(db_config)
+      def dump
         if dump_schema_after_migration?
-          filename = DataMigrate::DatabaseTasks.dump_filename(spec_name(db_config), ActiveRecord::Base.schema_format)
+          filename = DataMigrate::DatabaseTasks.schema_file
           ActiveRecord::Base.establish_connection(DataMigrate.config.db_configuration) if DataMigrate.config.db_configuration
           File.open(filename, "w:utf-8") do |file|
             DataMigrate::SchemaDumper.dump(ActiveRecord::Base.connection, file)
@@ -22,7 +22,7 @@ module DataMigrate
       def migrate
         target_version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
 
-        DataMigrate::DataMigrator.assure_data_schema_table
+        DataMigrate::DataMigrator.create_data_schema_table
         DataMigrate::MigrationContext.new(migrations_paths).migrate(target_version)
       end
 
@@ -44,12 +44,11 @@ module DataMigrate
         end
       end
 
-      def status(db_config)
-        puts "\ndatabase: #{spec_name(db_config)}\n\n"
-        DataMigrate::StatusService.dump(ActiveRecord::Base.connection)
+      def status
+        DataMigrate::StatusService.dump
       end
 
-      def status_with_schema(db_config)
+      def status_with_schema
         db_list_data = ActiveRecord::Base.connection.select_values(
           "SELECT version FROM #{DataMigrate::DataSchemaMigration.table_name}"
         )
@@ -77,7 +76,7 @@ module DataMigrate
         file_list.sort!{|a,b| "#{a[1]}_#{a[3] == 'data' ? 1 : 0}" <=> "#{b[1]}_#{b[3] == 'data' ? 1 : 0}" }
 
         # output
-        puts "\ndatabase: #{spec_name(db_config)}\n\n"
+        puts "\ndatabase: #{database_name}\n\n"
         puts "#{"Status".center(8)} #{"Type".center(8)}  #{"Migration ID".ljust(14)} Migration Name"
         puts "-" * 60
         file_list.each do |file|
@@ -94,11 +93,11 @@ module DataMigrate
 
       private
 
-      def spec_name(db_config)
+      def database_name
         if Gem::Dependency.new("railties", "~> 7.0").match?("railties", Gem.loaded_specs["railties"].version)
-          db_config.name
+          ActiveRecord::Base.connection_db_config.database
         elsif Gem::Dependency.new("railties", "~> 6.0").match?("railties", Gem.loaded_specs["railties"].version)
-          db_config.spec_name
+          ActiveRecord::Base.connection_config[:database]
         end
       end
     end

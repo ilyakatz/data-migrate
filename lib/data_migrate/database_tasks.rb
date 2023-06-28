@@ -9,6 +9,10 @@ module DataMigrate
     extend ActiveRecord::Tasks::DatabaseTasks
 
     class << self
+      def schema_file(_format = nil)
+        File.join(db_dir, "data_schema.rb")
+      end
+
       def schema_file_type(_format = nil)
         "data_schema.rb"
       end
@@ -65,7 +69,7 @@ module DataMigrate
     end
 
     def self.forward(step = 1)
-      DataMigrate::DataMigrator.assure_data_schema_table
+      DataMigrate::DataMigrator.create_data_schema_table
       migrations = pending_migrations.reverse.pop(step).reverse
       migrations.each do | pending_migration |
         if pending_migration[:kind] == :data
