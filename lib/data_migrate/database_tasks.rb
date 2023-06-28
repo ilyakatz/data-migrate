@@ -66,6 +66,18 @@ module DataMigrate
           )
         end
       end
+
+      def schema_dump_path(db_config, format = ActiveRecord.schema_format)
+        return ENV["DATA_SCHEMA"] if ENV["DATA_SCHEMA"]
+        super.gsub(/(_)?schema\.rb\z/, '\1data_schema.rb')
+      end
+
+      # Override this method from `ActiveRecord::Tasks::DatabaseTasks`
+      # to ensure that the sha saved in ar_internal_metadata table
+      # is from the original schema.rb file
+      def schema_sha1(file)
+        super(file.gsub(/data_schema.rb\z/, 'schema.rb'))
+      end
     end
 
     def self.forward(step = 1)
