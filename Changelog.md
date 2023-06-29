@@ -1,5 +1,10 @@
 # Changelog
 
+## 9.1.0
+
+- Fix a bug that caused `schema_sha1` in `ar_internal_metadata` to be reset to the `data_schema.rb` file. (#272)
+- Remove the need for empty data_schema files for non-primary databases. (#273)
+
 ## [YANKED] 10.0.3.rc
 
 - Remove all travis references [leoarnold](https//:github.com/leoarnold)
