@@ -82,6 +82,22 @@ module DataMigrate
       def schema_sha1(file)
         super(file.gsub(/data_schema.rb\z/, 'schema.rb'))
       end
+
+      def with_temporary_pool(db_config)
+        original_db_config = migration_class.connection_db_config
+        pool = migration_class.establish_connection(db_config)
+        yield pool
+      ensure
+        migration_class.establish_connection(original_db_config)
+      end
+
+      def migration_class # :nodoc:
+        ActiveRecord::Base
+      end
+
+      def migration_connection # :nodoc:
+        migration_class.connection
+      end
     end
 
     def self.forward(step = 1)
