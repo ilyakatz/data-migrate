@@ -44,6 +44,22 @@ module DataMigrate
       ensure
         migration_class.connection_handler.establish_connection(original_db_config)
       end
+
+      def with_temporary_pool(db_config)
+        original_db_config = migration_class.connection_db_config
+        pool = migration_class.establish_connection(db_config)
+        yield pool
+      ensure
+        migration_class.establish_connection(original_db_config)
+      end
+
+      def migration_class # :nodoc:
+        ActiveRecord::Base
+      end
+
+      def migration_connection # :nodoc:
+        migration_class.connection
+      end
     end
 
     def db_configs_with_versions
