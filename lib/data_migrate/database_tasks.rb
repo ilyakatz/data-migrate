@@ -220,5 +220,40 @@ module DataMigrate
         end
       end
     end
+
+    def self.prepare_all_with_data
+      seed = false
+
+      each_current_configuration(env) do |db_config|
+        with_temporary_pool(db_config) do
+          begin
+            database_initialized = migration_connection.schema_migration.table_exists?
+          rescue ActiveRecord::NoDatabaseError
+            create(db_config)
+            retry
+          end
+
+          unless database_initialized
+            if File.exist?(schema_dump_path(db_config))
+              load_schema(db_config, ActiveRecord.schema_format, nil)
+              load_schema_current(
+                :ruby,
+                ENV["DATA_SCHEMA"]
+              )
+            end
+
+            seed = true
+          end
+
+          migrate_with_data
+          if ActiveRecord.dump_schema_after_migration
+            dump_schema(db_config)
+            DataMigrate::Tasks::DataMigrateTasks.dump
+          end
+        end
+      end
+
+      load_seed if seed
+    end
   end
 end
