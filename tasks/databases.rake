@@ -146,6 +146,13 @@ namespace :db do
       end
     end
   end
+
+  namespace :prepare do
+    desc "Runs setup if database does not exist, or runs data and schema migrations if it does"
+    task with_data: :environment do
+      DataMigrate::DatabaseTasks.prepare_all_with_data
+    end
+  end
 end
 
 namespace :data do
