@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
     activerecord
     railties
   ].each do |rails_gem|
-    s.add_dependency(rails_gem, '>= 6.0')
+    s.add_dependency(rails_gem, '>= 6.1')
   end
 
   s.add_development_dependency "appraisal"

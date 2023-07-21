@@ -1,5 +1,9 @@
 # Changelog
 
+## 11.0.0
+- Commit *.lock files
+- Remove support for Rails 6.0
+
 ## 9.1.0
 
 - Fix a bug that caused `schema_sha1` in `ar_internal_metadata` to be reset to the `data_schema.rb` file. (#272)
