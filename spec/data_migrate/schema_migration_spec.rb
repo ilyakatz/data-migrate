@@ -61,7 +61,7 @@ describe DataMigrate::SchemaMigration do
       let(:paths) { ['spec/db/migrate', 'spec/db/migrate/other'] }
       let(:specification_name) { "primary" }
       let(:config_options) do
-        if Gem::Dependency.new("railties", "~> 6.0").match?("railties", Gem.loaded_specs["railties"].version)
+        if Gem::Dependency.new("railties", "~> 6.1").match?("railties", Gem.loaded_specs["railties"].version)
           { env_name: Rails.env, spec_name: specification_name }
         elsif Gem::Dependency.new("railties", "~> 7.0").match?("railties", Gem.loaded_specs["railties"].version)
           { env_name: Rails.env, name: specification_name }
