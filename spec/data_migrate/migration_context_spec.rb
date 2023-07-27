@@ -5,10 +5,17 @@ require "spec_helper"
 describe DataMigrate::DataMigrator do
   let(:context) { DataMigrate::MigrationContext.new("spec/db/data") }
   let(:schema_context) { ActiveRecord::MigrationContext.new("spec/db/migrate", ActiveRecord::Base.connection.schema_migration) }
+  let(:db_config) do
+    {
+      adapter: "sqlite3",
+      database: "spec/db/test.db"
+    }
+  end
 
   before do
-    ActiveRecord::SchemaMigration.create_table
-    DataMigrate::DataSchemaMigration.create_table
+    ActiveRecord::Base.establish_connection(db_config)
+    DataMigrate::RailsHelper.schema_migration.create_table
+    DataMigrate::RailsHelper.data_schema_migration.create_table
   end
 
   after do
@@ -20,7 +27,7 @@ describe DataMigrate::DataMigrator do
     it "migrates existing file" do
       context.migrate(nil)
       context.migrations_status
-      versions = DataMigrate::DataSchemaMigration.normalized_versions
+      versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
       expect(versions.count).to eq(2)
       expect(versions).to include("20091231235959")
       expect(versions).to include("20171231235959")
@@ -29,7 +36,7 @@ describe DataMigrate::DataMigrator do
     it "undo migration" do
       context.migrate(nil)
       context.run(:down, 20171231235959)
-      versions = DataMigrate::DataSchemaMigration.normalized_versions
+      versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
       expect(versions.count).to eq(1)
       expect(versions).to include("20091231235959")
     end
@@ -46,7 +53,7 @@ describe DataMigrate::DataMigrator do
 
     it "runs a specific migration" do
       context.run(:up, 20171231235959)
-      versions = DataMigrate::DataSchemaMigration.normalized_versions
+      versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
       expect(versions.count).to eq(1)
       expect(versions).to include("20171231235959")
     end
@@ -74,7 +81,7 @@ describe DataMigrate::DataMigrator do
       expect {
         context.rollback
       }.to output(/Undoing SuperUpdate/).to_stdout
-      versions = DataMigrate::DataSchemaMigration.normalized_versions
+      versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
       expect(versions.count).to eq(1)
       expect(versions).to include("20091231235959")
     end
@@ -85,7 +92,7 @@ describe DataMigrate::DataMigrator do
       expect {
         context.rollback(2)
       }.to output(/Undoing SomeName/).to_stdout
-      versions = DataMigrate::DataSchemaMigration.normalized_versions
+      versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
       expect(versions.count).to eq(0)
     end
 
@@ -94,7 +101,7 @@ describe DataMigrate::DataMigrator do
       expect {
         context.rollback(2)
       }.to output(/Undoing SomeName/).to_stdout
-      versions = DataMigrate::DataSchemaMigration.normalized_versions
+      versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
       expect(versions.count).to eq(0)
     end
   end

@@ -33,9 +33,12 @@ describe DataMigrate::StatusService do
     end
 
     before do
-      ActiveRecord::SchemaMigration.create_table
-      DataMigrate::DataSchemaMigration.create_table
-      DataMigrate::DataSchemaMigration.create(fixture_file_timestamps.map { |t| { version: t } })
+      DataMigrate::RailsHelper.schema_migration.create_table
+      DataMigrate::RailsHelper.data_schema_migration.create_table
+
+      fixture_file_timestamps.map do |t|
+        DataMigrate::RailsHelper.data_schema_migration.create_version(t)
+      end
 
       subject.dump(connection_db_config, stream)
       stream.rewind

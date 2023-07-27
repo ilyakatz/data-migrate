@@ -11,7 +11,8 @@ module DataMigrate
                               migrations
                             end
 
-      DataMigrator.new(:up, selected_migrations, target_version).migrate
+      data_migrator = DataMigrate::RailsHelper.data_migrator(:up, selected_migrations, DataMigrate::RailsHelper.schema_migration, DataMigrate::RailsHelper.internal_metadata, target_version)
+      data_migrator.migrate
     end
 
     def down(target_version = nil)
@@ -22,11 +23,13 @@ module DataMigrate
           migrations
         end
 
-      DataMigrator.new(:down, selected_migrations, target_version).migrate
+      data_migrator = DataMigrate::RailsHelper.data_migrator(:down, selected_migrations, DataMigrate::RailsHelper.schema_migration, DataMigrate::RailsHelper.internal_metadata, target_version)
+      data_migrator.migrate
     end
 
     def run(direction, target_version)
-      DataMigrator.new(direction, migrations, target_version).run
+      data_migrator = DataMigrate::RailsHelper.data_migrator(direction, migrations, DataMigrate::RailsHelper.schema_migration, DataMigrate::RailsHelper.internal_metadata, target_version)
+      data_migrator.run
     end
 
     def current_version
@@ -40,12 +43,12 @@ module DataMigrate
     end
 
     def migrations_status
-      db_list = DataSchemaMigration.normalized_versions
+      db_list = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
 
       file_list = migration_files.map do |file|
         version, name, scope = parse_migration_filename(file)
         raise ActiveRecord::IllegalMigrationNameError.new(file) unless version
-        version = ActiveRecord::SchemaMigration.normalize_migration_number(version)
+        version = DataMigrate::RailsHelper.schema_migration.normalize_migration_number(version)
         status = db_list.delete(version) ? "up" : "down"
         [status, version, (name + scope).humanize]
       end.compact
@@ -60,15 +63,15 @@ module DataMigrate
     private
 
     def get_all_versions
-      if DataMigrate::DataSchemaMigration.table_exists?
-        DataSchemaMigration.normalized_versions.map(&:to_i)
+      if DataMigrate::RailsHelper.data_schema_migration.table_exists?
+        DataMigrate::RailsHelper.data_schema_migration.normalized_versions.map(&:to_i)
       else
         []
       end
     end
 
     def move(direction, steps)
-      migrator = DataMigrator.new(direction, migrations)
+      migrator = DataMigrate::RailsHelper.data_migrator(direction, migrations)
 
       if current_version != 0 && !migrator.current_migration
         raise ActiveRecord::UnknownMigrationVersionError.new(current_version)

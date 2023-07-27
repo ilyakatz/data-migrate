@@ -55,7 +55,7 @@ describe DataMigrate::Data do
 
         sql_select = <<-SQL
           SELECT version
-          FROM #{DataMigrate::DataSchemaMigration.table_name}
+          FROM #{DataMigrate::RailsHelper.data_schema_migration.table_name}
         SQL
 
         db_list_data = ActiveRecord::Base.connection.

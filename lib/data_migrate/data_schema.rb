@@ -57,7 +57,7 @@ module DataMigrate
     end
 
     def table_name
-      DataMigrate::DataSchemaMigration.table_name
+      DataMigrate::RailsHelper.data_schema_migration.table_name
     end
   end
 end

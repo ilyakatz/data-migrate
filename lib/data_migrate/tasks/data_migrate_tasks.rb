@@ -50,9 +50,9 @@ module DataMigrate
 
       def status_with_schema
         db_list_data = ActiveRecord::Base.connection.select_values(
-          "SELECT version FROM #{DataMigrate::DataSchemaMigration.table_name}"
+          "SELECT version FROM #{DataMigrate::RailsHelper.data_schema_migration.table_name}"
         )
-        db_list_schema = ActiveRecord::SchemaMigration.all.pluck(:version)
+        db_list_schema = DataMigrate::RailsHelper.schema_migration_versions
         file_list = []
 
         Dir.foreach(File.join(Rails.root, migrations_paths)) do |file|
