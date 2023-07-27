@@ -3,6 +3,7 @@
 ## 11.0.0
 - Commit *.lock files
 - Remove support for Rails 6.0
+- Support Rails 7.1
 
 ## 9.1.0
 
