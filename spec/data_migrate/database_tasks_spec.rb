@@ -28,18 +28,9 @@ describe DataMigrate::DatabaseTasks do
       data_migrations_path
     }
     ActiveRecord::Base.establish_connection(db_config)
-    # if Gem::Dependency.new("railties", ">= 6.1").match?("railties", Gem.loaded_specs["railties"].version)
-    #   hash_config = ActiveRecord::DatabaseConfigurations::HashConfig.new('test', 'test', db_config)
-    #   config_obj = ActiveRecord::DatabaseConfigurations.new([hash_config])
-    #   allow(ActiveRecord::Base).to receive(:configurations).and_return(config_obj)
-    # else
-    #   ActiveRecord::Base.configurations[:test] = db_config
-    # end
-
     hash_config = ActiveRecord::DatabaseConfigurations::HashConfig.new('test', 'test', db_config)
     config_obj = ActiveRecord::DatabaseConfigurations.new([hash_config])
     allow(ActiveRecord::Base).to receive(:configurations).and_return(config_obj)
-
   end
 
   context "migrations" do
