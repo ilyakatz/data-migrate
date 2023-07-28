@@ -3,17 +3,17 @@
 require "spec_helper"
 
 describe DataMigrate::Tasks::DataMigrateTasks do
-  let(:connection_db_config) do
-    if Gem::Dependency.new("railties", ">= 6.1").match?("railties", Gem.loaded_specs["railties"].version)
-      ActiveRecord::Base.connection_db_config
-    else
-      ActiveRecord::Base.configurations.configs_for.first
-    end
+  let(:db_config) do
+    {
+      adapter: "sqlite3",
+      database: "spec/db/test.db"
+    }
   end
 
   before do
-    ActiveRecord::SchemaMigration.create_table
-    DataMigrate::DataSchemaMigration.create_table
+    ActiveRecord::Base.establish_connection(db_config)
+    DataMigrate::RailsHelper.schema_migration.create_table
+    DataMigrate::RailsHelper.data_schema_migration.create_table
   end
 
   after do

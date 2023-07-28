@@ -26,7 +26,7 @@ module DataMigrate
 
     def initialize(connection)
       @connection = connection
-      all_versions =  DataSchemaMigration.normalized_versions
+      all_versions =  DataMigrate::RailsHelper.data_schema_migration.normalized_versions
 
       @version = begin
                     all_versions.max

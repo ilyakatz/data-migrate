@@ -7,14 +7,14 @@ module DataMigrate
     def self.pending_schema_migrations
       all_migrations = DataMigrate::MigrationContext.new(migrations_paths).migrations
       sort_migrations(
-        ActiveRecord::Migrator.new(:up, all_migrations, ActiveRecord::Base.connection.schema_migration).
+        ActiveRecord::Migrator.new(:up, all_migrations, DataMigrate::RailsHelper.schema_migration, DataMigrate::RailsHelper.internal_metadata).
         pending_migrations.
         map {|m| { version: m.version, kind: :schema }}
       )
     end
 
     def self.run(direction, migration_paths, version)
-      ActiveRecord::MigrationContext.new(migration_paths, ActiveRecord::Base.connection.schema_migration).run(direction, version)
+      ActiveRecord::MigrationContext.new(migration_paths, DataMigrate::RailsHelper.schema_migration).run(direction, version)
     end
 
     def self.sort_migrations(set1, set2 = nil)
@@ -24,7 +24,8 @@ module DataMigrate
 
     def self.migrations_paths
       spec_name = DataMigrate.config.spec_name
-      if spec_name && Gem::Dependency.new("railties", "~> 7.0").match?("railties", Gem.loaded_specs["railties"].version)
+      # The positional argument true is to include pre-release versions, such as 7.1.0.alpha
+      if spec_name && Gem::Dependency.new("railties", ">= 7.0").match?("railties", Gem.loaded_specs["railties"].version, true)
         ActiveRecord::Base.configurations.configs_for(env_name: Rails.env, name: spec_name).migrations_paths
       elsif spec_name && Gem::Dependency.new("railties", "~> 6.1").match?("railties", Gem.loaded_specs["railties"].version)
         ActiveRecord::Base.configurations.configs_for(env_name: Rails.env, spec_name: spec_name).migrations_paths

@@ -8,10 +8,17 @@ describe DataMigrate::SchemaMigration do
   let(:fixture_file_timestamps) do
     %w[20091231235959 20101231235959 20111231235959]
   end
+  let(:db_config) do
+    {
+      adapter: "sqlite3",
+      database: "spec/db/test.db"
+    }
+  end
 
   before do
-    ActiveRecord::SchemaMigration.create_table
-    DataMigrate::DataSchemaMigration.create_table
+    ActiveRecord::Base.establish_connection(db_config)
+    DataMigrate::RailsHelper.schema_migration.create_table
+    DataMigrate::RailsHelper.data_schema_migration.create_table
   end
 
   after do
@@ -38,7 +45,7 @@ describe DataMigrate::SchemaMigration do
       expect {
         subject.run(:up, migration_path, 20202020202011)
       }.to output(/20202020202011 DbMigration: migrating/).to_stdout
-      versions = ActiveRecord::SchemaMigration.normalized_versions
+      versions = DataMigrate::RailsHelper.schema_migration.normalized_versions
       expect(versions.first).to eq("20202020202011")
     end
 
@@ -49,7 +56,7 @@ describe DataMigrate::SchemaMigration do
         subject.run(:down, migration_path, 20202020202011)
       }.to output(/Undoing DbMigration/).to_stdout
 
-      versions = ActiveRecord::SchemaMigration.normalized_versions
+      versions = DataMigrate::RailsHelper.schema_migration.normalized_versions
 
       expect(versions.count).to eq(0)
     end
@@ -63,7 +70,7 @@ describe DataMigrate::SchemaMigration do
       let(:config_options) do
         if Gem::Dependency.new("railties", "~> 6.1").match?("railties", Gem.loaded_specs["railties"].version)
           { env_name: Rails.env, spec_name: specification_name }
-        elsif Gem::Dependency.new("railties", "~> 7.0").match?("railties", Gem.loaded_specs["railties"].version)
+        else
           { env_name: Rails.env, name: specification_name }
         end
       end

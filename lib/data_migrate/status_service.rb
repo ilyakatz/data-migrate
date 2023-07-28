@@ -24,11 +24,11 @@ module DataMigrate
     private
 
     def table_name
-      DataMigrate::DataSchemaMigration.table_name
+      DataMigrate::RailsHelper.data_schema_migration.table_name
     end
 
     def output(stream)
-      unless DataMigrate::DataSchemaMigration.table_exists?
+      unless DataMigrate::RailsHelper.data_schema_migration.table_exists?
         stream.puts "Data migrations table does not exist yet."
         return
       end

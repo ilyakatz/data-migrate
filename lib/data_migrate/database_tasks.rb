@@ -100,8 +100,10 @@ module DataMigrate
 
     def self.pending_data_migrations
       data_migrations = DataMigrate::DataMigrator.migrations(data_migrations_path)
-      sort_migrations(DataMigrate::DataMigrator.new(:up, data_migrations ).
-        pending_migrations.map {|m| { version: m.version, name: m.name, kind: :data }})
+      data_migrator = DataMigrate::RailsHelper.data_migrator(:up, data_migrations)
+      sort_migrations(
+        data_migrator.pending_migrations.map { |m| { version: m.version, name: m.name, kind: :data } }
+        )
     end
 
     def self.pending_schema_migrations
@@ -109,8 +111,8 @@ module DataMigrate
     end
 
     def self.past_migrations(sort = nil)
-      data_versions = DataMigrate::DataSchemaMigration.table_exists? ? DataMigrate::DataSchemaMigration.normalized_versions : []
-      schema_versions = ActiveRecord::SchemaMigration.normalized_versions
+      data_versions = DataMigrate::RailsHelper.data_schema_migration.table_exists? ? DataMigrate::RailsHelper.data_schema_migration.normalized_versions : []
+      schema_versions = DataMigrate::RailsHelper.schema_migration.normalized_versions
       migrations = data_versions.map { |v| { version: v.to_i, kind: :data } } + schema_versions.map { |v| { version: v.to_i, kind: :schema } }
 
       sort&.downcase == "asc" ? sort_migrations(migrations) : sort_migrations(migrations).reverse

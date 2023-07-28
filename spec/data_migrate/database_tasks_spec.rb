@@ -28,13 +28,9 @@ describe DataMigrate::DatabaseTasks do
       data_migrations_path
     }
     ActiveRecord::Base.establish_connection(db_config)
-    if Gem::Dependency.new("railties", ">= 6.1").match?("railties", Gem.loaded_specs["railties"].version)
-      hash_config = ActiveRecord::DatabaseConfigurations::HashConfig.new('test', 'test', db_config)
-      config_obj = ActiveRecord::DatabaseConfigurations.new([hash_config])
-      allow(ActiveRecord::Base).to receive(:configurations).and_return(config_obj)
-    else
-      ActiveRecord::Base.configurations[:test] = db_config
-    end
+    hash_config = ActiveRecord::DatabaseConfigurations::HashConfig.new('test', 'test', db_config)
+    config_obj = ActiveRecord::DatabaseConfigurations.new([hash_config])
+    allow(ActiveRecord::Base).to receive(:configurations).and_return(config_obj)
   end
 
   context "migrations" do
@@ -44,7 +40,7 @@ describe DataMigrate::DatabaseTasks do
     end
 
     before do
-      ActiveRecord::SchemaMigration.create_table
+      DataMigrate::RailsHelper.schema_migration.create_table
 
       allow(DataMigrate::SchemaMigration).to receive(:migrations_paths) {
         migration_path
@@ -72,16 +68,16 @@ describe DataMigrate::DatabaseTasks do
 
       it "run forward default amount of times" do
         subject.forward
-        versions = DataMigrate::DataSchemaMigration.normalized_versions
+        versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
         expect(versions.count).to eq(1)
       end
 
       it "run forward defined number of times" do
         subject.forward(2)
-        versions = DataMigrate::DataSchemaMigration.normalized_versions
+        versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
         expect(versions.count).to eq(1)
         expect(versions.first).to eq "20091231235959"
-        versions = ActiveRecord::SchemaMigration.normalized_versions
+        versions = DataMigrate::RailsHelper.schema_migration.normalized_versions
         expect(versions.count).to eq(1)
         expect(versions.first).to eq "20131111111111"
       end

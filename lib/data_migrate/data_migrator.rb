@@ -5,32 +5,20 @@ require "data_migrate/config"
 
 module DataMigrate
   class DataMigrator < ActiveRecord::Migrator
-    def self.migrations_paths
-      [DataMigrate.config.data_migrations_path]
-    end
-
-    def self.create_data_schema_table
-      DataMigrate::DataSchemaMigration.create_table
-    end
-
-    def initialize(direction, migrations, target_version = nil)
-      @direction         = direction
-      @target_version    = target_version
-      @migrated_versions = nil
-      @migrations        = migrations
-
-      validate(@migrations)
-
-      DataMigrate::DataSchemaMigration.create_table
-      ActiveRecord::InternalMetadata.create_table
-    end
-
     def load_migrated
       @migrated_versions =
-        DataMigrate::DataSchemaMigration.normalized_versions.map(&:to_i).sort
+        DataMigrate::RailsHelper.data_schema_migration.normalized_versions.map(&:to_i).sort
     end
 
     class << self
+      def migrations_paths
+        [DataMigrate.config.data_migrations_path]
+      end
+
+      def create_data_schema_table
+        DataMigrate::RailsHelper.data_schema_migration.create_table
+      end
+
       def current_version
         DataMigrate::MigrationContext.new(migrations_paths).current_version
       end
@@ -79,10 +67,10 @@ module DataMigrate
     def record_version_state_after_migrating(version)
       if down?
         migrated.delete(version)
-        DataMigrate::DataSchemaMigration.where(version: version.to_s).delete_all
+        DataMigrate::RailsHelper.data_schema_delete_version(version.to_s)
       else
         migrated << version
-        DataMigrate::DataSchemaMigration.create!(version: version.to_s)
+        DataMigrate::RailsHelper.data_schema_migration.create_version(version.to_s)
       end
     end
   end
