@@ -106,8 +106,6 @@ module DataMigrate
             mapping[dump_path] = File.join(File.dirname(dump_path), data_dump_name)
           end
         end
-        puts @schema_to_data_schema_dump_paths.inspect
-        @schema_to_data_schema_dump_paths
       end
     end
 
