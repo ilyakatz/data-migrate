@@ -1,8 +1,12 @@
 module DataMigrate
-  class DataMigrate::RailsHelper
+  class RailsHelper
     class << self
       def rails_version_equal_to_or_higher_than_7_1
         @equal_to_or_higher_than_7_1 ||= Gem::Dependency.new("railties", ">= 7.1.0.alpha").match?("railties", Gem.loaded_specs["railties"].version)
+      end
+
+      def rails_version_equal_to_or_higher_than_7_0
+        @rails_version_equal_to_or_higher_than_7_0 ||= Gem::Dependency.new("railties", ">= 7.0").match?("railties", Gem.loaded_specs["railties"].version)
       end
 
       def internal_metadata

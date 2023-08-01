@@ -17,6 +17,7 @@ module DataMigrate
         "data_schema.rb"
       end
 
+      # This method is removed in Rails 7.0
       def dump_filename(spec_name, format = ActiveRecord::Base.schema_format)
         filename = if spec_name == "primary"
           schema_file_type(format)
