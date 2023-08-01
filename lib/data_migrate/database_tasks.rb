@@ -67,20 +67,35 @@ module DataMigrate
         end
       end
 
+      alias_method :original_schema_dump_path, :schema_dump_path
       def schema_dump_path(db_config, format = ActiveRecord.schema_format)
         return ENV["DATA_SCHEMA"] if ENV["DATA_SCHEMA"]
 
         # We only require a schema.rb file for the primary database
         return unless db_config.primary?
 
-        super.gsub(/(_)?schema\.rb\z/, '\1data_schema.rb')
+        schema_to_data_schema_dump_paths.fetch(super)
       end
 
       # Override this method from `ActiveRecord::Tasks::DatabaseTasks`
       # to ensure that the sha saved in ar_internal_metadata table
       # is from the original schema.rb file
       def schema_sha1(file)
-        super(file.gsub(/data_schema.rb\z/, 'schema.rb'))
+        super(schema_to_data_schema_dump_paths.key(file))
+      end
+
+      private
+
+      def schema_to_data_schema_dump_paths
+        @schema_to_data_schema_dump_paths ||= begin
+          ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env).each_with_object({}) do |config, mapping|
+            dump_path = original_schema_dump_path(config)
+            data_schema_dump_path = dump_path.gsub(/(_)?(schema\.rb|structure\.sql)\z/, '\1data_schema.rb')
+            mapping[dump_path] = data_schema_dump_path
+          end
+        end
+        puts @schema_to_data_schema_dump_paths.inspect
+        @schema_to_data_schema_dump_paths
       end
     end
 
