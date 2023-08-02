@@ -80,23 +80,22 @@ describe DataMigrate::DatabaseTasks do
       describe :schema_dump_path do
         before do
           allow(ActiveRecord::Base).to receive(:configurations).and_return(ActiveRecord::DatabaseConfigurations.new([db_config]))
-          DataMigrate::DatabaseTasks.instance_variable_set(:@schema_to_data_schema_dump_paths, nil)
         end
 
-        context "with no custom schema dump path" do
-          let(:db_config) { ActiveRecord::DatabaseConfigurations::HashConfig.new("development", nil, {} ) }
+        context "for primary database" do
+          let(:db_config) { ActiveRecord::DatabaseConfigurations::HashConfig.new("development", "primary", {} ) }
 
           context "for :ruby db format" do
-            it 'returns the default data schema path' do
+            it 'returns the data schema path' do
               allow(ActiveRecord).to receive(:schema_format).and_return(:ruby)
-              expect(subject.schema_dump_path(db_config)).to eq "db/data_schema.rb"
+              expect(subject.schema_dump_path(db_config)).to eq("db/data_schema.rb")
             end
           end
 
           context "for :sql db format" do
-            it 'returns the default data schema path' do
+            it 'returns the data schema path' do
               allow(ActiveRecord).to receive(:schema_format).and_return(:sql)
-              expect(subject.schema_dump_path(db_config, :sql)).to eq "db/data_schema.rb"
+              expect(subject.schema_dump_path(db_config, :sql)).to eq("db/data_schema.rb")
             end
           end
         end
