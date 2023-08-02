@@ -68,45 +68,20 @@ module DataMigrate
         end
       end
 
-      # This method only exists in Rails 7.0+.
-      if method_defined?(:schema_dump_path)
-        alias_method :original_schema_dump_path, :schema_dump_path
-      end
-
       def schema_dump_path(db_config, format = ActiveRecord.schema_format)
         return ENV["DATA_SCHEMA"] if ENV["DATA_SCHEMA"]
 
         # We only require a schema.rb file for the primary database
         return unless db_config.primary?
 
-        schema_to_data_schema_dump_paths.fetch(super)
+        File.join(File.dirname(ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(db_config, format)), schema_file_type)
       end
 
       # Override this method from `ActiveRecord::Tasks::DatabaseTasks`
       # to ensure that the sha saved in ar_internal_metadata table
       # is from the original schema.rb file
       def schema_sha1(file)
-        super(schema_to_data_schema_dump_paths.key(file))
-      end
-
-      private
-
-      def schema_to_data_schema_dump_paths
-        @schema_to_data_schema_dump_paths ||= begin
-          ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env).each_with_object({}) do |db_config, mapping|
-            dump_path = respond_to?(:original_schema_dump_path) ? original_schema_dump_path(db_config) : ActiveRecord::Tasks::DatabaseTasks.dump_filename(db_config.name)
-            # As of Rails 7.0, `schema_dump` could return false for when schema dumping is not supported.
-            next unless dump_path
-
-            data_dump_name = File.basename(dump_path, File.extname(dump_path))
-
-            unless data_dump_name.gsub!(/(_)?(schema|structure)\z/, "\\1#{schema_file_type}")
-              data_dump_name.concat("_#{schema_file_type}")
-            end
-
-            mapping[dump_path] = File.join(File.dirname(dump_path), data_dump_name)
-          end
-        end
+        ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env, name: "primary"))
       end
     end
 

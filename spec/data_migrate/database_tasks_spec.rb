@@ -100,26 +100,6 @@ describe DataMigrate::DatabaseTasks do
             end
           end
         end
-
-        context "with custom schema dump path" do
-          context "for :ruby db format" do
-            let(:db_config) { ActiveRecord::DatabaseConfigurations::HashConfig.new("development", nil, { schema_dump: "payments_schema.rb" }) }
-
-            it 'returns the default data schema path' do
-              allow(ActiveRecord).to receive(:schema_format).and_return(:ruby)
-              expect(subject.schema_dump_path(db_config)).to eq "db/payments_data_schema.rb"
-            end
-          end
-
-          context "for :sql db format" do
-            let(:db_config) { ActiveRecord::DatabaseConfigurations::HashConfig.new("development", nil, { schema_dump: "payments_structure.sql" }) }
-
-            it 'returns the default data schema path' do
-              allow(ActiveRecord).to receive(:schema_format).and_return(:sql)
-              expect(subject.schema_dump_path(db_config, :sql)).to eq "db/payments_data_schema.rb"
-            end
-          end
-        end
       end
     end
   end
