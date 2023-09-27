@@ -105,8 +105,9 @@ GEM
       concurrent-ruby (~> 1.0)
     iniparse (1.5.0)
     io-console (0.6.0)
-    irb (1.7.4)
-      reline (>= 0.3.6)
+    irb (1.8.1)
+      rdoc
+      reline (>= 0.3.8)
     json (2.6.3)
     language_server-protocol (3.17.0.3)
     loofah (2.21.3)
@@ -120,7 +121,7 @@ GEM
     marcel (1.0.2)
     method_source (1.0.0)
     mini_mime (1.1.5)
-    minitest (5.18.1)
+    minitest (5.20.0)
     mutex_m (0.1.2)
     net-imap (0.3.7)
       date
@@ -129,12 +130,12 @@ GEM
       net-protocol
     net-protocol (0.2.1)
       timeout
-    net-smtp (0.3.3)
+    net-smtp (0.4.0)
       net-protocol
     nio4r (2.5.9)
-    nokogiri (1.15.3-arm64-darwin)
+    nokogiri (1.15.4-arm64-darwin)
       racc (~> 1.4)
-    nokogiri (1.15.3-x86_64-linux)
+    nokogiri (1.15.4-x86_64-linux)
       racc (~> 1.4)
     overcommit (0.60.0)
       childprocess (>= 0.6.3, < 5)
@@ -147,6 +148,8 @@ GEM
     pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
+    psych (5.1.0)
+      stringio
     racc (1.7.1)
     rack (3.0.8)
     rack-session (2.0.0)
@@ -188,8 +191,10 @@ GEM
     rainbow (3.1.1)
     rake (13.0.6)
     rb-readline (0.5.5)
+    rdoc (6.5.0)
+      psych (>= 4.0.0)
     regexp_parser (2.8.1)
-    reline (0.3.6)
+    reline (0.3.8)
       io-console (~> 0.5)
     rexml (3.2.5)
     rspec (3.12.0)
@@ -222,6 +227,7 @@ GEM
     ruby2_keywords (0.0.5)
     sqlite3 (1.6.3-arm64-darwin)
     sqlite3 (1.6.3-x86_64-linux)
+    stringio (3.0.8)
     thor (1.2.2)
     timecop (0.9.6)
     timeout (0.4.0)
@@ -232,7 +238,7 @@ GEM
     websocket-driver (0.7.6)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    zeitwerk (2.6.8)
+    zeitwerk (2.6.12)
 
 PLATFORMS
   arm64-darwin-22
