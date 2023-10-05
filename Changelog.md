@@ -1,9 +1,8 @@
 # Changelog
 
-## 11.0.0
-- Commit *.lock files
-- Remove support for Rails 6.0
-- Support Rails 7.1
+## 9.2.0
+- Support Rails 7.1 https://github.com/ilyakatz/data-migrate/pull/278
+- Build and test against 7.1.0.rc1 https://github.com/ilyakatz/data-migrate/pull/286
 
 ## 9.1.0
 
