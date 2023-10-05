@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    data_migrate (9.1.0)
+    data_migrate (9.2.0)
       activerecord (>= 6.1)
       railties (>= 6.1)
 
@@ -110,6 +110,8 @@ GEM
     nio4r (2.5.9)
     nokogiri (1.15.2-arm64-darwin)
       racc (~> 1.4)
+    nokogiri (1.15.2-x86_64-linux)
+      racc (~> 1.4)
     overcommit (0.60.0)
       childprocess (>= 0.6.3, < 5)
       iniparse (~> 1.4)
@@ -191,6 +193,7 @@ GEM
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
     sqlite3 (1.6.3-arm64-darwin)
+    sqlite3 (1.6.3-x86_64-linux)
     thor (1.2.2)
     timecop (0.9.6)
     timeout (0.3.2)
