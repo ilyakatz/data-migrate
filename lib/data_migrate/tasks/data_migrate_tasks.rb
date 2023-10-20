@@ -55,7 +55,9 @@ module DataMigrate
         db_list_schema = DataMigrate::RailsHelper.schema_migration_versions
         file_list = []
 
-        Dir.foreach(File.join(Rails.root, migrations_paths)) do |file|
+        Array(migrations_paths).map do |path|
+          Dir.children(path) if Dir.exist?(path)
+        end.flatten.compact.each do |file|
           # only files matching "20091231235959_some_name.rb" pattern
           if match_data = /(\d{14})_(.+)\.rb/.match(file)
             status = db_list_data.delete(match_data[1]) ? 'up' : 'down'
