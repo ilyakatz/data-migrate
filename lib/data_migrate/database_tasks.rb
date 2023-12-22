@@ -5,9 +5,63 @@ require "data_migrate/config"
 module DataMigrate
   ##
   # This class extends DatabaseTasks to add a schema_file method.
-  class DatabaseTasks
+  module DatabaseTasks
     extend ActiveRecord::Tasks::DatabaseTasks
     extend self
+
+    # These method are only introduced in Rails 7.1
+    unless respond_to?(:with_temporary_connection_for_each)
+      def with_temporary_connection_for_each(env: ActiveRecord::Tasks::DatabaseTasks.env, name: nil, &block) # :nodoc:
+        if name
+          db_config = ActiveRecord::Base.configurations.configs_for(env_name: env, name: name)
+          with_temporary_connection(db_config, &block)
+        else
+          ActiveRecord::Base.configurations.configs_for(env_name: env, name: name).each do |db_config|
+            with_temporary_connection(db_config, &block)
+          end
+        end
+      end
+
+      def with_temporary_connection(db_config) # :nodoc:
+        with_temporary_pool(db_config) do |pool|
+          yield pool.connection
+        end
+      end
+
+      def migration_class # :nodoc:
+        ActiveRecord::Base
+      end
+
+      def migration_connection # :nodoc:
+        migration_class.connection
+      end
+
+      private def with_temporary_pool(db_config)
+        original_db_config = migration_class.connection_db_config
+        pool = migration_class.connection_handler.establish_connection(db_config)
+
+        yield pool
+      ensure
+        migration_class.connection_handler.establish_connection(original_db_config)
+      end
+    end
+
+    def db_configs_with_versions
+      db_configs_with_versions = Hash.new { |h, k| h[k] = [] }
+
+      with_temporary_connection_for_each do |conn|
+        db_config = conn.pool.db_config
+        versions_to_run = conn.migration_context.pending_migration_versions
+        target_version = ActiveRecord::Tasks::DatabaseTasks.target_version
+
+        versions_to_run.each do |version|
+          next if target_version && target_version != version
+          db_configs_with_versions[version] << db_config
+        end
+      end
+
+      db_configs_with_versions
+    end
 
     def schema_file(_format = nil)
       File.join(db_dir, "data_schema.rb")
