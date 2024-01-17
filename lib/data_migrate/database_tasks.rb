@@ -24,7 +24,7 @@ module DataMigrate
 
       def with_temporary_connection(db_config) # :nodoc:
         with_temporary_pool(db_config) do |pool|
-          yield pool.connection, db_config
+          yield pool.connection
         end
       end
 
@@ -49,7 +49,8 @@ module DataMigrate
     def db_configs_with_versions
       db_configs_with_versions = Hash.new { |h, k| h[k] = [] }
 
-      with_temporary_connection_for_each do |conn, db_config|
+      with_temporary_connection_for_each do |conn|
+        db_config = conn.pool.db_config
         if db_config.primary?
           versions_to_run = DataMigrate::DatabaseTasks.pending_data_migrations.map { |m| m[:version] }
           target_version = ActiveRecord::Tasks::DatabaseTasks.target_version
