@@ -83,6 +83,22 @@ module DataMigrate
       def schema_sha1(file)
         ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env, name: "primary"))
       end
+
+      def with_temporary_pool(db_config)
+        original_db_config = migration_class.connection_db_config
+        pool = migration_class.establish_connection(db_config)
+        yield pool
+      ensure
+        migration_class.establish_connection(original_db_config)
+      end
+
+      def migration_class # :nodoc:
+        ActiveRecord::Base
+      end
+
+      def migration_connection # :nodoc:
+        migration_class.connection
+      end
     end
 
     def self.forward(step = 1)
@@ -117,6 +133,90 @@ module DataMigrate
       migrations = data_versions.map { |v| { version: v.to_i, kind: :data } } + schema_versions.map { |v| { version: v.to_i, kind: :schema } }
 
       sort&.downcase == "asc" ? sort_migrations(migrations) : sort_migrations(migrations).reverse
+    end
+
+    def self.migrate_with_data
+      DataMigrate::DataMigrator.create_data_schema_table
+
+      ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
+      target_version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
+      migrations = []
+
+      if target_version.nil?
+        migrations = DataMigrate::DatabaseTasks.pending_migrations.map { |m| m.merge(direction: :up) }
+      else
+        current_schema_version = ActiveRecord::Migrator.current_version
+        schema_migrations = if target_version > current_schema_version
+          DataMigrate::DatabaseTasks.pending_schema_migrations.keep_if { |m| m[:version] <= target_version }.map { |m| m.merge(direction: :up) }
+        elsif target_version < current_schema_version
+          DataMigrate::DatabaseTasks.past_migrations.keep_if { |m| m[:version] > target_version }.map { |m| m.merge(direction: :down) }
+        else # ==
+          []
+        end
+
+        current_data_version = DataMigrate::DataMigrator.current_version
+        data_migrations = if target_version > current_data_version
+          DataMigrate::DatabaseTasks.pending_data_migrations.keep_if { |m| m[:version] <= target_version }.map { |m| m.merge(direction: :up) }
+        elsif target_version < current_data_version
+          DataMigrate::DatabaseTasks.past_migrations.keep_if { |m| m[:version] > target_version }.map { |m| m.merge(direction: :down) }
+        else # ==
+          []
+        end
+        migrations = if schema_migrations.empty?
+          data_migrations
+        elsif data_migrations.empty?
+          schema_migrations
+        elsif target_version > current_data_version && target_version > current_schema_version
+          DataMigrate::DatabaseTasks.sort_migrations data_migrations, schema_migrations
+        elsif target_version < current_data_version && target_version < current_schema_version
+          DataMigrate::DatabaseTasks.sort_migrations(data_migrations, schema_migrations).reverse
+        elsif target_version > current_data_version && target_version < current_schema_version
+          schema_migrations + data_migrations
+        elsif target_version < current_data_version && target_version > current_schema_version
+          schema_migrations + data_migrations
+        end
+      end
+
+      migrations.each do |migration|
+        DataMigrate::DatabaseTasks.run_migration(migration, migration[:direction])
+      end
+    end
+
+    def self.prepare_all_with_data
+      seed = false
+
+      each_current_configuration(env) do |db_config|
+        next unless db_config.primary?
+        
+        with_temporary_pool(db_config) do
+          begin
+            database_initialized = migration_connection.schema_migration.table_exists?
+          rescue ActiveRecord::NoDatabaseError
+            create(db_config)
+            retry
+          end
+
+          unless database_initialized
+            if File.exist?(schema_dump_path(db_config))
+              load_schema(db_config, ActiveRecord.schema_format, nil)
+              load_schema_current(
+                :ruby,
+                ENV["DATA_SCHEMA"]
+              )
+            end
+
+            seed = true
+          end
+
+          migrate_with_data
+          if ActiveRecord.dump_schema_after_migration
+            dump_schema(db_config)
+            DataMigrate::Tasks::DataMigrateTasks.dump
+          end
+        end
+      end
+
+      load_seed if seed
     end
   end
 end

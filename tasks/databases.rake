@@ -6,51 +6,7 @@ namespace :db do
   namespace :migrate do
     desc "Migrate the database data and schema (options: VERSION=x, VERBOSE=false)."
     task :with_data => :environment do
-      DataMigrate::DataMigrator.create_data_schema_table
-
-      ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
-      target_version = ENV["VERSION"] ? ENV["VERSION"].to_i : nil
-      migrations = []
-
-      if target_version.nil?
-        migrations = DataMigrate::DatabaseTasks.pending_migrations.map{ |m| m.merge(:direction =>:up) }
-      else
-        current_schema_version = ActiveRecord::Migrator.current_version
-        schema_migrations = if target_version > current_schema_version
-                              DataMigrate::DatabaseTasks.pending_schema_migrations.keep_if{ |m| m[:version] <= target_version }.map{ |m| m.merge(:direction =>:up) }
-                            elsif target_version < current_schema_version
-                              DataMigrate::DatabaseTasks.past_migrations.keep_if{ |m| m[:version] > target_version }.map{ |m| m.merge(:direction =>:down) }
-                            else # ==
-                              []
-                            end
-
-        current_data_version = DataMigrate::DataMigrator.current_version
-        data_migrations = if target_version > current_data_version
-                            DataMigrate::DatabaseTasks.pending_data_migrations.keep_if{ |m| m[:version] <= target_version }.map{ |m| m.merge(:direction =>:up) }
-                          elsif target_version < current_data_version
-                            DataMigrate::DatabaseTasks.past_migrations.keep_if{ |m| m[:version] > target_version }.map{ |m| m.merge(:direction =>:down) }
-                          else # ==
-                            []
-                          end
-        migrations = if schema_migrations.empty?
-                       data_migrations
-                     elsif data_migrations.empty?
-                       schema_migrations
-                     elsif target_version > current_data_version && target_version > current_schema_version
-                       DataMigrate::DatabaseTasks.sort_migrations data_migrations, schema_migrations
-                     elsif target_version < current_data_version && target_version < current_schema_version
-                       DataMigrate::DatabaseTasks.sort_migrations(data_migrations, schema_migrations).reverse
-                     elsif target_version > current_data_version && target_version < current_schema_version
-                       schema_migrations + data_migrations
-                     elsif target_version < current_data_version && target_version > current_schema_version
-                       schema_migrations + data_migrations
-                     end
-      end
-
-      migrations.each do |migration|
-        DataMigrate::DatabaseTasks.run_migration(migration, migration[:direction])
-      end
-
+      DataMigrate::DatabaseTasks.migrate_with_data
       Rake::Task["db:_dump"].invoke
       Rake::Task["data:dump"].invoke
     end
@@ -188,6 +144,13 @@ namespace :db do
           ENV["DATA_SCHEMA"]
         )
       end
+    end
+  end
+
+  namespace :prepare do
+    desc "Runs setup if database does not exist, or runs data and schema migrations if it does"
+    task with_data: :environment do
+      DataMigrate::DatabaseTasks.prepare_all_with_data
     end
   end
 end
