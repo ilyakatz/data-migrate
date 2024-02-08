@@ -225,6 +225,8 @@ module DataMigrate
       seed = false
 
       each_current_configuration(env) do |db_config|
+        next unless db_config.primary?
+        
         with_temporary_pool(db_config) do
           begin
             database_initialized = migration_connection.schema_migration.table_exists?
