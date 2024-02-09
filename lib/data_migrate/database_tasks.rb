@@ -55,6 +55,8 @@ module DataMigrate
       end
 
       def run_migration(migration, direction)
+        ActiveRecord::Base.descendants.each(&:reset_column_information)
+
         if migration[:kind] == :data
           ::ActiveRecord::Migration.write("== %s %s" % ['Data', "=" * 71])
           ::DataMigrate::DataMigrator.run(direction, data_migrations_path, migration[:version])
@@ -89,6 +91,8 @@ module DataMigrate
       DataMigrate::DataMigrator.create_data_schema_table
       migrations = pending_migrations.reverse.pop(step).reverse
       migrations.each do | pending_migration |
+        ActiveRecord::Base.descendants.each(&:reset_column_information)
+
         if pending_migration[:kind] == :data
           ActiveRecord::Migration.write("== %s %s" % ["Data", "=" * 71])
           DataMigrate::DataMigrator.run(:up, data_migrations_path, pending_migration[:version])
