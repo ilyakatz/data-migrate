@@ -1,5 +1,8 @@
 # Changelog
 
+## 9.3.0
+- Improve with_data Rake task for multiple database https://github.com/ilyakatz/data-migrate/pull/296
+
 ## 9.2.0
 - Support Rails 7.1 https://github.com/ilyakatz/data-migrate/pull/278
 - Build and test against 7.1.0.rc1 https://github.com/ilyakatz/data-migrate/pull/286
