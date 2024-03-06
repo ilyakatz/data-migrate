@@ -106,24 +106,60 @@ describe DataMigrate::Tasks::DataMigrateTasks do
   end
 
   describe ".status" do
-    before do
-      allow(Rails).to receive(:root) { "." }
-      allow(Rails).to receive(:application) { OpenStruct.new(config: OpenStruct.new(paths: { "db/migrate" => ["spec/db/migrate"] })) }
+    context "with a single migration path" do
+      before do
+        allow(Rails).to receive(:root) { "." }
+        allow(Rails).to receive(:application) { OpenStruct.new(config: OpenStruct.new(paths: { "db/migrate" => ["spec/db/migrate"] })) }
 
-      DataMigrate::Tasks::DataMigrateTasks.migrate
+        DataMigrate::Tasks::DataMigrateTasks.migrate
+      end
+
+      it "should display data migration status" do
+        expect {
+          DataMigrate::Tasks::DataMigrateTasks.status
+        }.to output(/up     20091231235959  Some name/).to_stdout
+      end
+
+      it "should display schema and data migration status" do
+        expect {
+          DataMigrate::Tasks::DataMigrateTasks.status_with_schema
+        }.to output(match(/up      data   20091231235959  Some name/)
+          .and match(/down    schema  20131111111111  Late migration/)).to_stdout
+      end
     end
 
-    it "should display data migration status" do
-      expect {
-        DataMigrate::Tasks::DataMigrateTasks.status
-      }.to output(/up     20091231235959  Some name/).to_stdout
-    end
+    context "with multiple migration paths", :no_override do
+      before do
+        @prev_data_migrations_path = DataMigrate.config.data_migrations_path
+        DataMigrate.configure do |config|
+          config.data_migrations_path = ["spec/db/data", "spec/db_two/data"]
+        end
 
-    it "should display schema and data migration status" do
-      expect {
-        DataMigrate::Tasks::DataMigrateTasks.status_with_schema
-      }.to output(match(/up      data   20091231235959  Some name/)
-        .and match(/down    schema  20131111111111  Late migration/)).to_stdout
+        allow(Rails).to receive(:root) { "." }
+        allow(Rails).to receive(:application) { OpenStruct.new(config: OpenStruct.new(paths: { "db/migrate" => ["spec/db/migrate"] })) }
+
+        DataMigrate::Tasks::DataMigrateTasks.migrate
+      end
+
+      after do
+        DataMigrate.configure do |config|
+          config.data_migrations_path = @prev_data_migrations_path
+        end
+      end
+
+      it "should display data migration status" do
+        expect {
+          DataMigrate::Tasks::DataMigrateTasks.status
+        }.to output(/up     20091231235959  Some name/).to_stdout
+      end
+
+      it "should display schema and data migration status" do
+        expect {
+          DataMigrate::Tasks::DataMigrateTasks.status_with_schema
+        }.to output(match(/up      data   20091231235959  Some name/)
+            .and match(/up      data   20111231235959  Some other name/)
+          .and match(/down    schema  20131111111111  Late migration/)).to_stdout
+      end
     end
   end
 end
