@@ -11,7 +11,7 @@ namespace :db do
 
       db_configs = ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env)
 
-      schema_mapped_versions = ActiveRecord::Tasks::DatabaseTasks.db_configs_with_versions(db_configs)
+      schema_mapped_versions = DataMigrate::ActiveRecordDatabaseTasks.db_configs_with_versions
       data_mapped_versions = DataMigrate::DatabaseTasks.db_configs_with_versions
 
       mapped_versions = schema_mapped_versions.merge(data_mapped_versions) do |_key, schema_db_configs, data_db_configs|
