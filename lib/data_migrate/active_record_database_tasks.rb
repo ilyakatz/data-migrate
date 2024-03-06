@@ -35,7 +35,7 @@ module DataMigrate
         db_configs_with_versions
       end
 
-      unless repond_to?(:with_temporary_pool_for_each)
+      unless respond_to?(:with_temporary_pool_for_each)
         def with_temporary_connection_for_each(env: ActiveRecord::Tasks::DatabaseTasks.env, name: nil, &block) # :nodoc:
           if name
             db_config = ActiveRecord::Base.configurations.configs_for(env_name: env, name: name)
