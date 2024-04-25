@@ -54,6 +54,10 @@ module DataMigrate
 
       #TODO: this was added to be backward compatible, need to re-evaluate
       def run(direction, migration_paths, version)
+        # Ensure all Active Record model cache is reset for each data migration
+        # As recommended in: https://github.com/rails/rails/blob/da21c2e9812e5eb0698fba4a9aa38632fc004432/activerecord/lib/active_record/migration.rb#L467-L470
+        ActiveRecord::Base.descendants.each(&:reset_column_information)
+
         DataMigrate::MigrationContext.new(migration_paths).run(direction, version)
       end
 
