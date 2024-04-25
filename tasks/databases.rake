@@ -5,7 +5,7 @@ require 'data_migrate/tasks/data_migrate_tasks'
 namespace :db do
   namespace :migrate do
     desc "Migrate the database data and schema (options: VERSION=x, VERBOSE=false)."
-    task :with_data => :environment do
+    task :with_data => :load_config do
       DataMigrate::DataMigrator.create_data_schema_table
       ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
 
