@@ -2,6 +2,7 @@
 
 ## 9.4.0
 - Reset model schema cache before each data migration https://github.com/ilyakatz/data-migrate/pull/307
+- Run load_config rake task before db:migrate:with_data https://github.com/ilyakatz/data-migrate/pull/308
 
 ## 9.3.0
 - Improve with_data Rake task for multiple database https://github.com/ilyakatz/data-migrate/pull/296
