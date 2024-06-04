@@ -4,7 +4,7 @@ require "spec_helper"
 
 describe DataMigrate::DataMigrator do
   let(:context) { DataMigrate::MigrationContext.new("spec/db/data") }
-  let(:schema_context) { ActiveRecord::MigrationContext.new("spec/db/migrate", ActiveRecord::Base.connection.schema_migration) }
+  let(:schema_context) { ActiveRecord::MigrationContext.new("spec/db/migrate", ar_schema_migration()) }
   let(:db_config) do
     {
       adapter: "sqlite3",
@@ -103,6 +103,15 @@ describe DataMigrate::DataMigrator do
       }.to output(/Undoing SomeName/).to_stdout
       versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
       expect(versions.count).to eq(0)
+    end
+  end
+
+  # schema migration changed in Rails 7.2, from the connection to the pool object.
+  def ar_schema_migration
+    if ActiveRecord::Base.connection.pool.respond_to?(:schema_migration)
+      ActiveRecord::Base.connection.pool.schema_migration
+    else
+      ActiveRecord::Base.connection.schema_migration
     end
   end
 end

@@ -1,5 +1,9 @@
 # Changelog
 
+
+## 9.5.0
+- Support Rails 7.2
+
 ## 9.4.2
   - Fix db:prepare:with_data task
 

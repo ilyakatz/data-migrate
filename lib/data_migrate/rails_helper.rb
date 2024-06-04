@@ -1,6 +1,11 @@
 module DataMigrate
   class RailsHelper
     class << self
+      def rails_version_equal_to_or_higher_than_7_2
+        return @equal_to_or_higher_than_7_2 if defined?(@equal_to_or_higher_than_7_2)
+
+        @equal_to_or_higher_than_7_2 = Gem::Dependency.new("railties", ">= 7.2.0.alpha").match?("railties", Gem.loaded_specs["railties"].version, true)
+      end
       def rails_version_equal_to_or_higher_than_7_1
         return @equal_to_or_higher_than_7_1 if defined?(@equal_to_or_higher_than_7_1)
 
@@ -14,7 +19,9 @@ module DataMigrate
       end
 
       def internal_metadata
-        if rails_version_equal_to_or_higher_than_7_1
+        if rails_version_equal_to_or_higher_than_7_2
+          ActiveRecord::Base.connection.pool.internal_metadata
+        elsif rails_version_equal_to_or_higher_than_7_1
           ActiveRecord::Base.connection.internal_metadata
         else
           ActiveRecord::InternalMetadata
@@ -22,7 +29,9 @@ module DataMigrate
       end
 
       def schema_migration
-        if rails_version_equal_to_or_higher_than_7_1
+        if rails_version_equal_to_or_higher_than_7_2
+          ActiveRecord::Base.connection.pool.schema_migration
+        elsif rails_version_equal_to_or_higher_than_7_1
           ActiveRecord::Base.connection.schema_migration
         else
           ActiveRecord::SchemaMigration
@@ -54,7 +63,9 @@ module DataMigrate
       end
 
       def data_schema_migration
-        if rails_version_equal_to_or_higher_than_7_1
+        if rails_version_equal_to_or_higher_than_7_2
+          DataMigrate::DataSchemaMigration.new(ActiveRecord::Tasks::DatabaseTasks.migration_connection.pool)
+        elsif rails_version_equal_to_or_higher_than_7_1
           DataMigrate::DataSchemaMigration.new(ActiveRecord::Tasks::DatabaseTasks.migration_connection)
         else
           DataMigrate::DataSchemaMigration
