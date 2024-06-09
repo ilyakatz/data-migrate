@@ -20,7 +20,7 @@ module DataMigrate
 
       def internal_metadata
         if rails_version_equal_to_or_higher_than_7_2
-          ActiveRecord::Base.connection.pool.internal_metadata
+          ActiveRecord::Base.connection_pool.internal_metadata
         elsif rails_version_equal_to_or_higher_than_7_1
           ActiveRecord::Base.connection.internal_metadata
         else
@@ -30,7 +30,7 @@ module DataMigrate
 
       def schema_migration
         if rails_version_equal_to_or_higher_than_7_2
-          ActiveRecord::Base.connection.pool.schema_migration
+          ActiveRecord::Base.connection_pool.schema_migration
         elsif rails_version_equal_to_or_higher_than_7_1
           ActiveRecord::Base.connection.schema_migration
         else
@@ -64,7 +64,7 @@ module DataMigrate
 
       def data_schema_migration
         if rails_version_equal_to_or_higher_than_7_2
-          DataMigrate::DataSchemaMigration.new(ActiveRecord::Tasks::DatabaseTasks.migration_connection.pool)
+          DataMigrate::DataSchemaMigration.new(ActiveRecord::Tasks::DatabaseTasks.migration_connection_pool)
         elsif rails_version_equal_to_or_higher_than_7_1
           DataMigrate::DataSchemaMigration.new(ActiveRecord::Tasks::DatabaseTasks.migration_connection)
         else

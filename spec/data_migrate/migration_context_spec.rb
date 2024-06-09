@@ -108,8 +108,8 @@ describe DataMigrate::DataMigrator do
 
   # schema migration changed in Rails 7.2, from the connection to the pool object.
   def ar_schema_migration
-    if ActiveRecord::Base.connection.pool.respond_to?(:schema_migration)
-      ActiveRecord::Base.connection.pool.schema_migration
+    if ActiveRecord::Base.connection_pool.respond_to?(:schema_migration)
+      ActiveRecord::Base.connection_pool.schema_migration
     else
       ActiveRecord::Base.connection.schema_migration
     end
