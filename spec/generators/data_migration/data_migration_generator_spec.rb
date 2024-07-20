@@ -61,6 +61,20 @@ describe DataMigrate::Generators::DataMigrationGenerator do
         subject.create_data_migration
       end
     end
+
+    context 'when custom data migrations path contains an array of paths' do
+      before do
+        DataMigrate.config.data_migrations_path = ['abc', 'def']
+      end
+
+      it 'returns the first file path' do
+        is_expected.to receive(:migration_template).with(
+          'data_migration.rb', data_migrations_file_path
+        )
+
+        subject.create_data_migration
+      end
+    end
   end
 
   describe ".source_root" do
