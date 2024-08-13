@@ -173,5 +173,36 @@ module DataMigrate
 
       sort&.downcase == "asc" ? sort_migrations(migrations) : sort_migrations(migrations).reverse
     end
+
+    def self.migrate_with_data
+      DataMigrate::DataMigrator.create_data_schema_table
+
+      ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
+
+      db_configs = ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env)
+
+      schema_mapped_versions = ActiveRecord::Tasks::DatabaseTasks.db_configs_with_versions(db_configs)
+      data_mapped_versions = DataMigrate::DatabaseTasks.db_configs_with_versions
+
+      mapped_versions = schema_mapped_versions.merge(data_mapped_versions) do |_key, schema_db_configs, data_db_configs|
+        schema_db_configs + data_db_configs
+      end
+
+      mapped_versions.sort.each do |version, db_configs|
+        db_configs.each do |db_config|
+          if is_data_migration = db_config.is_a?(DataMigrate::DatabaseConfigurationWrapper)
+            db_config = db_config.db_config
+          end
+
+          DataMigrate::DatabaseTasks.with_temporary_connection(db_config) do
+            if is_data_migration
+              DataMigrate::DataMigrator.run(:up, DataMigrate::DatabaseTasks.data_migrations_path, version)
+            else
+              ActiveRecord::Tasks::DatabaseTasks.migrate(version)
+            end
+          end
+        end
+      end
+    end
   end
 end
