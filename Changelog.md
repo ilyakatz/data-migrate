@@ -1,5 +1,8 @@
 # Changelog
 
+## 9.4.2
+  - Fix db:prepare:with_data task
+
 ## 9.4.1
   - Add db:prepare task
 
