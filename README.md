@@ -170,6 +170,14 @@ bundle exec appraisal rails-7.1 rspec
 bundle exec appraisal rails-7.2 rspec
 ```
 
+## Releasing new version
+
+1. Create a new tag, eg `git tag 9.4.1`
+1. Go to https://github.com/ilyakatz/data-migrate/tags
+1. Click "Create release" under 9.4.1
+1. CLick "Generate release notes"
+1. Click "Publish release"
+
 ## Thanks
 
 [Andrew J Vargo](http://github.com/ajvargo) Andrew was the original creator and maintainer of this project!
