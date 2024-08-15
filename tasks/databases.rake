@@ -7,7 +7,6 @@ namespace :db do
     desc "Migrate the database data and schema (options: VERSION=x, VERBOSE=false)."
     task :with_data => :load_config do
       DataMigrate::DatabaseTasks.migrate_with_data
-
       Rake::Task["db:_dump"].invoke
       Rake::Task["data:dump"].invoke
     end
