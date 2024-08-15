@@ -1,10 +1,13 @@
 # Changelog
 
+# Unreleased
+- Remove Ruby 3.0 from build matrix
+
 ## 9.4.2
-  - Fix db:prepare:with_data task
+- Fix db:prepare:with_data task
 
 ## 9.4.1
-  - Add db:prepare task
+- Add db:prepare task
 
 ## 9.4.0
 - Reset model schema cache before each data migration https://github.com/ilyakatz/data-migrate/pull/307
