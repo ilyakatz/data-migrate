@@ -4,7 +4,7 @@ require "spec_helper"
 
 describe DataMigrate::DataMigrator do
   let(:context) { DataMigrate::MigrationContext.new("spec/db/data") }
-  let(:schema_context) { ActiveRecord::MigrationContext.new("spec/db/migrate", ar_schema_migration()) }
+  let(:schema_context) { ActiveRecord::MigrationContext.new("spec/db/migrate", ar_schema_migration) }
   let(:db_config) do
     {
       adapter: "sqlite3",
