@@ -36,7 +36,7 @@ table to track all migrations.
 
 ## Rails Support
 
-Support Rails 6.1 through 7.1
+Support Rails 6.1 through 7.2
 
 
 #### v1
@@ -167,6 +167,7 @@ bundle exec appraisal install
 bundle exec appraisal rails-6.1 rspec
 bundle exec appraisal rails-7.0 rspec
 bundle exec appraisal rails-7.1 rspec
+bundle exec appraisal rails-7.2 rspec
 ```
 
 ## Thanks

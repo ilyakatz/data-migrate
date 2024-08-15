@@ -10,21 +10,21 @@ module DataMigrate
     extend self
 
     # These method are only introduced in Rails 7.1
-    unless respond_to?(:with_temporary_connection_for_each)
-      def with_temporary_connection_for_each(env: ActiveRecord::Tasks::DatabaseTasks.env, name: nil, &block) # :nodoc:
+    unless respond_to?(:with_temporary_pool_for_each)
+      def with_temporary_pool_for_each(env: ActiveRecord::Tasks::DatabaseTasks.env, name: nil, &block) # :nodoc:
         if name
           db_config = ActiveRecord::Base.configurations.configs_for(env_name: env, name: name)
-          with_temporary_connection(db_config, &block)
+          with_temporary_pool(db_config, &block)
         else
           ActiveRecord::Base.configurations.configs_for(env_name: env, name: name).each do |db_config|
-            with_temporary_connection(db_config, &block)
+            with_temporary_pool(db_config, &block)
           end
         end
       end
 
       def with_temporary_connection(db_config) # :nodoc:
         with_temporary_pool(db_config) do |pool|
-          yield pool.connection
+          pool.with_connection
         end
       end
 
@@ -33,7 +33,7 @@ module DataMigrate
       end
 
       def migration_connection # :nodoc:
-        migration_class.connection
+        migration_class.lease_connection
       end
 
       private def with_temporary_pool(db_config)
@@ -49,8 +49,8 @@ module DataMigrate
     def db_configs_with_versions
       db_configs_with_versions = Hash.new { |h, k| h[k] = [] }
 
-      with_temporary_connection_for_each do |conn|
-        db_config = conn.pool.db_config
+      with_temporary_pool_for_each do |pool|
+        db_config = pool.db_config
         if db_config.primary?
           versions_to_run = DataMigrate::DatabaseTasks.pending_data_migrations.map { |m| m[:version] }
           target_version = ActiveRecord::Tasks::DatabaseTasks.target_version
@@ -179,9 +179,7 @@ module DataMigrate
 
       ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
 
-      db_configs = ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env)
-
-      schema_mapped_versions = ActiveRecord::Tasks::DatabaseTasks.db_configs_with_versions(db_configs)
+      schema_mapped_versions = ActiveRecord::Tasks::DatabaseTasks.db_configs_with_versions
       data_mapped_versions = DataMigrate::DatabaseTasks.db_configs_with_versions
 
       mapped_versions = schema_mapped_versions.merge(data_mapped_versions) do |_key, schema_db_configs, data_db_configs|
