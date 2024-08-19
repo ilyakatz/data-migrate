@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    data_migrate (9.4.2)
+    data_migrate (9.4.4)
       activerecord (>= 6.1)
       railties (>= 6.1)
 
@@ -151,7 +151,6 @@ GEM
     rubocop-ast (1.30.0)
       parser (>= 3.2.1.0)
     ruby-progressbar (1.13.0)
-    ruby2_keywords (0.0.5)
     sqlite3 (1.7.2-aarch64-linux)
     sqlite3 (1.7.2-arm64-darwin)
     sqlite3 (1.7.2-x86_64-linux)
