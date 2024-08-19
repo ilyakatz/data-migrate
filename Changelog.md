@@ -1,8 +1,9 @@
 # Changelog
 
-# Unreleased
+# 11.0.0rc
 - Remove Ruby 3.0 from build matrix
-- Support Rails 7.2 https://github.com/ilyakatz/data-migrate/pull/312
+- Support Rails 7.2.0 https://github.com/ilyakatz/data-migrate/pull/312
+- Update gemfile.lock builds
 
 ## 9.4.2
 - Fix db:prepare:with_data task

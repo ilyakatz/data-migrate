@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    data_migrate (9.4.4)
+    data_migrate (11.0.0.rc)
       activerecord (>= 6.1)
       railties (>= 6.1)
 
