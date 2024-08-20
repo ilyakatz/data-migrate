@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    data_migrate (11.0.0.rc)
+    data_migrate (11.0.0.rc3)
       activerecord (>= 6.1)
       railties (>= 6.1)
 
@@ -133,6 +133,8 @@ GEM
       racc (~> 1.4)
     nokogiri (1.16.7-arm64-darwin)
       racc (~> 1.4)
+    nokogiri (1.16.7-x86_64-darwin)
+      racc (~> 1.4)
     nokogiri (1.16.7-x86_64-linux)
       racc (~> 1.4)
     overcommit (0.63.0)
@@ -226,6 +228,7 @@ GEM
     securerandom (0.3.1)
     sqlite3 (2.0.2-aarch64-linux-gnu)
     sqlite3 (2.0.2-arm64-darwin)
+    sqlite3 (2.0.2-x86_64-darwin)
     sqlite3 (2.0.2-x86_64-linux-gnu)
     stringio (3.1.1)
     strscan (3.1.0)
@@ -245,6 +248,7 @@ GEM
 PLATFORMS
   aarch64-linux
   arm64-darwin-23
+  x86_64-darwin-22
   x86_64-linux
 
 DEPENDENCIES
