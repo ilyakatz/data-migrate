@@ -179,7 +179,7 @@ module DataMigrate
 
       ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
 
-      schema_mapped_versions = if rails_version_equal_to_or_higher_than_7_1
+      schema_mapped_versions = if DataMigrate::RailsHelper.rails_version_equal_to_or_higher_than_7_1
         ActiveRecord::Tasks::DatabaseTasks.db_configs_with_versions
       else
         db_configs = ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env)
