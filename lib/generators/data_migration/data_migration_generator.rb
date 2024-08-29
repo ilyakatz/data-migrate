@@ -38,8 +38,9 @@ module DataMigrate
         File.join(data_migrations_path, "#{file_name}.rb")
       end
 
+      # Use the first path in the data_migrations_path as the target directory
       def data_migrations_path
-        DataMigrate.config.data_migrations_path
+        Array.wrap(DataMigrate.config.data_migrations_path).first
       end
     end
   end

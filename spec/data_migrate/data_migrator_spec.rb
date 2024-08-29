@@ -51,9 +51,10 @@ describe DataMigrate::DataMigrator do
   describe "#migrations_status" do
     it "returns all migrations statuses" do
       status = described_class.migrations_status
-      expect(status.length).to eq 2
+      expect(status.length).to eq 3
       expect(status.first).to eq ["down", "20091231235959", "Some name"]
       expect(status.second).to eq ["down", "20171231235959", "Super update"]
+      expect(status.third).to eq ["down", "20241231235959", "Data two update"]
     end
   end
 

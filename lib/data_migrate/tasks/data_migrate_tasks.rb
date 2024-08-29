@@ -6,7 +6,7 @@ module DataMigrate
       extend self
 
       def migrations_paths
-        @migrations_paths ||= DataMigrate.config.data_migrations_path
+        @migrations_paths ||= Array.wrap(DataMigrate.config.data_migrations_path)
       end
 
       def dump
@@ -55,11 +55,13 @@ module DataMigrate
         db_list_schema = DataMigrate::RailsHelper.schema_migration_versions
         file_list = []
 
-        Dir.foreach(File.join(Rails.root, migrations_paths)) do |file|
-          # only files matching "20091231235959_some_name.rb" pattern
-          if match_data = /(\d{14})_(.+)\.rb/.match(file)
-            status = db_list_data.delete(match_data[1]) ? 'up' : 'down'
-            file_list << [status, match_data[1], match_data[2], 'data']
+        migrations_paths.each do |path|
+          Dir.foreach(File.join(Rails.root, path)) do |file|
+            # only files matching "20091231235959_some_name.rb" pattern
+            if match_data = /(\d{14})_(.+)\.rb/.match(file)
+              status = db_list_data.delete(match_data[1]) ? 'up' : 'down'
+              file_list << [status, match_data[1], match_data[2], 'data']
+            end
           end
         end
 
