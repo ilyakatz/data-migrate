@@ -29,13 +29,13 @@ module DataMigrate
     end
 
     def versions
-      @versions ||= begin
-        versions = []
-        Dir.foreach(DataMigrate::DataMigrator.full_migrations_path) do |file|
-          match_data = DataMigrate::DataMigrator.match(file)
-          versions << match_data[1].to_i if match_data
+      @versions ||= Set.new.tap do |versions|
+        DataMigrate::DataMigrator.migrations_paths.each do |path|
+          Dir.foreach(path) do |file|
+            match_data = DataMigrate::DataMigrator.match(file)
+            versions << match_data[1].to_i if match_data
+          end
         end
-        versions
       end
     end
 

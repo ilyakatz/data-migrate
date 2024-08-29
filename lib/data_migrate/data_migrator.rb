@@ -12,7 +12,7 @@ module DataMigrate
 
     class << self
       def migrations_paths
-        [DataMigrate.config.data_migrations_path]
+        Array.wrap(DataMigrate.config.data_migrations_path)
       end
 
       def create_data_schema_table

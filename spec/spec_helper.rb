@@ -21,7 +21,7 @@ RSpec.configure do |config|
     else
       @prev_data_migrations_path = DataMigrate.config.data_migrations_path
       DataMigrate.configure do |config|
-        config.data_migrations_path = "spec/db/data"
+        config.data_migrations_path = ["spec/db/data", "spec/db/data_two"]
       end
     end
   end
