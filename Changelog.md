@@ -1,5 +1,10 @@
 # Changelog
 
+# 11.0.0
+
+- [Update rexml to 3.3.6](https://github.com/ilyakatz/data-migrate/pull/329)
+- Fixes a bug which ignored migrations on [Rails 7.1 and higher](https://github.com/ilyakatz/data-migrate/pull/326)
+
 # 11.0.0rc
 - Remove Ruby 3.0 from build matrix
 - Support Rails 7.2.0 https://github.com/ilyakatz/data-migrate/pull/312
