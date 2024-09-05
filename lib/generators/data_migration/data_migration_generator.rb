@@ -39,7 +39,7 @@ module DataMigrate
       end
 
       def data_migrations_path
-        DataMigrate.config.data_migrations_path
+        Array(DataMigrate.config.data_migrations_path).first
       end
     end
   end
