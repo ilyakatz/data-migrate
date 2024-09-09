@@ -163,7 +163,6 @@ Then, in the Engine's `db/data` folder, you can add data migrations and run them
 Run tests for a specific version of Rails
 
 ```
-
 bundle exec appraisal rails-6.1 rspec
 bundle exec appraisal rails-7.0 rspec
 bundle exec appraisal rails-7.1 rspec
