@@ -5,9 +5,7 @@ require "spec_helper"
 describe DataMigrate::DatabaseTasks do
   let(:subject) { DataMigrate::DatabaseTasks }
   let(:migration_path) { "spec/db/migrate" }
-  let(:data_migrations_path) {
-    DataMigrate.config.data_migrations_path
-  }
+  let(:data_migrations_path) { DataMigrate.config.data_migrations_path }
 
   before do
     # In a normal Rails installation, db_dir would defer to
@@ -18,11 +16,13 @@ describe DataMigrate::DatabaseTasks do
   end
 
   before do
-    allow(DataMigrate::Tasks::DataMigrateTasks).to receive(:migrations_paths) {
+    allow(DataMigrate::Tasks::DataMigrateTasks).to receive(:migrations_paths) do
       data_migrations_path
-    }
-    ActiveRecord::Base.establish_connection({ adapter: "sqlite3", database: "spec/db/test.db" })
-    hash_config = ActiveRecord::DatabaseConfigurations::HashConfig.new('test', 'test', { adapter: "sqlite3", database: "spec/db/test.db" })
+    end
+    ActiveRecord::Base.establish_connection(adapter: "sqlite3", database: "spec/db/test.db")
+    hash_config = ActiveRecord::DatabaseConfigurations::HashConfig.new(
+      'test', 'test', adapter: "sqlite3", database: "spec/db/test.db"
+    )
     config_obj = ActiveRecord::DatabaseConfigurations.new([hash_config])
     allow(ActiveRecord::Base).to receive(:configurations).and_return(config_obj)
   end
@@ -36,12 +36,10 @@ describe DataMigrate::DatabaseTasks do
     before do
       DataMigrate::RailsHelper.schema_migration.create_table
 
-      allow(DataMigrate::SchemaMigration).to receive(:migrations_paths) {
-        migration_path
-      }
-      allow(DataMigrate::DatabaseTasks).to receive(:data_migrations_path) {
+      allow(DataMigrate::SchemaMigration).to receive(:migrations_paths) { migration_path }
+      allow(DataMigrate::DatabaseTasks).to receive(:data_migrations_path) do
         data_migrations_path
-      }.at_least(:once)
+      end.at_least(:once)
     end
 
     describe :past_migrations do
@@ -79,11 +77,14 @@ describe DataMigrate::DatabaseTasks do
     if DataMigrate::RailsHelper.rails_version_equal_to_or_higher_than_7_0
       describe :schema_dump_path do
         before do
-          allow(ActiveRecord::Base).to receive(:configurations).and_return(ActiveRecord::DatabaseConfigurations.new([db_config]))
+          allow(ActiveRecord::Base).to receive(:configurations)
+            .and_return(ActiveRecord::DatabaseConfigurations.new([db_config]))
         end
 
         context "for primary database" do
-          let(:db_config) { ActiveRecord::DatabaseConfigurations::HashConfig.new("development", "primary", {} ) }
+          let(:db_config) do
+            ActiveRecord::DatabaseConfigurations::HashConfig.new("development", "primary", {})
+          end
 
           context "for :ruby db format" do
             it 'returns the data schema path' do
@@ -98,6 +99,114 @@ describe DataMigrate::DatabaseTasks do
               expect(subject.schema_dump_path(db_config, :sql)).to eq("db/data_schema.rb")
             end
           end
+        end
+      end
+    end
+
+    describe :prepare_all_with_data do
+      let(:db_config) do
+        ActiveRecord::DatabaseConfigurations::HashConfig.new(
+          'test',
+          'primary',
+          adapter: "sqlite3",
+          database: "spec/db/test.db"
+        )
+      end
+
+      let(:pool) { double("ConnectionPool") }
+      let(:connection) { double("Connection") }
+
+      before do
+        allow(subject).to receive(:each_current_configuration).and_yield(db_config)
+        allow(subject).to receive(:with_temporary_pool).with(db_config).and_yield(pool)
+        allow(pool).to receive(:connection).and_return(connection)
+        allow(subject).to receive(:schema_dump_path).and_return("db/data_schema.rb")
+        allow(File).to receive(:exist?).and_return(true)
+        allow(subject).to receive(:load_schema)
+        allow(subject).to receive(:load_schema_current)
+        allow(subject).to receive(:migrate_with_data)
+        allow(subject).to receive(:dump_schema)
+        allow(DataMigrate::Tasks::DataMigrateTasks).to receive(:dump)
+        allow(subject).to receive(:load_seed)
+
+        configurations = ActiveRecord::DatabaseConfigurations.new([db_config])
+        allow(ActiveRecord::Base).to receive(:configurations).and_return(configurations)
+      end
+
+      context "when the database does not exist" do
+        before do
+          allow(subject).to receive(:database_exists?).with(connection).and_return(false)
+          allow_any_instance_of(ActiveRecord::Tasks::DatabaseTasks).to receive(:create)
+            .and_return(true)
+        end
+
+        it "creates the database" do
+          expect_any_instance_of(ActiveRecord::Tasks::DatabaseTasks).to receive(:create)
+            .with(db_config)
+          subject.prepare_all_with_data
+        end
+
+        it "loads the schema" do
+          expect(subject).to receive(:load_schema).with(
+            db_config,
+            subject.send(:schema_format),
+            nil
+          )
+          subject.prepare_all_with_data
+        end
+
+        it "loads the current data schema" do
+          expect(subject).to receive(:load_schema_current).with(:ruby, ENV["DATA_SCHEMA"])
+          subject.prepare_all_with_data
+        end
+
+        it "runs migrations with data" do
+          expect(subject).to receive(:migrate_with_data)
+          subject.prepare_all_with_data
+        end
+
+        it "dumps the schema after migration" do
+          expect(subject).to receive(:dump_schema).with(db_config)
+          expect(DataMigrate::Tasks::DataMigrateTasks).to receive(:dump)
+          subject.prepare_all_with_data
+        end
+
+        it "loads seed data" do
+          expect(subject).to receive(:load_seed)
+          subject.prepare_all_with_data
+        end
+      end
+
+      context "when the database exists" do
+        before do
+          allow(subject).to receive(:database_exists?).with(connection).and_return(true)
+        end
+
+        it "does not create the database" do
+          expect(ActiveRecord::Tasks::DatabaseTasks).not_to receive(:create)
+          subject.prepare_all_with_data
+        end
+
+        it "does not load the schema" do
+          expect(subject).not_to receive(:load_schema)
+          expect(subject).not_to receive(:load_schema_current)
+          subject.prepare_all_with_data
+        end
+
+        it "runs migrations with data" do
+          expect(subject).to receive(:migrate_with_data)
+          subject.prepare_all_with_data
+        end
+
+        it "dumps the schema after migration" do
+          expect(subject).to receive(:dump_schema).with(db_config)
+          expect(DataMigrate::Tasks::DataMigrateTasks).to receive(:dump)
+          subject.prepare_all_with_data
+        end
+
+        it "does not load seed data" do
+          expect(subject).not_to receive(:load_seed)
+          subject.prepare_all_with_data
         end
       end
     end

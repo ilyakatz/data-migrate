@@ -86,6 +86,7 @@ You can generate a data migration as you would a schema migration:
     rake db:migrate:status:with_data               # Display status of data and schema migrations
     rake db:migrate:up:with_data                   # Runs the "up" for a given migration VERSION
     rake db:migrate:with_data                      # Migrate the database data and schema (options: VERSION=x, VERBOSE=false)
+    rake db:prepare:with_data                      # Runs setup if database does not exist, or runs data and schema migrations if it does
     rake db:rollback:with_data                     # Rolls the schema back to the previous version (specify steps w/ STEP=n)
     rake db:schema:load:with_data                  # Load both schema.rb and data_schema.rb file into the database
     rake db:structure:load:with_data               # Load both structure.sql and data_schema.rb file into the database
