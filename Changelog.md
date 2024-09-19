@@ -1,5 +1,7 @@
 # Changelog
 
+- Fix db:prepare:with_data task on [Rails 7.2](https://github.com/ilyakatz/data-migrate/pull/339)
+
 # 11.0.0
 
 - [Update rexml to 3.3.6](https://github.com/ilyakatz/data-migrate/pull/329)

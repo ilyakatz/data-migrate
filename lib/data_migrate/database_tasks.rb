@@ -214,19 +214,13 @@ module DataMigrate
       seed = false
 
       each_current_configuration(env) do |db_config|
-        next unless db_config.primary?
+        next unless primary?(db_config)
 
-        with_temporary_pool(db_config) do
-          begin
-            database_initialized = migration_connection.schema_migration.table_exists?
-          rescue ActiveRecord::NoDatabaseError
+        with_temporary_pool(db_config) do |pool|
+          unless database_exists?(pool.connection)
             create(db_config)
-            retry
-          end
-
-          unless database_initialized
             if File.exist?(schema_dump_path(db_config))
-              load_schema(db_config, ActiveRecord.schema_format, nil)
+              load_schema(db_config, schema_format, nil)
               load_schema_current(
                 :ruby,
                 ENV["DATA_SCHEMA"]
@@ -237,7 +231,7 @@ module DataMigrate
           end
 
           migrate_with_data
-          if ActiveRecord.dump_schema_after_migration
+          if dump_schema_after_migration?
             dump_schema(db_config)
             DataMigrate::Tasks::DataMigrateTasks.dump
           end
@@ -245,6 +239,42 @@ module DataMigrate
       end
 
       load_seed if seed
+    end
+
+    private
+
+    def database_exists?(connection)
+      if connection.respond_to?(:database_exists?)  # Rails 7.1+
+        connection.database_exists?
+      else
+        connection.table_exists?(ActiveRecord::SchemaMigration.table_name)
+      end
+    rescue ActiveRecord::NoDatabaseError
+      false
+    end
+
+    def primary?(db_config)
+      if db_config.respond_to?(:primary?)  # Rails 7.0+
+        db_config.primary?
+      else
+        db_config.name == "primary"
+      end
+    end
+
+    def dump_schema_after_migration?
+      if ActiveRecord.respond_to?(:dump_schema_after_migration)
+        ActiveRecord.dump_schema_after_migration
+      else
+        ActiveRecord::Base.dump_schema_after_migration
+      end
+    end
+
+    def schema_format
+      if ActiveRecord.respond_to?(:schema_format)
+        ActiveRecord.schema_format
+      else
+        ActiveRecord::Base.schema_format
+      end
     end
   end
 end
