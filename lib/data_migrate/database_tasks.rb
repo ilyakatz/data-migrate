@@ -22,9 +22,9 @@ module DataMigrate
         end
       end
 
-      def with_temporary_connection(db_config) # :nodoc:
-        with_temporary_pool(db_config) do |pool|
-          yield pool.connection
+      def with_temporary_connection(db_config, clobber: false, &block) # :nodoc:
+        with_temporary_pool(db_config, clobber: clobber) do |pool|
+          pool.with_connection(&block)
         end
       end
 
@@ -36,13 +36,13 @@ module DataMigrate
         migration_class.connection
       end
 
-      private def with_temporary_pool(db_config)
+      private def with_temporary_pool(db_config, clobber: false)
         original_db_config = migration_class.connection_db_config
-        pool = migration_class.connection_handler.establish_connection(db_config)
+        pool = migration_class.connection_handler.establish_connection(db_config, clobber: clobber)
 
         yield pool
       ensure
-        migration_class.connection_handler.establish_connection(original_db_config)
+        migration_class.connection_handler.establish_connection(original_db_config, clobber: clobber)
       end
     end
 
