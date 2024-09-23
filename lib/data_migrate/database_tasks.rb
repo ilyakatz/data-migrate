@@ -74,14 +74,22 @@ module DataMigrate
         # We only require a schema.rb file for the primary database
         return unless db_config.primary?
 
-        File.join(File.dirname(ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(db_config, format)), schema_file_type)
+        if Gem::Dependency.new("railties", ">= 6.1").match?("railties", Gem.loaded_specs["railties"].version)
+          File.join(File.dirname(ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(db_config, format)), schema_file_type)
+        else
+          super.gsub(/(_)?schema\.rb\z/, '\1data_schema.rb')
+        end
       end
 
       # Override this method from `ActiveRecord::Tasks::DatabaseTasks`
       # to ensure that the sha saved in ar_internal_metadata table
       # is from the original schema.rb file
       def schema_sha1(file)
-        ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env, name: "primary"))
+        if Gem::Dependency.new("railties", ">= 6.1").match?("railties", Gem.loaded_specs["railties"].version)
+          ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env, name: "primary"))
+        else
+          super(file.gsub(/data_schema.rb\z/, 'schema.rb'))
+        end
       end
     end
 
