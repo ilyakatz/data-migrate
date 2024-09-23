@@ -38,6 +38,11 @@ table to track all migrations.
 
 Support Rails 6.1 through 7.2
 
+For **Rails 6.0** support, please use gem version `9.1.x`:
+
+```ruby
+gem 'data_migrate', '~> 9.1.0'
+```
 
 #### v1
 

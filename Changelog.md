@@ -1,5 +1,6 @@
 # Changelog
 
+- Allow multiple data migration paths https://github.com/ilyakatz/data-migrate/pull/331
 - Fix db:prepare:with_data task on [Rails 7.2](https://github.com/ilyakatz/data-migrate/pull/339)
 
 # 11.0.0
