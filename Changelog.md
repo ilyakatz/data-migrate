@@ -1,5 +1,13 @@
 # Changelog
 
+## 9.1.2
+
+- Fix #281 to maintain rails 6.0 support. (#342)
+
+## 9.1.1
+
+- Backport Fix data:schema:load for structure.sql (#281)
+
 ## 9.1.0
 
 - Fix a bug that caused `schema_sha1` in `ar_internal_metadata` to be reset to the `data_schema.rb` file. (#272)
