@@ -1,5 +1,10 @@
 # Changelog
 
+
+## 9.1.3
+
+- Fix #342 for schema load on rails 6.x. (#343)
+
 ## 9.1.2
 
 - Fix #281 to maintain rails 6.0 support. (#342)

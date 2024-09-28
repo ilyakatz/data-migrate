@@ -68,28 +68,23 @@ module DataMigrate
         end
       end
 
-      def schema_dump_path(db_config, format = ActiveRecord.schema_format)
-        return ENV["DATA_SCHEMA"] if ENV["DATA_SCHEMA"]
+      if Gem::Dependency.new("railties", ">= 7.0").match?("railties", Gem.loaded_specs["railties"].version)
+        # inspired from https://github.com/rails/rails/commit/059d64b874ef8092cca3bc4a7dad06ebd6eeb8ff
+        def schema_dump_path(db_config, format = ActiveRecord.schema_format)
+          return ENV["DATA_SCHEMA"] if ENV["DATA_SCHEMA"]
 
-        # We only require a schema.rb file for the primary database
-        return unless db_config.primary?
+          # We only require a schema.rb file for the primary database
+          return unless db_config.primary?
 
-        if rails_version_lower_than_6_1?
-          return super.gsub(/(_)?schema\.rb\z/, '\1data_schema.rb')
+          File.join(File.dirname(ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(db_config, format)), schema_file_type)
         end
 
-        File.join(File.dirname(ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(db_config, format)), schema_file_type)
-      end
-
-      # Override this method from `ActiveRecord::Tasks::DatabaseTasks`
-      # to ensure that the sha saved in ar_internal_metadata table
-      # is from the original schema.rb file
-      def schema_sha1(file)
-        if rails_version_lower_than_6_1?
-          return super(file.gsub(/data_schema.rb\z/, 'schema.rb'))
+        # Override this method from `ActiveRecord::Tasks::DatabaseTasks`
+        # to ensure that the sha saved in ar_internal_metadata table
+        # is from the original schema.rb file
+        def schema_sha1(file)
+          ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env, name: "primary"))
         end
-
-        ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env, name: "primary"))
       end
     end
 
@@ -123,10 +118,6 @@ module DataMigrate
       migrations = data_versions.map { |v| { version: v.to_i, kind: :data } } + schema_versions.map { |v| { version: v.to_i, kind: :schema } }
 
       sort&.downcase == "asc" ? sort_migrations(migrations) : sort_migrations(migrations).reverse
-    end
-
-    def self.rails_version_lower_than_6_1?
-      Gem::Dependency.new("railties", "< 6.1").match?("railties", Gem.loaded_specs["railties"].version)
     end
   end
 end
