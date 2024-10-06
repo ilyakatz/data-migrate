@@ -10,20 +10,20 @@ module DataMigrate
     extend self
 
     # These method are only introduced in Rails 7.1
-    unless respond_to?(:with_temporary_connection_for_each)
-      def with_temporary_connection_for_each(env: ActiveRecord::Tasks::DatabaseTasks.env, name: nil, &block) # :nodoc:
+    unless respond_to?(:with_temporary_pool_for_each)
+      def with_temporary_pool_for_each(env: ActiveRecord::Tasks::DatabaseTasks.env, name: nil, &block) # :nodoc:
         if name
           db_config = ActiveRecord::Base.configurations.configs_for(env_name: env, name: name)
-          with_temporary_connection(db_config, &block)
+           with_temporary_pool(db_config, &block)
         else
           ActiveRecord::Base.configurations.configs_for(env_name: env, name: name).each do |db_config|
-            with_temporary_connection(db_config, &block)
+             with_temporary_pool(db_config, &block)
           end
         end
       end
 
-      def with_temporary_connection(db_config, clobber: false, &block) # :nodoc:
-        with_temporary_pool(db_config, clobber: clobber) do |pool|
+      def with_temporary_connection(db_config, &block) # :nodoc:
+        with_temporary_pool(db_config) do |pool|
           pool.with_connection(&block)
         end
       end
@@ -36,21 +36,21 @@ module DataMigrate
         migration_class.connection
       end
 
-      private def with_temporary_pool(db_config, clobber: false)
+      private def with_temporary_pool(db_config)
         original_db_config = migration_class.connection_db_config
-        pool = migration_class.connection_handler.establish_connection(db_config, clobber: clobber)
+        pool = migration_class.connection_handler.establish_connection(db_config)
 
         yield pool
       ensure
-        migration_class.connection_handler.establish_connection(original_db_config, clobber: clobber)
+        migration_class.connection_handler.establish_connection(original_db_config)
       end
     end
 
     def db_configs_with_versions
       db_configs_with_versions = Hash.new { |h, k| h[k] = [] }
 
-      with_temporary_connection_for_each do |conn|
-        db_config = conn.pool.db_config
+      with_temporary_pool_for_each do |pool|
+        db_config = pool.db_config
         if db_config.primary?
           versions_to_run = DataMigrate::DatabaseTasks.pending_data_migrations.map { |m| m[:version] }
           target_version = ActiveRecord::Tasks::DatabaseTasks.target_version
