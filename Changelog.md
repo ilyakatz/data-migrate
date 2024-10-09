@@ -1,10 +1,13 @@
 # Changelog
 
+# 11.1.0
 - Allow multiple data migration paths https://github.com/ilyakatz/data-migrate/pull/331
 - Fix db:prepare:with_data task on [Rails 7.2](https://github.com/ilyakatz/data-migrate/pull/339)
+- Fix ConnectionPool deprecation warnings on [Rails 7.2](https://github.com/ilyakatz/data-migrate/pull/341)
+- Add Rails 8.0 to testing grounds https://github.com/ilyakatz/data-migrate/pull/341
+- [Bump webrick from 1.8.1 to 1.8.2](https://github.com/ilyakatz/data-migrate/pull/345)
 
 # 11.0.0
-
 - [Update rexml to 3.3.6](https://github.com/ilyakatz/data-migrate/pull/329)
 - Fixes a bug which ignored migrations on [Rails 7.1 and higher](https://github.com/ilyakatz/data-migrate/pull/326)
 
