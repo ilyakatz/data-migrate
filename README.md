@@ -144,19 +144,12 @@ From now on capistrano will run `rake db:migrate:with_data` in every deploy.
 ## Rails Engines support
 
 This gem also has a initial support for adding data migrations inside Rails engines.
-Inside the Engine's class initializer (the one that inherits from `Rails::Engine`, usually inside `engines/ENGINE_NAME/lib/engine.rb`) you need to add something like this:
-
+Just add your engines directory pattern to data_migrations initializer, for example 
+in the case your engines are located in `components` folder you can set it up like this:
 
 ```ruby
-module EngineName
-  class Engine < ::Rails::Engine
-    initializer :engine_name do |app|
-      ::DataMigrate.configure do |data_migrate|
-        default_path = ::DataMigrate::Config.new.data_migrations_path
-        data_migrate.data_migrations_path = [default_path, root.join('db', 'data')]
-      end
-    end
-  end
+DataMigrate.configure do |config|
+  config.data_migrations_path = ['db/data'] + Dir['components/**/db/data']
 end
 ```
 
