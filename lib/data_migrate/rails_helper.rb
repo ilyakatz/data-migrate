@@ -6,6 +6,7 @@ module DataMigrate
 
         @equal_to_or_higher_than_7_2 = Gem::Dependency.new("railties", ">= 7.2.0.alpha").match?("railties", Gem.loaded_specs["railties"].version, true)
       end
+
       def rails_version_equal_to_or_higher_than_7_1
         return @equal_to_or_higher_than_7_1 if defined?(@equal_to_or_higher_than_7_1)
 
