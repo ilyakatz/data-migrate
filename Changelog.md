@@ -1,5 +1,8 @@
 # Changelog
 
+# Unreleased
+- Remove committed Gemfile.lock
+
 # 11.1.0
 - Allow multiple data migration paths https://github.com/ilyakatz/data-migrate/pull/331
 - Fix db:prepare:with_data task on [Rails 7.2](https://github.com/ilyakatz/data-migrate/pull/339)
