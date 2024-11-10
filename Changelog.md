@@ -1,5 +1,12 @@
 # Changelog
 
+# Unreleased
+
+- Remove committed Gemfile.lock, reduce bundled file list when running `gem install` https://github.com/ilyakatz/data-migrate/pull/351
+- [Bump actionpack from 7.1.3.4 to 7.1.4.1](https://github.com/ilyakatz/data-migrate/pull/348)
+- [Bump rexml from 3.3.6 to 3.3.9](https://github.com/ilyakatz/data-migrate/pull/349)
+- Fix db_config_with_versions arity change and backport https://github.com/ilyakatz/data-migrate/pull/337
+
 # 11.1.0
 - Allow multiple data migration paths https://github.com/ilyakatz/data-migrate/pull/331
 - Fix db:prepare:with_data task on [Rails 7.2](https://github.com/ilyakatz/data-migrate/pull/339)
