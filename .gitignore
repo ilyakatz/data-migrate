@@ -10,3 +10,4 @@ spec/db/data_schema.rb
 .ruby-version
 .idea/
 vendor/
+Gemfile.lock
