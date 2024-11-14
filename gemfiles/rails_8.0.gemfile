@@ -2,6 +2,6 @@
 
 source "http://rubygems.org"
 
-gem "rails", "8.0.0.beta1"
+gem "rails", "~> 8.0.0"
 
 gemspec path: "../"
