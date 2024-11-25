@@ -9,6 +9,13 @@ module DataMigrate
     extend ActiveRecord::Tasks::DatabaseTasks
     extend self
 
+    if respond_to?(:register_task)
+      register_task(/mysql/,        "ActiveRecord::Tasks::MySQLDatabaseTasks")
+      register_task(/trilogy/,      "ActiveRecord::Tasks::MySQLDatabaseTasks")
+      register_task(/postgresql/,   "ActiveRecord::Tasks::PostgreSQLDatabaseTasks")
+      register_task(/sqlite/,       "ActiveRecord::Tasks::SQLiteDatabaseTasks")
+    end
+
     # These method are only introduced in Rails 7.1
     unless respond_to?(:with_temporary_pool_for_each)
       def with_temporary_pool_for_each(env: ActiveRecord::Tasks::DatabaseTasks.env, name: nil, &block) # :nodoc:
@@ -219,7 +226,7 @@ module DataMigrate
         next unless primary?(db_config)
 
         with_temporary_pool(db_config) do |pool|
-          unless database_exists?(pool.connection)
+          unless database_exists?(pool.lease_connection)
             create(db_config)
             if File.exist?(schema_dump_path(db_config))
               load_schema(db_config, schema_format, nil)
