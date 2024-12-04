@@ -1,7 +1,9 @@
 # Changelog
 
-# 11.2.0
+# Unreleased
+- Use lease_connection over deprecated connection for rails 8 https://github.com/ilyakatz/data-migrate/pull/353
 
+# 11.2.0
 - Remove committed Gemfile.lock, reduce bundled file list when running `gem install` https://github.com/ilyakatz/data-migrate/pull/351
 - [Bump actionpack from 7.1.3.4 to 7.1.4.1](https://github.com/ilyakatz/data-migrate/pull/348)
 - [Bump rexml from 3.3.6 to 3.3.9](https://github.com/ilyakatz/data-migrate/pull/349)

@@ -106,7 +106,7 @@ module DataMigrate
     end
 
     def sort_migrations(*migrations)
-      migrations.flatten.sort { |a, b|  sort_string(a) <=> sort_string(b) }
+      migrations.flatten.sort { |a, b| sort_string(a) <=> sort_string(b) }
     end
 
     def sort_string migration
@@ -166,7 +166,7 @@ module DataMigrate
       data_migrator = DataMigrate::RailsHelper.data_migrator(:up, data_migrations)
       sort_migrations(
         data_migrator.pending_migrations.map { |m| { version: m.version, name: m.name, kind: :data } }
-        )
+      )
     end
 
     def pending_schema_migrations
@@ -226,7 +226,8 @@ module DataMigrate
         next unless primary?(db_config)
 
         with_temporary_pool(db_config) do |pool|
-          unless database_exists?(pool.lease_connection)
+          connection = pool.respond_to?(:lease_connection) ? pool.lease_connection : pool.connection
+          unless database_exists?(connection)
             create(db_config)
             if File.exist?(schema_dump_path(db_config))
               load_schema(db_config, schema_format, nil)
