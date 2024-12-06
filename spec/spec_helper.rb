@@ -1,5 +1,5 @@
 require 'simplecov'
-SimpleCov.start
+SimpleCov.start 'rails'
 
 require 'rspec'
 require 'rails'
