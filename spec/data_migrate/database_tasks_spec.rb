@@ -119,7 +119,7 @@ describe DataMigrate::DatabaseTasks do
       before do
         allow(subject).to receive(:each_current_configuration).and_yield(db_config)
         allow(subject).to receive(:with_temporary_pool).with(db_config).and_yield(pool)
-        allow(pool).to receive(:connection).and_return(connection)
+        allow(pool).to receive(:lease_connection).and_return(connection)
         allow(subject).to receive(:schema_dump_path).and_return("db/data_schema.rb")
         allow(File).to receive(:exist?).and_return(true)
         allow(subject).to receive(:load_schema)

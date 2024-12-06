@@ -48,7 +48,6 @@ module DataMigrate
 
       # TODO: this was added to be backward compatible, need to re-evaluate
       def migrations(_migrations_paths)
-        #DataMigrate::MigrationContext.new(migrations_paths).migrations
         DataMigrate::MigrationContext.new(_migrations_paths).migrations
       end
 

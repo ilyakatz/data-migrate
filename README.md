@@ -144,7 +144,7 @@ From now on capistrano will run `rake db:migrate:with_data` in every deploy.
 ## Rails Engines support
 
 This gem also has a initial support for adding data migrations inside Rails engines.
-Just add your engines directory pattern to data_migrations initializer, for example 
+Just add your engines directory pattern to data_migrations initializer, for example
 in the case your engines are located in `engines` folder you can set it up like this:
 
 ```ruby
@@ -166,6 +166,7 @@ bundle exec appraisal rails-6.1 rspec
 bundle exec appraisal rails-7.0 rspec
 bundle exec appraisal rails-7.1 rspec
 bundle exec appraisal rails-7.2 rspec
+bundle exec appraisal rails-8.0 rspec
 ```
 
 ## Releasing new version
