@@ -11,3 +11,4 @@ spec/db/data_schema.rb
 .idea/
 vendor/
 Gemfile.lock
+coverage/

@@ -1,3 +1,6 @@
+require 'simplecov'
+SimpleCov.start 'rails'
+
 require 'rspec'
 require 'rails'
 require 'sqlite3'
