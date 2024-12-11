@@ -15,9 +15,29 @@ module DataMigrate
       def create_data_migration
         set_local_assigns!
         migration_template template_path, data_migrations_file_path
+        create_data_migration_test
       end
 
       protected
+
+      def create_data_migration_test
+        return unless DataMigrate.config.test_support_enabled
+
+        case DataMigrate::Helpers::InferTestSuiteType.new.call
+        when :rspec
+          template "data_migration_spec.rb", data_migrations_spec_file_path
+        when :minitest
+          template "data_migration_test.rb", data_migrations_test_file_path
+        end
+      end
+
+      def data_migrations_test_file_path
+        File.join(Rails.root, 'test', DataMigrate.config.data_migrations_path, "#{file_name}_test.rb")
+      end
+
+      def data_migrations_spec_file_path
+        File.join(Rails.root, 'spec', DataMigrate.config.data_migrations_path, "#{file_name}_spec.rb")
+      end
 
       def set_local_assigns!
         if file_name =~ /^(add|remove)_.*_(?:to|from)_(.*)/
