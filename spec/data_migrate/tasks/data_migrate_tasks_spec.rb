@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "spec_helper"
+require "ostruct"
 
 describe DataMigrate::Tasks::DataMigrateTasks do
   let(:db_config) do
