@@ -2,6 +2,7 @@
 
 # Unreleased
 - Use lease_connection over deprecated connection for rails 8 https://github.com/ilyakatz/data-migrate/pull/353
+- Add Ruby 3.4 to CI matrix
 
 # 11.2.0
 - Remove committed Gemfile.lock, reduce bundled file list when running `gem install` https://github.com/ilyakatz/data-migrate/pull/351
