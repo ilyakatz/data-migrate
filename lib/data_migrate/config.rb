@@ -1,7 +1,7 @@
 module DataMigrate
   include ActiveSupport::Configurable
-  class << self
 
+  class << self
     def configure
       yield config
     end
@@ -12,7 +12,7 @@ module DataMigrate
   end
 
   class Config
-    attr_accessor :data_migrations_path, :data_template_path, :db_configuration, :spec_name
+    attr_accessor :data_migrations_path, :data_template_path, :db_configuration, :spec_name, :test_support_enabled
 
     DEFAULT_DATA_TEMPLATE_PATH = "data_migration.rb"
 
@@ -21,6 +21,7 @@ module DataMigrate
       @data_template_path = DEFAULT_DATA_TEMPLATE_PATH
       @db_configuration = nil
       @spec_name = nil
+      @test_support_enabled = false
     end
 
     def data_template_path=(value)
