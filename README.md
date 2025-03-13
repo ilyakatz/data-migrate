@@ -36,7 +36,7 @@ table to track all migrations.
 
 ## Rails Support
 
-Support Rails 6.1 through 7.2
+Support Rails 6.1 through 8.0
 
 For **Rails 6.0** support, please use gem version `9.1.x`:
 
