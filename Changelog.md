@@ -1,6 +1,7 @@
 # Changelog
 
-# Unreleased
+# 11.3.0
+- Make table_name configurable https://github.com/ilyakatz/data-migrate/pull/361
 - Use lease_connection over deprecated connection for rails 8 https://github.com/ilyakatz/data-migrate/pull/353
 - Add Ruby 3.4 to CI matrix
 
