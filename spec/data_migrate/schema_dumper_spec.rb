@@ -28,7 +28,7 @@ describe DataMigrate::SchemaDumper do
       DataMigrate::SchemaDumper.dump(ActiveRecord::Base.connection, stream)
       stream.rewind
 
-      last_version = fixture_file_timestamps.last.insert(4, "_").insert(7, "_").insert(10, "_")
+      last_version = fixture_file_timestamps.last.dup.insert(4, "_").insert(7, "_").insert(10, "_")
       expected = "DataMigrate::Data.define(version: #{last_version})"
       expect(stream.read).to include expected
     end
