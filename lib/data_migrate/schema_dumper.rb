@@ -39,7 +39,7 @@ module DataMigrate
     def formatted_version
       stringified = @version.to_s
       return stringified unless stringified.length == 14
-      stringified.insert(4, "_").insert(7, "_").insert(10, "_")      
+      stringified.insert(4, "_").insert(7, "_").insert(10, "_")
     end
   end
 end
