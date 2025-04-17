@@ -15,7 +15,7 @@ module DataMigrate
     end
 
     def dump(stream)
-      define_params = @version ? "version: #{@version}" : ""
+      define_params = @version ? "version: #{formatted_version}" : ""
 
       stream.puts "DataMigrate::Data.define(#{define_params})"
 
@@ -33,6 +33,13 @@ module DataMigrate
                   rescue StandardError
                     0
                   end
+    end
+
+    # turns 20170404131909 into "2017_04_04_131909"
+    def formatted_version
+      stringified = @version.to_s
+      return stringified unless stringified.length == 14
+      stringified.insert(4, "_").insert(7, "_").insert(10, "_")      
     end
   end
 end
