@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'data_migrate/tasks/data_migrate_tasks'
-require 'data_migrate/tasks/setup_tests'
 
 namespace :db do
   namespace :migrate do
@@ -250,13 +249,6 @@ namespace :data do
         :ruby,
         ENV["DATA_SCHEMA"]
       )
-    end
-  end
-
-  namespace :tests do
-    desc "Setup hook for additional functionality"
-    task setup: :environment do
-      DataMigrate::Tasks::SetupTests.new.call
     end
   end
 end

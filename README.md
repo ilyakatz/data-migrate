@@ -83,7 +83,6 @@ You can generate a data migration as you would a schema migration:
     rake data:migrate:up                           # Runs the "up" for a given migration VERSION
     rake data:rollback                             # Rolls the schema back to the previous version (specify steps w/ STEP=n)
     rake data:schema:load                          # Load data_schema.rb file into the database without running the data migrations
-    rake data:tests:setup                          # Setup data migrations for identified test suite
     rake data:version                              # Retrieves the current schema version number for data migrations
     rake db:abort_if_pending_migrations:with_data  # Raises an error if there are pending migrations or data migrations
     rake db:forward:with_data                      # Pushes the schema to the next version (specify steps w/ STEP=n)
@@ -97,7 +96,6 @@ You can generate a data migration as you would a schema migration:
     rake db:schema:load:with_data                  # Load both schema.rb and data_schema.rb file into the database
     rake db:structure:load:with_data               # Load both structure.sql and data_schema.rb file into the database
     rake db:version:with_data                      # Retrieves the current schema version numbers for data and schema migrations
-
 
 Tasks work as they would with the 'vanilla' db version. The 'with_data' addition to the 'db' tasks will run the task in the context of both the data and schema migrations. That is, rake db:rollback:with_data will check to see if it was a schema or data migration invoked last, and do that. Tasks invoked in that space also have an additional line of output, indicating if the action is performed on data or schema.
 
@@ -137,12 +135,11 @@ end
 When `config.test_support_enabled = true`, the `data_migration` generator will create test files for your data migrations. This is dependent on
 the test suite you are using.
 
+The standard data migration Rake task will now utilize corresponding RSpec and Minitest templates.
 For example, if you run `rails g data_migration add_this_to_that`, the following files will be created:
 
 - `/spec/db/data/add_this_to_that_spec.rb` (for RSpec)
 - `/test/db/data/add_this_to_that_test.rb` (for Minitest)
-
-You can also run the Rake task `rake data:tests:setup` to configure your test suite to load data migrations.
 
 ## Capistrano Support
 
