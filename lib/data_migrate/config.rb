@@ -12,7 +12,7 @@ module DataMigrate
   end
 
   class Config
-    attr_accessor :data_migrations_path, :data_template_path, :db_configuration, :spec_name, :test_support_enabled
+    attr_accessor :data_migrations_path, :data_template_path, :db_configuration, :spec_name, :test_support_enabled, :test_framework
 
     DEFAULT_DATA_TEMPLATE_PATH = "data_migration.rb"
 
@@ -22,12 +22,19 @@ module DataMigrate
       @db_configuration = nil
       @spec_name = nil
       @test_support_enabled = false
+      @test_framework = nil
     end
 
     def data_template_path=(value)
       @data_template_path = value.tap do |path|
         raise ArgumentError, "File not found: '#{path}'" unless path == DEFAULT_DATA_TEMPLATE_PATH || File.exist?(path)
       end
+    end
+
+    def test_framework=(value)
+      raise ArgumentError, "Invalid test framework: #{value}" unless [:rspec, :minitest].include?(value)
+
+      @test_framework = value
     end
   end
 end

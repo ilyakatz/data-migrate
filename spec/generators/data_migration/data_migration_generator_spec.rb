@@ -79,6 +79,10 @@ describe DataMigrate::Generators::DataMigrationGenerator do
         expect(DataMigrate::Helpers::InferTestSuiteType).to receive(:new).and_return(infer_double)
       end
 
+      after(:all) do
+        FileUtils.rm_rf(Dir.glob("#{DataMigrate.config.data_migrations_path}/*"))
+      end
+
       context 'and the test suite is RSpec' do
         let(:infer_double) { instance_double(DataMigrate::Helpers::InferTestSuiteType, call: :rspec) }
 

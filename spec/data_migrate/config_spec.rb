@@ -66,4 +66,28 @@ describe DataMigrate::Config do
       end
     end
   end
+
+  describe "#test_framework=" do
+    context "when valid test framework is set" do
+      it "sets the test framework" do
+        allow(DataMigrate.config).to receive(:test_framework).and_return(:minitest)
+
+        expect(DataMigrate.config.test_framework).to eq(:minitest)
+      end
+    end
+
+    context "when valid test framework is set" do
+      it "sets the test framework" do
+        allow(DataMigrate.config).to receive(:test_framework).and_return(:rspec)
+
+        expect(DataMigrate.config.test_framework).to eq(:rspec)
+      end
+    end
+
+    context "when invalid test framework is set" do
+      it "raises an error" do
+        expect { DataMigrate.config.test_framework = :invalid }.to raise_error(ArgumentError, "Invalid test framework: invalid")
+      end
+    end
+  end
 end

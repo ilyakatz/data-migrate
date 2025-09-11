@@ -1,4 +1,5 @@
 require 'test_helper'
+require './<%= data_migrations_file_path_with_version %>'
 
 class <%= migration_class_name %>Test < ActiveSupport::TestCase
   def setup

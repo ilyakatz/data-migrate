@@ -32,11 +32,11 @@ module DataMigrate
       end
 
       def data_migrations_test_file_path
-        File.join(Rails.root, 'test', DataMigrate.config.data_migrations_path, "#{file_name}_test.rb")
+        File.join(Rails.root, 'test', data_migrations_path, "#{migration_file_name}_test.rb")
       end
 
       def data_migrations_spec_file_path
-        File.join(Rails.root, 'spec', DataMigrate.config.data_migrations_path, "#{file_name}_spec.rb")
+        File.join(Rails.root, 'spec', data_migrations_path, "#{migration_file_name}_spec.rb")
       end
 
       def set_local_assigns!
@@ -56,6 +56,10 @@ module DataMigrate
 
       def data_migrations_file_path
         File.join(data_migrations_path, "#{file_name}.rb")
+      end
+
+      def data_migrations_file_path_with_version
+        File.join(data_migrations_path, "#{migration_number}_#{migration_file_name}.rb")
       end
 
       # Use the first path in the data_migrations_path as the target directory
