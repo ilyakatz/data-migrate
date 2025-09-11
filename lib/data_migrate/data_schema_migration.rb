@@ -4,7 +4,7 @@ module DataMigrate
     # So we only load the appropriate methods depending on Rails version.
     if DataMigrate::RailsHelper.rails_version_equal_to_or_higher_than_7_1
       def table_name
-        ActiveRecord::Base.table_name_prefix + 'data_migrations' + ActiveRecord::Base.table_name_suffix
+        ActiveRecord::Base.table_name_prefix + DataMigrate.config.data_migrations_table_name + ActiveRecord::Base.table_name_suffix
       end
 
       def primary_key
@@ -13,7 +13,7 @@ module DataMigrate
     else
       class << self
         def table_name
-          ActiveRecord::Base.table_name_prefix + 'data_migrations' + ActiveRecord::Base.table_name_suffix
+          ActiveRecord::Base.table_name_prefix + DataMigrate.config.data_migrations_table_name + ActiveRecord::Base.table_name_suffix
         end
 
         def primary_key

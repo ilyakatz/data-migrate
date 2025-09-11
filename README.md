@@ -36,7 +36,7 @@ table to track all migrations.
 
 ## Rails Support
 
-Support Rails 6.1 through 7.2
+Support Rails 6.1 through 8.0
 
 For **Rails 6.0** support, please use gem version `9.1.x`:
 
@@ -114,6 +114,7 @@ You can override this setting in `config/initializers/data_migrate.rb`
 
 ```ruby
 DataMigrate.configure do |config|
+  config.data_migrations_table_name = 'my_migrations_database_name'
   config.data_migrations_path = 'db/awesomepath/'
   config.data_template_path = Rails.root.join("lib", "awesomepath", "custom_data_migration.rb")
   config.db_configuration = {
@@ -184,11 +185,12 @@ bundle exec appraisal rails-8.0 rspec
 
 ## Releasing new version
 
-1. Create a new tag, eg `git tag 9.4.1`
-1. Go to https://github.com/ilyakatz/data-migrate/tags
-1. Click "Create release" under 9.4.1
-1. CLick "Generate release notes"
-1. Click "Publish release"
+1. Update version.rb file, run `bundle exec appraisal` to update the version in corresponding gemfile.lock
+2. Create a new tag, eg `git tag 9.4.1`
+3. Go to https://github.com/ilyakatz/data-migrate/tags
+4. Click "Create release" under 9.4.1
+5. CLick "Generate release notes"
+6. Click "Publish release"
 
 ## Thanks
 
