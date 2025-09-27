@@ -127,15 +127,22 @@ DataMigrate.configure do |config|
   config.spec_name = 'primary'
 
   # Enable data_migration generator to create test files
-  config.test_support_enabled = true  # default: false
-  config.test_framework = :rspec      # default: nil (will infer framework when test support enabled)
+  config.test_generator_enabled = true  # default: false
+  config.test_generator_framework = :rspec      # default: nil (will infer framework when test support enabled)
 end
 ```
 
 ### Test Suite Support
 
-When `config.test_support_enabled = true`, the `data_migration` generator will create test files for your data migrations. You can explitcly set the test framework from the `config.test_framework` setting. Otherwise, this will be inferred from the detected test suite.
-the test suite you are using.
+When `config.test_generator_enabled = true`, the `data_migration` generator will create test files for your data migrations. You can explitcly set the test framework from the `config.test_generator_framework` setting. Otherwise, this will be inferred from the detected test suite.
+
+**Setup**
+Data Migration files should be required within your respective spec_helper.rb or test_helper.rb files.
+
+```
+# spec_helper.rb
+require db/data/my_new_data_migration.rb
+```
 
 The standard data migration Rake task will now utilize corresponding RSpec and Minitest templates.
 For example, if you run `rails g data_migration add_this_to_that`, the following files will be created:

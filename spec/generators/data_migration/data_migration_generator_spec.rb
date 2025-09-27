@@ -68,15 +68,14 @@ describe DataMigrate::Generators::DataMigrationGenerator do
       end
     end
 
-    context 'when test support is enabled' do
+    context 'when test generation is enabled' do
       let(:rails_root) { 'dummy-app' }
 
       before do
         DataMigrate.config.data_migrations_path = 'db/data/'
-        DataMigrate.config.test_support_enabled = true
+        DataMigrate.config.test_generator_enabled = true
 
         allow(Rails).to receive(:root).and_return(Pathname.new(rails_root))
-        expect(DataMigrate::Helpers::InferTestSuiteType).to receive(:new).and_return(infer_double)
       end
 
       after(:all) do
@@ -84,7 +83,9 @@ describe DataMigrate::Generators::DataMigrationGenerator do
       end
 
       context 'and the test suite is RSpec' do
-        let(:infer_double) { instance_double(DataMigrate::Helpers::InferTestSuiteType, call: :rspec) }
+        before do
+          DataMigrate.config.test_generator_framework = :rspec
+        end
 
         it 'creates a spec file' do
           expect(subject).to receive(:template).with(
@@ -97,7 +98,9 @@ describe DataMigrate::Generators::DataMigrationGenerator do
       end
 
       context 'and the test suite is Minitest' do
-        let(:infer_double) { instance_double(DataMigrate::Helpers::InferTestSuiteType, call: :minitest) }
+        before do
+          DataMigrate.config.test_generator_framework = :minitest
+        end
 
         it 'creates a test file' do
           expect(subject).to receive(:template).with(

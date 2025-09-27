@@ -21,9 +21,9 @@ module DataMigrate
       protected
 
       def create_data_migration_test
-        return unless DataMigrate.config.test_support_enabled
+        return unless DataMigrate.config.test_generator_enabled
 
-        case DataMigrate::Helpers::InferTestSuiteType.new.call
+        case DataMigrate.config.test_generator_framework
         when :rspec
           template "data_migration_spec.rb", data_migrations_spec_file_path
         when :minitest
