@@ -79,7 +79,7 @@ describe DataMigrate::Generators::DataMigrationGenerator do
       end
 
       after(:all) do
-        FileUtils.rm_rf(Dir.glob("#{DataMigrate.config.data_migrations_path}/*"))
+        FileUtils.rm_rf(Dir.pwd + '/db/data')
       end
 
       context 'and the test suite is RSpec' do
