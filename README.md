@@ -127,8 +127,8 @@ DataMigrate.configure do |config|
   config.spec_name = 'primary'
 
   # Enable data_migration generator to create test files
-  config.test_generator_enabled = true  # default: false
-  config.test_generator_framework = :rspec      # default: nil (will infer framework when test support enabled)
+  config.test_generator_enabled = true      # default: false
+  config.test_generator_framework = :rspec  # default: nil (will infer framework when test support enabled)
 end
 ```
 
