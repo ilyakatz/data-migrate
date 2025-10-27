@@ -1,5 +1,10 @@
 # Changelog
 
+# 11.3.1
+- Schema version -- do formatted version like activerecord https://github.com/ilyakatz/data-migrate/pull/363
+- Resolve ActiveSupport::Configurable deprecation in Rails 8.2 https://github.com/ilyakatz/data-migrate/pull/365
+- Add support for Rails 8.1 in Appraisal https://github.com/ilyakatz/data-migrate/pull/366
+
 # 11.3.0
 - Make table_name configurable https://github.com/ilyakatz/data-migrate/pull/361
 - Use lease_connection over deprecated connection for rails 8 https://github.com/ilyakatz/data-migrate/pull/353
