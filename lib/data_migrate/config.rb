@@ -1,5 +1,4 @@
 module DataMigrate
-  include ActiveSupport::Configurable
   class << self
 
     def configure
