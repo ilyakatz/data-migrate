@@ -125,5 +125,50 @@ describe DataMigrate::Tasks::DataMigrateTasks do
       }.to output(match(/up      data   20091231235959  Some name/)
         .and match(/down    schema  20131111111111  Late migration/)).to_stdout
     end
+
+    context "with migrations in subdirectories" do
+      let(:archive_dir) { "spec/db/data/archive" }
+      let(:archived_schema_dir) { "spec/db/migrate/archived" }
+
+      before do
+        FileUtils.mkdir_p(archive_dir)
+        FileUtils.mkdir_p(archived_schema_dir)
+
+        File.write("#{archive_dir}/20101010101010_archived_data.rb", <<~RUBY)
+          class ArchivedData < ActiveRecord::Migration[6.1]
+          end
+        RUBY
+
+        File.write("#{archived_schema_dir}/20121212121212_archived_schema.rb", <<~RUBY)
+          class ArchivedSchema < ActiveRecord::Migration[6.1]
+          end
+        RUBY
+
+        ActiveRecord::Base.connection.execute(<<~SQL.squish)
+          INSERT INTO data_migrations (version) VALUES ('20101010101010')
+        SQL
+      end
+
+      after do
+        FileUtils.rm_rf(archive_dir)
+        FileUtils.rm_rf(archived_schema_dir)
+      end
+
+      it "should find and display data migrations in subdirectories" do
+        expect {
+          DataMigrate::Tasks::DataMigrateTasks.status
+        }.to output(match(/up     20091231235959  Some name/)
+          .and match(/up     20101010101010  Archived data/)).to_stdout
+      end
+
+      it "should find and display schema migrations in subdirectories" do
+        expect {
+          DataMigrate::Tasks::DataMigrateTasks.status_with_schema
+        }.to output(match(/up      data   20091231235959  Some name/)
+          .and match(/up      data   20101010101010  Archived data/)
+          .and match(/down    schema  20121212121212  Archived schema/)
+          .and match(/down    schema  20131111111111  Late migration/)).to_stdout
+      end
+    end
   end
 end
