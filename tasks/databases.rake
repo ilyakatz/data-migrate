@@ -11,6 +11,11 @@ namespace :db do
       Rake::Task["data:dump"].invoke
     end
 
+    namespace :reset do
+      desc 'Drops and creates a fresh database and runs all migrations.'
+      task with_data: ["db:drop", "db:create", "db:migrate:with_data"]
+    end
+
     namespace :redo do
       desc 'Rollbacks the database one migration and re migrate up (options: STEP=x, VERSION=x).'
       task :with_data => :environment do
