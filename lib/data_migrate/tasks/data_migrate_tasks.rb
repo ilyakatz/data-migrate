@@ -56,22 +56,24 @@ module DataMigrate
         file_list = []
 
         migrations_paths.each do |path|
-          Dir.foreach(File.join(Rails.root, path)) do |file|
+          Dir.glob(File.join(Rails.root, path, "**", "*.rb")).each do |file_path|
             # only files matching "20091231235959_some_name.rb" pattern
-            if match_data = /(\d{14})_(.+)\.rb/.match(file)
+            if match_data = /(\d{14})_(.+)\.rb/.match(File.basename(file_path))
               status = db_list_data.delete(match_data[1]) ? 'up' : 'down'
               file_list << [status, match_data[1], match_data[2], 'data']
             end
           end
         end
 
-        DataMigrate::SchemaMigration.migrations_paths.map do |path|
-          Dir.children(path) if Dir.exist?(path)
-        end.flatten.compact.each do |file|
-          # only files matching "20091231235959_some_name.rb" pattern
-          if match_data = /(\d{14})_(.+)\.rb/.match(file)
-            status = db_list_schema.delete(match_data[1]) ? 'up' : 'down'
-            file_list << [status, match_data[1], match_data[2], 'schema']
+        DataMigrate::SchemaMigration.migrations_paths.each do |path|
+          next unless Dir.exist?(path)
+
+          Dir.glob("#{path}/**/*.rb").each do |file_path|
+            # only files matching "20091231235959_some_name.rb" pattern
+            if match_data = /(\d{14})_(.+)\.rb/.match(File.basename(file_path))
+              status = db_list_schema.delete(match_data[1]) ? 'up' : 'down'
+              file_list << [status, match_data[1], match_data[2], 'schema']
+            end
           end
         end
 

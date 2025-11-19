@@ -1,7 +1,7 @@
 PATH
   remote: ..
   specs:
-    data_migrate (11.3.0)
+    data_migrate (11.3.1)
       activerecord (>= 6.1)
       railties (>= 6.1)
 
@@ -248,6 +248,7 @@ GEM
 PLATFORMS
   aarch64-linux
   arm64-darwin-23
+  arm64-darwin-24
   x86_64-darwin-22
   x86_64-linux
 
