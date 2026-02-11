@@ -186,16 +186,12 @@ module DataMigrate
 
       ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
 
-      # 7.2 removes the param for db_configs_with_versions in https://github.com/rails/rails/commit/9572fcb4a0bd5396436689a6a42613886871cd81
-      # 7.1 stable backported the change in https://github.com/rails/rails/commit/c53ec4b60980036b43528829d4b0b7457f759224
-      schema_mapped_versions = if Gem::Dependency.new("railties", ">= 7.1.4").match?("railties", Gem.loaded_specs["railties"].version, true)
-        ActiveRecord::Tasks::DatabaseTasks.db_configs_with_versions
-      else
-        db_configs = ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env)
-
-        ActiveRecord::Tasks::DatabaseTasks.db_configs_with_versions(db_configs)
+      unless ActiveRecord::Tasks::DatabaseTasks.respond_to?(:db_configs_with_versions)
+        pending_migrations.each { |migration| run_migration(migration, :up) }
+        return
       end
 
+      schema_mapped_versions = schema_db_configs_with_versions
       data_mapped_versions = DataMigrate::DatabaseTasks.db_configs_with_versions
 
       mapped_versions = schema_mapped_versions.merge(data_mapped_versions) do |_key, schema_db_configs, data_db_configs|
@@ -278,6 +274,17 @@ module DataMigrate
         ActiveRecord::Base.dump_schema_after_migration
       end
     end
+
+    def self.schema_db_configs_with_versions
+      method = ActiveRecord::Tasks::DatabaseTasks.method(:db_configs_with_versions)
+      if method.arity == 1
+        db_configs = ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env)
+        ActiveRecord::Tasks::DatabaseTasks.db_configs_with_versions(db_configs)
+      else
+        ActiveRecord::Tasks::DatabaseTasks.db_configs_with_versions
+      end
+    end
+    private_class_method :schema_db_configs_with_versions
 
     def schema_format
       if ActiveRecord.respond_to?(:schema_format)
