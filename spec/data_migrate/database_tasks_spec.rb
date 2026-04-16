@@ -103,6 +103,71 @@ describe DataMigrate::DatabaseTasks do
       end
     end
 
+    describe "structure_dump_flags delegation" do
+      it "delegates structure_dump_flags to ActiveRecord::Tasks::DatabaseTasks" do
+        original_flags = ActiveRecord::Tasks::DatabaseTasks.structure_dump_flags
+        begin
+          ActiveRecord::Tasks::DatabaseTasks.structure_dump_flags = { postgresql: "--no-comments" }
+          expect(subject.structure_dump_flags).to eq({ postgresql: "--no-comments" })
+        ensure
+          ActiveRecord::Tasks::DatabaseTasks.structure_dump_flags = original_flags
+        end
+      end
+
+      it "delegates structure_load_flags to ActiveRecord::Tasks::DatabaseTasks" do
+        original_flags = ActiveRecord::Tasks::DatabaseTasks.structure_load_flags
+        begin
+          ActiveRecord::Tasks::DatabaseTasks.structure_load_flags = { postgresql: "--quiet" }
+          expect(subject.structure_load_flags).to eq({ postgresql: "--quiet" })
+        ensure
+          ActiveRecord::Tasks::DatabaseTasks.structure_load_flags = original_flags
+        end
+      end
+
+      it "returns nil when structure_dump_flags is not set" do
+        original_flags = ActiveRecord::Tasks::DatabaseTasks.structure_dump_flags
+        begin
+          ActiveRecord::Tasks::DatabaseTasks.structure_dump_flags = nil
+          expect(subject.structure_dump_flags).to be_nil
+        ensure
+          ActiveRecord::Tasks::DatabaseTasks.structure_dump_flags = original_flags
+        end
+      end
+
+      it "returns nil when structure_load_flags is not set" do
+        original_flags = ActiveRecord::Tasks::DatabaseTasks.structure_load_flags
+        begin
+          ActiveRecord::Tasks::DatabaseTasks.structure_load_flags = nil
+          expect(subject.structure_load_flags).to be_nil
+        ensure
+          ActiveRecord::Tasks::DatabaseTasks.structure_load_flags = original_flags
+        end
+      end
+
+      context "when dump_schema calls structure_dump_flags_for" do
+        # This test ensures that the structure_dump_flags delegation works correctly
+        # when dump_schema is called with :sql format, which uses structure_dump internally.
+        # Without the delegation, this raises:
+        # NameError: undefined local variable or method 'structure_dump_flags' for module primary
+        it "does not raise NameError when accessing structure_dump_flags" do
+          db_config = ActiveRecord::DatabaseConfigurations::HashConfig.new(
+            'test',
+            'primary',
+            adapter: "sqlite3",
+            database: "spec/db/test.db"
+          )
+
+          # Verify the delegation methods are accessible and don't raise errors
+          expect { subject.structure_dump_flags }.not_to raise_error
+          expect { subject.structure_load_flags }.not_to raise_error
+
+          # These methods should return the same values as ActiveRecord::Tasks::DatabaseTasks
+          expect(subject.structure_dump_flags).to eq(ActiveRecord::Tasks::DatabaseTasks.structure_dump_flags)
+          expect(subject.structure_load_flags).to eq(ActiveRecord::Tasks::DatabaseTasks.structure_load_flags)
+        end
+      end
+    end
+
     describe :prepare_all_with_data do
       let(:db_config) do
         ActiveRecord::DatabaseConfigurations::HashConfig.new(

@@ -9,6 +9,17 @@ module DataMigrate
     extend ActiveRecord::Tasks::DatabaseTasks
     extend self
 
+    # Delegate structure_dump_flags and structure_load_flags to ActiveRecord::Tasks::DatabaseTasks.
+    # These are mattr_accessors on the original module that don't get properly extended,
+    # causing NameError when dump_schema calls structure_dump_flags_for in Rails 7.2+.
+    def self.structure_dump_flags
+      ActiveRecord::Tasks::DatabaseTasks.structure_dump_flags
+    end
+
+    def self.structure_load_flags
+      ActiveRecord::Tasks::DatabaseTasks.structure_load_flags
+    end
+
     if respond_to?(:register_task)
       register_task(/mysql/,        "ActiveRecord::Tasks::MySQLDatabaseTasks")
       register_task(/trilogy/,      "ActiveRecord::Tasks::MySQLDatabaseTasks")
