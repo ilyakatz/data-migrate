@@ -11,8 +11,10 @@ module DataMigrate
                               migrations
                             end
 
-      data_migrator = DataMigrate::RailsHelper.data_migrator(:up, selected_migrations, DataMigrate::RailsHelper.schema_migration, DataMigrate::RailsHelper.internal_metadata, target_version)
-      data_migrator.migrate
+      within_configured_connection do
+        data_migrator = DataMigrate::RailsHelper.data_migrator(:up, selected_migrations, DataMigrate::RailsHelper.schema_migration, DataMigrate::RailsHelper.internal_metadata, target_version)
+        data_migrator.migrate
+      end
     end
 
     def down(target_version = nil)
@@ -23,13 +25,17 @@ module DataMigrate
           migrations
         end
 
-      data_migrator = DataMigrate::RailsHelper.data_migrator(:down, selected_migrations, DataMigrate::RailsHelper.schema_migration, DataMigrate::RailsHelper.internal_metadata, target_version)
-      data_migrator.migrate
+      within_configured_connection do
+        data_migrator = DataMigrate::RailsHelper.data_migrator(:down, selected_migrations, DataMigrate::RailsHelper.schema_migration, DataMigrate::RailsHelper.internal_metadata, target_version)
+        data_migrator.migrate
+      end
     end
 
     def run(direction, target_version)
-      data_migrator = DataMigrate::RailsHelper.data_migrator(direction, migrations, DataMigrate::RailsHelper.schema_migration, DataMigrate::RailsHelper.internal_metadata, target_version)
-      data_migrator.run
+      within_configured_connection do
+        data_migrator = DataMigrate::RailsHelper.data_migrator(direction, migrations, DataMigrate::RailsHelper.schema_migration, DataMigrate::RailsHelper.internal_metadata, target_version)
+        data_migrator.run
+      end
     end
 
     def current_version
@@ -61,6 +67,14 @@ module DataMigrate
     end
 
     private
+
+    def within_configured_connection(&block)
+      raw_config = DataMigrate.config.db_configuration
+      return yield unless raw_config
+
+      db_config = ActiveRecord::Base.configurations.resolve(raw_config)
+      DataMigrate::DatabaseTasks.with_temporary_connection(db_config, &block)
+    end
 
     def get_all_versions
       if DataMigrate::RailsHelper.data_schema_migration.table_exists?

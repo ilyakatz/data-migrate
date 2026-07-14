@@ -14,10 +14,13 @@ RSpec.configure do |config|
   config.after(:each) do
     DataMigrate.configure do |config|
       config.data_migrations_path = @prev_data_migrations_path
+      config.db_configuration = @prev_db_configuration
     end
   end
 
   config.before(:each) do |example|
+    @prev_db_configuration = DataMigrate.config.db_configuration
+
     if example.metadata[:no_override]
     else
       @prev_data_migrations_path = DataMigrate.config.data_migrations_path

@@ -106,6 +106,58 @@ describe DataMigrate::DataMigrator do
     end
   end
 
+  describe "db_configuration" do
+    context "when db_configuration is not set" do
+      it "does not wrap the migration in a temporary connection" do
+        expect(DataMigrate::DatabaseTasks).not_to receive(:with_temporary_connection)
+
+        context.run(:up, 20171231235959)
+
+        versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
+        expect(versions).to include("20171231235959")
+      end
+    end
+
+    context "when db_configuration is set" do
+      before do
+        DataMigrate.configure do |config|
+          config.db_configuration = db_config
+        end
+      end
+
+      it "resolves the configuration and runs actions within a temporary connection" do
+        allow(ActiveRecord::Base.configurations).to receive(:resolve).and_call_original
+        expect(ActiveRecord::Base.configurations).to receive(:resolve).with(db_config).and_call_original
+        expect(DataMigrate::DatabaseTasks).to receive(:with_temporary_connection).and_call_original
+
+        context.run(:up, 20171231235959)
+
+        versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
+        expect(versions).to include("20171231235959")
+      end
+
+      it "wraps up in a temporary connection" do
+        expect(DataMigrate::DatabaseTasks).to receive(:with_temporary_connection).and_call_original
+
+        context.migrate(nil)
+
+        versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
+        expect(versions.count).to eq(2)
+      end
+
+      it "wraps run in a temporary connection" do
+        context.migrate(nil)
+
+        expect(DataMigrate::DatabaseTasks).to receive(:with_temporary_connection).and_call_original
+
+        context.run(:down, 20171231235959)
+
+        versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
+        expect(versions).not_to include("20171231235959")
+      end
+    end
+  end
+
   # schema migration changed in Rails 7.2, from the connection to the pool object.
   def ar_schema_migration
     if ActiveRecord::Base.connection_pool.respond_to?(:schema_migration)
