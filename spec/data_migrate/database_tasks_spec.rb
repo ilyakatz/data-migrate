@@ -103,6 +103,31 @@ describe DataMigrate::DatabaseTasks do
       end
     end
 
+    describe :migrate_with_data do
+      let(:env) { ActiveRecord::Tasks::DatabaseTasks.env }
+
+      before do
+        hash_config = ActiveRecord::DatabaseConfigurations::HashConfig.new(
+          env, 'primary',
+          adapter: "sqlite3",
+          database: "spec/db/test.db",
+          migrations_paths: "spec/db/migrate"
+        )
+        configurations = ActiveRecord::DatabaseConfigurations.new([hash_config])
+        allow(ActiveRecord::Base).to receive(:configurations).and_return(configurations)
+      end
+
+      it "runs all pending data and schema migrations" do
+        subject.migrate_with_data
+
+        data_versions = DataMigrate::RailsHelper.data_schema_migration.normalized_versions
+        expect(data_versions).to include("20091231235959")
+
+        schema_versions = DataMigrate::RailsHelper.schema_migration.normalized_versions
+        expect(schema_versions).to include("20131111111111")
+      end
+    end
+
     describe :prepare_all_with_data do
       let(:db_config) do
         ActiveRecord::DatabaseConfigurations::HashConfig.new(
