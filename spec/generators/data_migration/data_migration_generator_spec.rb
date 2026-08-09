@@ -30,9 +30,11 @@ describe DataMigrate::Generators::DataMigrationGenerator do
   end
 
   describe :create_data_migration do
-    subject { DataMigrate::Generators::DataMigrationGenerator.new(['my_migration']) }
+    let(:migration_name) { 'my_migration' }
 
-    let(:data_migrations_file_path) { 'abc/my_migration.rb' }
+    subject { DataMigrate::Generators::DataMigrationGenerator.new([migration_name]) }
+
+    let(:data_migrations_file_path) { "abc/#{migration_name}.rb" }
 
     context 'when custom data migrations path has a trailing slash' do
       before do
@@ -43,6 +45,8 @@ describe DataMigrate::Generators::DataMigrationGenerator do
         is_expected.to receive(:migration_template).with(
           'data_migration.rb', data_migrations_file_path
         )
+
+        expect(subject).not_to receive(:template)
 
         subject.create_data_migration
       end
@@ -58,7 +62,54 @@ describe DataMigrate::Generators::DataMigrationGenerator do
           'data_migration.rb', data_migrations_file_path
         )
 
+        expect(subject).not_to receive(:template)
+
         subject.create_data_migration
+      end
+    end
+
+    context 'when test generation is enabled' do
+      let(:rails_root) { 'dummy-app' }
+
+      before do
+        DataMigrate.config.data_migrations_path = 'db/data/'
+        DataMigrate.config.test_generator_enabled = true
+
+        allow(Rails).to receive(:root).and_return(Pathname.new(rails_root))
+      end
+
+      after(:all) do
+        FileUtils.rm_rf(Dir.pwd + '/db/data')
+      end
+
+      context 'and the test suite is RSpec' do
+        before do
+          DataMigrate.config.test_generator_framework = :rspec
+        end
+
+        it 'creates a spec file' do
+          expect(subject).to receive(:template).with(
+            'data_migration_spec.rb',
+            "#{rails_root}/spec/db/data/#{migration_name}_spec.rb"
+          )
+
+          subject.create_data_migration
+        end
+      end
+
+      context 'and the test suite is Minitest' do
+        before do
+          DataMigrate.config.test_generator_framework = :minitest
+        end
+
+        it 'creates a test file' do
+          expect(subject).to receive(:template).with(
+            'data_migration_test.rb',
+            "#{rails_root}/test/db/data/#{migration_name}_test.rb"
+          )
+
+          subject.create_data_migration
+        end
       end
     end
   end

@@ -15,9 +15,29 @@ module DataMigrate
       def create_data_migration
         set_local_assigns!
         migration_template template_path, data_migrations_file_path
+        create_data_migration_test
       end
 
       protected
+
+      def create_data_migration_test
+        return unless DataMigrate.config.test_generator_enabled
+
+        case DataMigrate.config.test_generator_framework
+        when :rspec
+          template "data_migration_spec.rb", data_migrations_spec_file_path
+        when :minitest
+          template "data_migration_test.rb", data_migrations_test_file_path
+        end
+      end
+
+      def data_migrations_test_file_path
+        File.join(Rails.root, 'test', data_migrations_path, "#{migration_file_name}_test.rb")
+      end
+
+      def data_migrations_spec_file_path
+        File.join(Rails.root, 'spec', data_migrations_path, "#{migration_file_name}_spec.rb")
+      end
 
       def set_local_assigns!
         if file_name =~ /^(add|remove)_.*_(?:to|from)_(.*)/
@@ -36,6 +56,10 @@ module DataMigrate
 
       def data_migrations_file_path
         File.join(data_migrations_path, "#{file_name}.rb")
+      end
+
+      def data_migrations_file_path_with_version
+        File.join(data_migrations_path, "#{migration_number}_#{migration_file_name}.rb")
       end
 
       # Use the first path in the data_migrations_path as the target directory

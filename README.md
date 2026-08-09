@@ -97,7 +97,6 @@ You can generate a data migration as you would a schema migration:
     rake db:structure:load:with_data               # Load both structure.sql and data_schema.rb file into the database
     rake db:version:with_data                      # Retrieves the current schema version numbers for data and schema migrations
 
-
 Tasks work as they would with the 'vanilla' db version. The 'with_data' addition to the 'db' tasks will run the task in the context of both the data and schema migrations. That is, rake db:rollback:with_data will check to see if it was a schema or data migration invoked last, and do that. Tasks invoked in that space also have an additional line of output, indicating if the action is performed on data or schema.
 
 With 'up' and 'down', you can specify the option 'BOTH', which defaults to false. Using true, will migrate both the data and schema (in the desired direction) if they both match the version provided. Again, going up, schema is given precedence. Down its data.
@@ -126,9 +125,30 @@ DataMigrate.configure do |config|
     'password' => nil,
   }
   config.spec_name = 'primary'
+
+  # Enable data_migration generator to create test files
+  config.test_generator_enabled = true      # default: false
+  config.test_generator_framework = :rspec  # default: nil (will infer framework when test support enabled)
 end
+```
+
+### Test Suite Support
+
+When `config.test_generator_enabled = true`, the `data_migration` generator will create test files for your data migrations. You can explitcly set the test framework from the `config.test_generator_framework` setting. Otherwise, this will be inferred from the detected test suite.
+
+**Setup**
+Data Migration files should be required within your respective spec_helper.rb or test_helper.rb files.
 
 ```
+# spec_helper.rb
+require db/data/my_new_data_migration.rb
+```
+
+The standard data migration Rake task will now utilize corresponding RSpec and Minitest templates.
+For example, if you run `rails g data_migration add_this_to_that`, the following files will be created:
+
+- `/spec/db/data/add_this_to_that_spec.rb` (for RSpec)
+- `/test/db/data/add_this_to_that_test.rb` (for Minitest)
 
 ## Capistrano Support
 
