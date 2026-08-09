@@ -88,6 +88,7 @@ You can generate a data migration as you would a schema migration:
     rake db:forward:with_data                      # Pushes the schema to the next version (specify steps w/ STEP=n)
     rake db:migrate:down:with_data                 # Runs the "down" for a given migration VERSION
     rake db:migrate:redo:with_data                 # Rollbacks the database one migration and re migrate up (options: STEP=x, VERSION=x)
+    rake db:migrate:reset:with_data                # Drops and creates a fresh database and runs all migrations.
     rake db:migrate:status:with_data               # Display status of data and schema migrations
     rake db:migrate:up:with_data                   # Runs the "up" for a given migration VERSION
     rake db:migrate:with_data                      # Migrate the database data and schema (options: VERSION=x, VERBOSE=false)
