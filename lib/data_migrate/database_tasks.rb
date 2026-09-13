@@ -240,29 +240,33 @@ module DataMigrate
           connection = pool.respond_to?(:lease_connection) ? pool.lease_connection : pool.connection
           unless database_exists?(connection)
             create(db_config)
-
-            ar_schema_path = ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(db_config, schema_format)
-            if ar_schema_path && File.exist?(ar_schema_path)
-              ActiveRecord::Tasks::DatabaseTasks.load_schema(db_config, schema_format, ar_schema_path)
-            end
-
-            data_schema_path = ENV["DATA_SCHEMA"] || schema_dump_path(db_config)
-            if data_schema_path && File.exist?(data_schema_path)
-              load_schema_current(:ruby, ENV["DATA_SCHEMA"])
-            end
-
+            load_schemas_for_prepare(db_config)
             seed = true
           end
 
           migrate_with_data
-          if dump_schema_after_migration?
-            ActiveRecord::Tasks::DatabaseTasks.dump_schema(db_config)
-            DataMigrate::Tasks::DataMigrateTasks.dump
-          end
+          dump_schemas_after_migrate(db_config) if dump_schema_after_migration?
         end
       end
 
       load_seed if seed
+    end
+
+    def self.load_schemas_for_prepare(db_config)
+      ar_schema_path = ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(db_config, schema_format)
+      if ar_schema_path && File.exist?(ar_schema_path)
+        ActiveRecord::Tasks::DatabaseTasks.load_schema(db_config, schema_format, ar_schema_path)
+      end
+
+      data_schema_path = ENV["DATA_SCHEMA"] || schema_dump_path(db_config)
+      return unless data_schema_path && File.exist?(data_schema_path)
+
+      load_schema_current(:ruby, ENV["DATA_SCHEMA"])
+    end
+
+    def self.dump_schemas_after_migrate(db_config)
+      ActiveRecord::Tasks::DatabaseTasks.dump_schema(db_config)
+      DataMigrate::Tasks::DataMigrateTasks.dump
     end
 
     private

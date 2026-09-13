@@ -150,13 +150,6 @@ describe DataMigrate::DatabaseTasks do
         # Without the delegation, this raises:
         # NameError: undefined local variable or method 'structure_dump_flags' for module primary
         it "does not raise NameError when accessing structure_dump_flags" do
-          db_config = ActiveRecord::DatabaseConfigurations::HashConfig.new(
-            'test',
-            'primary',
-            adapter: "sqlite3",
-            database: "spec/db/test.db"
-          )
-
           # Verify the delegation methods are accessible and don't raise errors
           expect { subject.structure_dump_flags }.not_to raise_error
           expect { subject.structure_load_flags }.not_to raise_error
@@ -171,8 +164,8 @@ describe DataMigrate::DatabaseTasks do
     describe :prepare_all_with_data do
       let(:db_config) do
         ActiveRecord::DatabaseConfigurations::HashConfig.new(
-          'test',
-          'primary',
+          "test",
+          "primary",
           adapter: "sqlite3",
           database: "spec/db/test.db"
         )
