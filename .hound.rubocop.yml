@@ -1,0 +1,6 @@
+# Hound's newest RuboCop is 1.22.1, which does not accept TargetRubyVersion 3.1.
+# Keep project lint target at 3.1 in .ruby-style.yml for local/overcommit runs.
+inherit_from: .rubocop.yml
+
+AllCops:
+  TargetRubyVersion: 3.0

@@ -9,6 +9,17 @@ module DataMigrate
     extend ActiveRecord::Tasks::DatabaseTasks
     extend self
 
+    # Delegate structure_dump_flags and structure_load_flags to ActiveRecord::Tasks::DatabaseTasks.
+    # These are mattr_accessors on the original module that don't get properly extended,
+    # causing NameError when dump_schema calls structure_dump_flags_for in Rails 7.2+.
+    def self.structure_dump_flags
+      ActiveRecord::Tasks::DatabaseTasks.structure_dump_flags
+    end
+
+    def self.structure_load_flags
+      ActiveRecord::Tasks::DatabaseTasks.structure_load_flags
+    end
+
     if respond_to?(:register_task)
       register_task(/mysql/,        "ActiveRecord::Tasks::MySQLDatabaseTasks")
       register_task(/trilogy/,      "ActiveRecord::Tasks::MySQLDatabaseTasks")
@@ -229,26 +240,33 @@ module DataMigrate
           connection = pool.respond_to?(:lease_connection) ? pool.lease_connection : pool.connection
           unless database_exists?(connection)
             create(db_config)
-            if File.exist?(schema_dump_path(db_config))
-              load_schema(db_config, schema_format, nil)
-              load_schema_current(
-                :ruby,
-                ENV["DATA_SCHEMA"]
-              )
-            end
-
+            load_schemas_for_prepare(db_config)
             seed = true
           end
 
           migrate_with_data
-          if dump_schema_after_migration?
-            dump_schema(db_config)
-            DataMigrate::Tasks::DataMigrateTasks.dump
-          end
+          dump_schemas_after_migrate(db_config) if dump_schema_after_migration?
         end
       end
 
       load_seed if seed
+    end
+
+    def self.load_schemas_for_prepare(db_config)
+      ar_schema_path = ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(db_config, schema_format)
+      if ar_schema_path && File.exist?(ar_schema_path)
+        ActiveRecord::Tasks::DatabaseTasks.load_schema(db_config, schema_format, ar_schema_path)
+      end
+
+      data_schema_path = ENV["DATA_SCHEMA"] || schema_dump_path(db_config)
+      return unless data_schema_path && File.exist?(data_schema_path)
+
+      load_schema_current(:ruby, ENV["DATA_SCHEMA"])
+    end
+
+    def self.dump_schemas_after_migrate(db_config)
+      ActiveRecord::Tasks::DatabaseTasks.dump_schema(db_config)
+      DataMigrate::Tasks::DataMigrateTasks.dump
     end
 
     private

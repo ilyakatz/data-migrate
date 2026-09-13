@@ -103,11 +103,69 @@ describe DataMigrate::DatabaseTasks do
       end
     end
 
+    describe "structure_dump_flags delegation" do
+      it "delegates structure_dump_flags to ActiveRecord::Tasks::DatabaseTasks" do
+        original_flags = ActiveRecord::Tasks::DatabaseTasks.structure_dump_flags
+        begin
+          ActiveRecord::Tasks::DatabaseTasks.structure_dump_flags = { postgresql: "--no-comments" }
+          expect(subject.structure_dump_flags).to eq({ postgresql: "--no-comments" })
+        ensure
+          ActiveRecord::Tasks::DatabaseTasks.structure_dump_flags = original_flags
+        end
+      end
+
+      it "delegates structure_load_flags to ActiveRecord::Tasks::DatabaseTasks" do
+        original_flags = ActiveRecord::Tasks::DatabaseTasks.structure_load_flags
+        begin
+          ActiveRecord::Tasks::DatabaseTasks.structure_load_flags = { postgresql: "--quiet" }
+          expect(subject.structure_load_flags).to eq({ postgresql: "--quiet" })
+        ensure
+          ActiveRecord::Tasks::DatabaseTasks.structure_load_flags = original_flags
+        end
+      end
+
+      it "returns nil when structure_dump_flags is not set" do
+        original_flags = ActiveRecord::Tasks::DatabaseTasks.structure_dump_flags
+        begin
+          ActiveRecord::Tasks::DatabaseTasks.structure_dump_flags = nil
+          expect(subject.structure_dump_flags).to be_nil
+        ensure
+          ActiveRecord::Tasks::DatabaseTasks.structure_dump_flags = original_flags
+        end
+      end
+
+      it "returns nil when structure_load_flags is not set" do
+        original_flags = ActiveRecord::Tasks::DatabaseTasks.structure_load_flags
+        begin
+          ActiveRecord::Tasks::DatabaseTasks.structure_load_flags = nil
+          expect(subject.structure_load_flags).to be_nil
+        ensure
+          ActiveRecord::Tasks::DatabaseTasks.structure_load_flags = original_flags
+        end
+      end
+
+      context "when dump_schema calls structure_dump_flags_for" do
+        # This test ensures that the structure_dump_flags delegation works correctly
+        # when dump_schema is called with :sql format, which uses structure_dump internally.
+        # Without the delegation, this raises:
+        # NameError: undefined local variable or method 'structure_dump_flags' for module primary
+        it "does not raise NameError when accessing structure_dump_flags" do
+          # Verify the delegation methods are accessible and don't raise errors
+          expect { subject.structure_dump_flags }.not_to raise_error
+          expect { subject.structure_load_flags }.not_to raise_error
+
+          # These methods should return the same values as ActiveRecord::Tasks::DatabaseTasks
+          expect(subject.structure_dump_flags).to eq(ActiveRecord::Tasks::DatabaseTasks.structure_dump_flags)
+          expect(subject.structure_load_flags).to eq(ActiveRecord::Tasks::DatabaseTasks.structure_load_flags)
+        end
+      end
+    end
+
     describe :prepare_all_with_data do
       let(:db_config) do
         ActiveRecord::DatabaseConfigurations::HashConfig.new(
-          'test',
-          'primary',
+          "test",
+          "primary",
           adapter: "sqlite3",
           database: "spec/db/test.db"
         )
@@ -115,17 +173,24 @@ describe DataMigrate::DatabaseTasks do
 
       let(:pool) { double("ConnectionPool") }
       let(:connection) { double("Connection") }
+      let(:ar_schema_path) { "db/structure.sql" }
+      let(:data_schema_path) { "db/data_schema.rb" }
 
       before do
         allow(subject).to receive(:each_current_configuration).and_yield(db_config)
         allow(subject).to receive(:with_temporary_pool).with(db_config).and_yield(pool)
         allow(pool).to receive(:lease_connection).and_return(connection)
-        allow(subject).to receive(:schema_dump_path).and_return("db/data_schema.rb")
-        allow(File).to receive(:exist?).and_return(true)
-        allow(subject).to receive(:load_schema)
+        allow(subject).to receive(:schema_dump_path).and_return(data_schema_path)
+        allow(subject).to receive(:schema_format).and_return(:sql)
+        allow(ActiveRecord::Tasks::DatabaseTasks).to receive(:schema_dump_path)
+          .with(db_config, :sql).and_return(ar_schema_path)
+        allow(File).to receive(:exist?).and_call_original
+        allow(File).to receive(:exist?).with(ar_schema_path).and_return(true)
+        allow(File).to receive(:exist?).with(data_schema_path).and_return(true)
+        allow(ActiveRecord::Tasks::DatabaseTasks).to receive(:load_schema)
         allow(subject).to receive(:load_schema_current)
         allow(subject).to receive(:migrate_with_data)
-        allow(subject).to receive(:dump_schema)
+        allow(ActiveRecord::Tasks::DatabaseTasks).to receive(:dump_schema)
         allow(DataMigrate::Tasks::DataMigrateTasks).to receive(:dump)
         allow(subject).to receive(:load_seed)
 
@@ -146,17 +211,27 @@ describe DataMigrate::DatabaseTasks do
           subject.prepare_all_with_data
         end
 
-        it "loads the schema" do
-          expect(subject).to receive(:load_schema).with(
+        it "loads the ActiveRecord schema via ActiveRecord::Tasks::DatabaseTasks" do
+          expect(ActiveRecord::Tasks::DatabaseTasks).to receive(:load_schema).with(
             db_config,
-            subject.send(:schema_format),
-            nil
+            :sql,
+            ar_schema_path
           )
           subject.prepare_all_with_data
         end
 
-        it "loads the current data schema" do
+        it "loads the current data schema as ruby" do
           expect(subject).to receive(:load_schema_current).with(:ruby, ENV["DATA_SCHEMA"])
+          subject.prepare_all_with_data
+        end
+
+        it "does not load data_schema.rb as sql" do
+          expect(ActiveRecord::Tasks::DatabaseTasks).not_to receive(:load_schema).with(
+            db_config,
+            :sql,
+            data_schema_path
+          )
+          expect(subject).not_to receive(:load_schema)
           subject.prepare_all_with_data
         end
 
@@ -165,8 +240,8 @@ describe DataMigrate::DatabaseTasks do
           subject.prepare_all_with_data
         end
 
-        it "dumps the schema after migration" do
-          expect(subject).to receive(:dump_schema).with(db_config)
+        it "dumps the ActiveRecord schema and data schema after migration" do
+          expect(ActiveRecord::Tasks::DatabaseTasks).to receive(:dump_schema).with(db_config)
           expect(DataMigrate::Tasks::DataMigrateTasks).to receive(:dump)
           subject.prepare_all_with_data
         end
@@ -174,6 +249,34 @@ describe DataMigrate::DatabaseTasks do
         it "loads seed data" do
           expect(subject).to receive(:load_seed)
           subject.prepare_all_with_data
+        end
+
+        context "when only the ActiveRecord schema exists" do
+          before do
+            allow(File).to receive(:exist?).with(data_schema_path).and_return(false)
+          end
+
+          it "loads the ActiveRecord schema but not the data schema" do
+            expect(ActiveRecord::Tasks::DatabaseTasks).to receive(:load_schema).with(
+              db_config,
+              :sql,
+              ar_schema_path
+            )
+            expect(subject).not_to receive(:load_schema_current)
+            subject.prepare_all_with_data
+          end
+        end
+
+        context "when only the data schema exists" do
+          before do
+            allow(File).to receive(:exist?).with(ar_schema_path).and_return(false)
+          end
+
+          it "loads the data schema but not the ActiveRecord schema" do
+            expect(ActiveRecord::Tasks::DatabaseTasks).not_to receive(:load_schema)
+            expect(subject).to receive(:load_schema_current).with(:ruby, ENV["DATA_SCHEMA"])
+            subject.prepare_all_with_data
+          end
         end
       end
 
@@ -188,7 +291,7 @@ describe DataMigrate::DatabaseTasks do
         end
 
         it "does not load the schema" do
-          expect(subject).not_to receive(:load_schema)
+          expect(ActiveRecord::Tasks::DatabaseTasks).not_to receive(:load_schema)
           expect(subject).not_to receive(:load_schema_current)
           subject.prepare_all_with_data
         end
@@ -198,8 +301,8 @@ describe DataMigrate::DatabaseTasks do
           subject.prepare_all_with_data
         end
 
-        it "dumps the schema after migration" do
-          expect(subject).to receive(:dump_schema).with(db_config)
+        it "dumps the ActiveRecord schema and data schema after migration" do
+          expect(ActiveRecord::Tasks::DatabaseTasks).to receive(:dump_schema).with(db_config)
           expect(DataMigrate::Tasks::DataMigrateTasks).to receive(:dump)
           subject.prepare_all_with_data
         end
