@@ -240,12 +240,15 @@ module DataMigrate
           connection = pool.respond_to?(:lease_connection) ? pool.lease_connection : pool.connection
           unless database_exists?(connection)
             create(db_config)
-            if File.exist?(schema_dump_path(db_config))
-              load_schema(db_config, schema_format, nil)
-              load_schema_current(
-                :ruby,
-                ENV["DATA_SCHEMA"]
-              )
+
+            ar_schema_path = ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(db_config, schema_format)
+            if ar_schema_path && File.exist?(ar_schema_path)
+              ActiveRecord::Tasks::DatabaseTasks.load_schema(db_config, schema_format, ar_schema_path)
+            end
+
+            data_schema_path = ENV["DATA_SCHEMA"] || schema_dump_path(db_config)
+            if data_schema_path && File.exist?(data_schema_path)
+              load_schema_current(:ruby, ENV["DATA_SCHEMA"])
             end
 
             seed = true
@@ -253,7 +256,7 @@ module DataMigrate
 
           migrate_with_data
           if dump_schema_after_migration?
-            dump_schema(db_config)
+            ActiveRecord::Tasks::DatabaseTasks.dump_schema(db_config)
             DataMigrate::Tasks::DataMigrateTasks.dump
           end
         end
