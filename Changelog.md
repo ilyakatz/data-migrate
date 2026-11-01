@@ -1,5 +1,8 @@
 # Changelog
 
+# Unreleased
+- Fix `ActiveRecord::StatementInvalid` when checking for pending data migrations before the data_migrations table exists
+
 # 11.3.1
 - Schema version -- do formatted version like activerecord https://github.com/ilyakatz/data-migrate/pull/363
 - Resolve ActiveSupport::Configurable deprecation in Rails 8.2 https://github.com/ilyakatz/data-migrate/pull/365

@@ -56,6 +56,15 @@ describe DataMigrate::DatabaseTasks do
       end
     end
 
+    describe :pending_data_migrations do
+      it "returns all data migrations as pending when the data_migrations table does not exist" do
+        ActiveRecord::Migration.drop_table("data_migrations") rescue nil
+
+        expect(subject.pending_data_migrations.map { |m| m[:version] })
+          .to eq([20091231235959, 20171231235959, 20241231235959])
+      end
+    end
+
     describe :forward do
       it "run forward default amount of times" do
         subject.forward
