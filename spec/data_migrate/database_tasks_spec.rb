@@ -58,7 +58,7 @@ describe DataMigrate::DatabaseTasks do
 
     describe :pending_data_migrations do
       it "returns all data migrations as pending when the data_migrations table does not exist" do
-        ActiveRecord::Migration.drop_table("data_migrations") rescue nil
+        ActiveRecord::Migration.drop_table("data_migrations", if_exists: true)
 
         expect(subject.pending_data_migrations.map { |m| m[:version] })
           .to eq([20091231235959, 20171231235959, 20241231235959])

@@ -11,7 +11,8 @@ module DataMigrate
   end
 
   class Config
-    attr_accessor :data_migrations_table_name, :data_migrations_path, :data_template_path, :db_configuration, :spec_name, :pending_migration_error
+    attr_accessor :data_migrations_table_name, :data_migrations_path, :data_template_path, :db_configuration,
+                  :spec_name, :pending_migration_error
 
     DEFAULT_DATA_TEMPLATE_PATH = "data_migration.rb"
 

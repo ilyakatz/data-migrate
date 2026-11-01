@@ -18,8 +18,8 @@ describe DataMigrate::CheckPending do
 
   after do
     DataMigrate.configure { |config| config.pending_migration_error = nil }
-    ActiveRecord::Migration.drop_table("data_migrations") rescue nil
-    ActiveRecord::Migration.drop_table("schema_migrations") rescue nil
+    ActiveRecord::Migration.drop_table("data_migrations", if_exists: true)
+    ActiveRecord::Migration.drop_table("schema_migrations", if_exists: true)
   end
 
   def mark_as_migrated(*versions)
@@ -71,7 +71,10 @@ describe DataMigrate::CheckPending do
 
   context "with a temporary data migrations directory" do
     around do |example|
-      Dir.mktmpdir { |dir| @dir = dir; example.run }
+      Dir.mktmpdir do |dir|
+        @dir = dir
+        example.run
+      end
     end
 
     it "checks again when a new data migration file is added" do

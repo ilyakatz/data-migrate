@@ -17,7 +17,8 @@ module DataMigrate
 
     def pending_migrations_message(pending_migrations)
       message = +"Data migrations are pending. To resolve this issue, run:\n\n        bin/rails data:migrate\n\n"
-      message << "You have #{pending_migrations.size} pending data #{'migration'.pluralize(pending_migrations.size)}:\n\n"
+      count = pending_migrations.size
+      message << "You have #{count} pending data #{'migration'.pluralize(count)}:\n\n"
       pending_migrations.each do |pending_migration|
         message << "  %4d %s\n" % [pending_migration[:version], pending_migration[:name]]
       end

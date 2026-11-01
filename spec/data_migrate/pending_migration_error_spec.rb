@@ -5,10 +5,12 @@ require "spec_helper"
 describe DataMigrate::PendingMigrationError do
   describe "#message" do
     it "lists pending migrations like data:abort_if_pending_migrations" do
-      error = described_class.new(pending_migrations: [
-        { version: 20091231235959, name: "SomeName", kind: :data },
-        { version: 20171231235959, name: "SuperUpdate", kind: :data }
-      ])
+      error = described_class.new(
+        pending_migrations: [
+          { version: 20091231235959, name: "SomeName", kind: :data },
+          { version: 20171231235959, name: "SuperUpdate", kind: :data }
+        ]
+      )
 
       expect(error.message.strip).to eq(<<~MSG.strip)
         Data migrations are pending. To resolve this issue, run:
@@ -23,9 +25,9 @@ describe DataMigrate::PendingMigrationError do
     end
 
     it "uses the singular form for a single pending migration" do
-      error = described_class.new(pending_migrations: [
-        { version: 20091231235959, name: "SomeName", kind: :data }
-      ])
+      error = described_class.new(
+        pending_migrations: [{ version: 20091231235959, name: "SomeName", kind: :data }]
+      )
 
       expect(error.message).to include("You have 1 pending data migration:\n")
     end
@@ -47,8 +49,8 @@ describe DataMigrate::PendingMigrationError do
     end
 
     after do
-      ActiveRecord::Migration.drop_table("data_migrations") rescue nil
-      ActiveRecord::Migration.drop_table("schema_migrations") rescue nil
+      ActiveRecord::Migration.drop_table("data_migrations", if_exists: true)
+      ActiveRecord::Migration.drop_table("schema_migrations", if_exists: true)
     end
 
     it "offers a single action to run pending data migrations" do
