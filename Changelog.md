@@ -1,8 +1,8 @@
 # Changelog
 
 # Unreleased
-- Add `pending_migration_error = :page_load` option to raise an error on page load when data migrations are pending https://github.com/ilyakatz/data-migrate/issues/294
-- Fix `ActiveRecord::StatementInvalid` when checking for pending data migrations before the data_migrations table exists
+- Add `pending_migration_error = :page_load` option to raise an error on page load when data migrations are pending https://github.com/ilyakatz/data-migrate/pull/374
+- Fix `ActiveRecord::StatementInvalid` when checking for pending data migrations before the data_migrations table exists https://github.com/ilyakatz/data-migrate/pull/374
 
 # 11.3.1
 - Schema version -- do formatted version like activerecord https://github.com/ilyakatz/data-migrate/pull/363
