@@ -1,6 +1,7 @@
 # Changelog
 
 # Unreleased
+- Add `pending_migration_error = :page_load` option to raise an error on page load when data migrations are pending https://github.com/ilyakatz/data-migrate/issues/294
 - Fix `ActiveRecord::StatementInvalid` when checking for pending data migrations before the data_migrations table exists
 
 # 11.3.1

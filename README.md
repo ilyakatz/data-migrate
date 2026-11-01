@@ -130,6 +130,21 @@ end
 
 ```
 
+### Checking for pending data migrations on page load
+
+Rails raises an error on page load when schema migrations are pending (`config.active_record.migration_error = :page_load`). You can get the same behavior for data migrations:
+
+```ruby
+# config/initializers/data_migrate.rb
+DataMigrate.configure do |config|
+  config.pending_migration_error = :page_load if Rails.env.development?
+end
+```
+
+When data migrations are pending, requests raise `DataMigrate::PendingMigrationError`, which lists them and offers a "Run pending data migrations" button on the error page. Like its Rails counterpart, the check runs on every request while data migrations are pending; once they have run, it only queries the database again when the files in `data_migrations_path` change. Pending schema migrations are still reported first.
+
+This option is disabled by default and is intended for development only. `DataMigrate::CheckPending` is listed in `bin/rails middleware` either way, but when the option is disabled it is not built and adds nothing to requests.
+
 ## Capistrano Support
 
 The gem comes with a capistrano task that can be used instead of `capistrano/rails/migrations`.
