@@ -11,6 +11,32 @@ describe DataMigrate::Config do
     expect(DataMigrate.config.data_template_path).to eq DataMigrate::Config::DEFAULT_DATA_TEMPLATE_PATH
   end
 
+  it "disables pending_migration_error by default", :no_override do
+    expect(DataMigrate.config.pending_migration_error).to be_nil
+  end
+
+  describe "pending migration error configured" do
+    subject { DataMigrate.config.pending_migration_error }
+
+    before do
+      @original_pending_migration_error = DataMigrate.config.pending_migration_error
+
+      DataMigrate.configure do |config|
+        config.pending_migration_error = :page_load
+      end
+    end
+
+    after do
+      DataMigrate.configure do |config|
+        config.pending_migration_error = @original_pending_migration_error
+      end
+    end
+
+    it "equals the configured value" do
+      is_expected.to eq(:page_load)
+    end
+  end
+
   describe "data migration path configured" do
     subject { DataMigrate.config.data_migrations_path }
     let(:data_migrations_path) { "db/awesome/" }

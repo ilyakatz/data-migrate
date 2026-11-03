@@ -6,8 +6,10 @@ require "data_migrate/config"
 module DataMigrate
   class DataMigrator < ActiveRecord::Migrator
     def load_migrated
-      @migrated_versions =
-        DataMigrate::RailsHelper.data_schema_migration.normalized_versions.map(&:to_i).sort
+      data_schema_migration = DataMigrate::RailsHelper.data_schema_migration
+      return @migrated_versions = [] unless data_schema_migration.table_exists?
+
+      @migrated_versions = data_schema_migration.normalized_versions.map(&:to_i).sort
     end
 
     class << self
