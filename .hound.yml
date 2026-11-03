@@ -1,4 +1,6 @@
 fail_on_violations: true
 
-ruby:
-  config_file: .rubocop.yml
+rubocop:
+  enabled: true
+  version: 1.22.1
+  config_file: .hound.rubocop.yml
