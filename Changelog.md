@@ -1,6 +1,10 @@
 # Changelog
 
 # Unreleased
+
+# 11.4.0
+- Make `status` command find migrations in subdirectories https://github.com/ilyakatz/data-migrate/pull/367
+- Honor `DataMigrate.config.db_configuration` when running data migrations - #373 https://github.com/ilyakatz/data-migrate/pull/373
 - Add `pending_migration_error = :page_load` option to raise an error on page load when data migrations are pending https://github.com/ilyakatz/data-migrate/pull/374
 - Fix `ActiveRecord::StatementInvalid` when checking for pending data migrations before the data_migrations table exists https://github.com/ilyakatz/data-migrate/pull/374
 
