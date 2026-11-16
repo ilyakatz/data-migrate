@@ -127,7 +127,7 @@ GEM
     method_source (1.1.0)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
-    minitest (5.25.5)
+    minitest (5.27.0)
     net-imap (0.5.8)
       date
       net-protocol
@@ -149,6 +149,7 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.10-x86_64-linux-gnu)
       racc (~> 1.4)
+    ostruct (0.6.3)
     overcommit (0.64.0)
       childprocess (>= 0.6.3, < 6)
       iniparse (~> 1.4)
@@ -168,7 +169,7 @@ GEM
       date
       stringio
     racc (1.8.1)
-    rack (3.1.9)
+    rack (3.2.8)
     rack-session (2.1.0)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
@@ -260,7 +261,7 @@ GEM
       concurrent-ruby (~> 1.0)
     unicode-display_width (3.1.5)
       unicode-emoji (~> 4.0, >= 4.0.4)
-    unicode-emoji (4.0.4)
+    unicode-emoji (4.3.0)
     uri (1.0.3)
     useragent (0.16.11)
     websocket-driver (0.7.7)
@@ -279,6 +280,7 @@ PLATFORMS
 DEPENDENCIES
   appraisal
   data_migrate!
+  ostruct
   overcommit
   pry
   rails (~> 8.1.0)
@@ -291,4 +293,4 @@ DEPENDENCIES
   timecop
 
 BUNDLED WITH
-   2.5.22
+  4.1.0
