@@ -182,7 +182,7 @@ module DataMigrate
     end
 
     def self.migrate_with_data
-      initialize_database_with_data
+      initialize_databases_for_migrate
       DataMigrate::DataMigrator.create_data_schema_table
 
       ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
@@ -220,32 +220,52 @@ module DataMigrate
       end
     end
 
-    # On a blank database, Rails 8.0+ loads the schema instead of running every
-    # migration (ActiveRecord::Tasks::DatabaseTasks#initialize_database), once
-    # the first migration is due. That is too late here: the data migrator that
-    # lists the pending data migrations creates schema_migrations, after which
-    # the database looks initialized and every migration runs from the first.
-    # So the primary database is initialized before anything else, and
-    # data_schema.rb is loaded after schema.rb: the data migrations it records
-    # are marked as run, as the schema migrations are, instead of being run on a
-    # schema they were not written for.
-    def self.initialize_database_with_data
+    # Sets up a blank primary database, as Rails does when db:prepare (7.1+)
+    # or db:migrate (8.0+) runs on one: creates it if missing and, without
+    # schema_migrations yet, loads schema.rb instead of running every migration
+    # from the first. data_schema.rb is loaded after it: the data migrations it
+    # records are marked as run, as the schema migrations are, instead of being
+    # run on a schema they were not written for.
+    # Returns whether the database was blank, to be seeded then.
+    def self.initialize_database_with_data(db_config)
+      with_temporary_pool(db_config) do
+        begin
+          initialized = DataMigrate::RailsHelper.schema_migration.table_exists?
+        rescue ActiveRecord::NoDatabaseError
+          create(db_config)
+          retry
+        end
+        next false if initialized
+
+        schema = ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(db_config)
+        if schema && File.exist?(schema)
+          ActiveRecord::Tasks::DatabaseTasks.load_schema(db_config)
+
+          data_schema = schema_dump_path(db_config)
+          if data_schema && File.exist?(data_schema)
+            begin
+              verbose_was, ActiveRecord::Migration.verbose = ActiveRecord::Migration.verbose, false
+              load(data_schema)
+            ensure
+              ActiveRecord::Migration.verbose = verbose_was
+            end
+          end
+        end
+
+        true
+      end
+    end
+
+    # Since Rails 8.0, db:migrate sets up a blank database once its first
+    # migration is due. That is too late here: the data migrator that lists the
+    # pending data migrations creates schema_migrations, after which the
+    # database looks set up and every migration runs from the first. So
+    # db:migrate:with_data sets it up before anything else.
+    def self.initialize_databases_for_migrate
       return unless ActiveRecord::Tasks::DatabaseTasks.respond_to?(:initialize_database, true)
 
       ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env).each do |db_config|
-        next unless primary?(db_config)
-        next unless ActiveRecord::Tasks::DatabaseTasks.send(:initialize_database, db_config)
-
-        schema = ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(db_config)
-        data_schema = schema_dump_path(db_config)
-        next unless schema && File.exist?(schema) && data_schema && File.exist?(data_schema)
-
-        with_temporary_pool(db_config) do
-          verbose_was, ActiveRecord::Migration.verbose = ActiveRecord::Migration.verbose, false
-          load(data_schema)
-        ensure
-          ActiveRecord::Migration.verbose = verbose_was
-        end
+        initialize_database_with_data(db_config) if primary?(db_config)
       end
     end
 
@@ -255,21 +275,27 @@ module DataMigrate
       each_current_configuration(env) do |db_config|
         next unless primary?(db_config)
 
-        with_temporary_pool(db_config) do |pool|
-          connection = pool.respond_to?(:lease_connection) ? pool.lease_connection : pool.connection
-          unless database_exists?(connection)
-            create(db_config)
-            if File.exist?(schema_dump_path(db_config))
-              load_schema(db_config, schema_format, nil)
-              load_schema_current(
-                :ruby,
-                ENV["DATA_SCHEMA"]
-              )
+        if DataMigrate::RailsHelper.rails_version_equal_to_or_higher_than_7_1
+          # A database created or still blank is seeded, as db:prepare does.
+          seed = true if initialize_database_with_data(db_config)
+        else
+          with_temporary_pool(db_config) do |pool|
+            unless database_exists?(pool.connection)
+              create(db_config)
+              if File.exist?(schema_dump_path(db_config))
+                load_schema(db_config, schema_format, nil)
+                load_schema_current(
+                  :ruby,
+                  ENV["DATA_SCHEMA"]
+                )
+              end
+
+              seed = true
             end
-
-            seed = true
           end
+        end
 
+        with_temporary_pool(db_config) do |_pool|
           migrate_with_data
           if dump_schema_after_migration?
             dump_schema(db_config)
