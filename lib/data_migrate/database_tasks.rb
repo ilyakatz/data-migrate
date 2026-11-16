@@ -182,6 +182,7 @@ module DataMigrate
     end
 
     def self.migrate_with_data
+      initialize_database_with_data
       DataMigrate::DataMigrator.create_data_schema_table
 
       ActiveRecord::Migration.verbose = ENV["VERBOSE"] ? ENV["VERBOSE"] == "true" : true
@@ -215,6 +216,35 @@ module DataMigrate
               ActiveRecord::Tasks::DatabaseTasks.migrate(version)
             end
           end
+        end
+      end
+    end
+
+    # On a blank database, Rails 8.0+ loads the schema instead of running every
+    # migration (ActiveRecord::Tasks::DatabaseTasks#initialize_database), once
+    # the first migration is due. That is too late here: the data migrator that
+    # lists the pending data migrations creates schema_migrations, after which
+    # the database looks initialized and every migration runs from the first.
+    # So the primary database is initialized before anything else, and
+    # data_schema.rb is loaded after schema.rb: the data migrations it records
+    # are marked as run, as the schema migrations are, instead of being run on a
+    # schema they were not written for.
+    def self.initialize_database_with_data
+      return unless ActiveRecord::Tasks::DatabaseTasks.respond_to?(:initialize_database, true)
+
+      ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env).each do |db_config|
+        next unless primary?(db_config)
+        next unless ActiveRecord::Tasks::DatabaseTasks.send(:initialize_database, db_config)
+
+        schema = ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(db_config)
+        data_schema = schema_dump_path(db_config)
+        next unless schema && File.exist?(schema) && data_schema && File.exist?(data_schema)
+
+        with_temporary_pool(db_config) do
+          verbose_was, ActiveRecord::Migration.verbose = ActiveRecord::Migration.verbose, false
+          load(data_schema)
+        ensure
+          ActiveRecord::Migration.verbose = verbose_was
         end
       end
     end

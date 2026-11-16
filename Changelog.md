@@ -1,6 +1,7 @@
 # Changelog
 
 # Unreleased
+- On Rails 8.0+, `db:migrate:with_data` on a blank database loads `schema.rb` then `data_schema.rb`, as `db:migrate` loads the schema, instead of running every schema and data migration
 
 # 11.4.0
 - Make `status` command find migrations in subdirectories https://github.com/ilyakatz/data-migrate/pull/367

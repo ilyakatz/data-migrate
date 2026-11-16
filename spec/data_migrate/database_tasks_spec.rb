@@ -112,6 +112,45 @@ describe DataMigrate::DatabaseTasks do
       end
     end
 
+    if ActiveRecord::Tasks::DatabaseTasks.respond_to?(:initialize_database, true)
+      describe :migrate_with_data do
+        context "on a blank database" do
+          before do
+            connection = ActiveRecord::Base.connection
+            connection.tables.each { |table| connection.drop_table(table) }
+
+            primary = ActiveRecord::DatabaseConfigurations::HashConfig.new(
+              "test", "primary", adapter: "sqlite3", database: "spec/db/test.db"
+            )
+            allow(ActiveRecord::Base).to receive(:configurations)
+              .and_return(ActiveRecord::DatabaseConfigurations.new([primary]))
+            allow(ActiveRecord::Tasks::DatabaseTasks).to receive(:env).and_return("test")
+            allow(ActiveRecord::Tasks::DatabaseTasks).to receive(:schema_dump_path).and_return("spec/db/schema.rb")
+            allow(subject).to receive(:schema_dump_path).and_return("spec/db/data/schema/data_schema.rb")
+            allow(ActiveRecord::Migrator).to receive(:migrations_paths).and_return([migration_path])
+          end
+
+          after do
+            ActiveRecord::Migration.drop_table("things", if_exists: true)
+            ActiveRecord::Migration.drop_table("ar_internal_metadata", if_exists: true)
+          end
+
+          it "loads schema.rb and data_schema.rb instead of running the migrations they cover" do
+            expect { subject.migrate_with_data }.to output(
+              a_string_including("Doing DataTwoUpdate")
+                .and(satisfy { |out| !out.match?(/Doing schema|Doing data migration|Doing SuperUpdate/) })
+            ).to_stdout
+
+            expect(ActiveRecord::Base.connection.table_exists?("things")).to be(true)
+            expect(DataMigrate::RailsHelper.schema_migration.normalized_versions)
+              .to contain_exactly("20131111111111", "20202020202011")
+            expect(DataMigrate::RailsHelper.data_schema_migration.normalized_versions)
+              .to contain_exactly("20091231235959", "20171231235959", "20241231235959")
+          end
+        end
+      end
+    end
+
     describe :prepare_all_with_data do
       let(:db_config) do
         ActiveRecord::DatabaseConfigurations::HashConfig.new(
