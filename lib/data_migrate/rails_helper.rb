@@ -13,12 +13,6 @@ module DataMigrate
         @equal_to_or_higher_than_7_1 = Gem::Dependency.new("railties", ">= 7.1.0.alpha").match?("railties", Gem.loaded_specs["railties"].version, true)
       end
 
-      def rails_version_equal_to_or_higher_than_7_0
-        return @rails_version_equal_to_or_higher_than_7_0 if defined?(@rails_version_equal_to_or_higher_than_7_0)
-
-        @rails_version_equal_to_or_higher_than_7_0 = Gem::Dependency.new("railties", ">= 7.0").match?("railties", Gem.loaded_specs["railties"].version, true)
-      end
-
       def internal_metadata
         if rails_version_equal_to_or_higher_than_7_2
           ActiveRecord::Base.connection_pool.internal_metadata

@@ -80,17 +80,6 @@ module DataMigrate
       "data_schema.rb"
     end
 
-    # This method is removed in Rails 7.0
-    def dump_filename(spec_name, format = ActiveRecord::Base.schema_format)
-      filename = if spec_name == "primary"
-        schema_file_type(format)
-      else
-        "#{spec_name}_#{schema_file_type(format)}"
-      end
-
-      ENV["DATA_SCHEMA"] || File.join(db_dir, filename)
-    end
-
     def check_schema_file(filename)
       unless File.exist?(filename)
         message = +%{#{filename} doesn't exist yet. Run `rake data:migrate` to create it, then try again.}
@@ -143,8 +132,8 @@ module DataMigrate
     # Override this method from `ActiveRecord::Tasks::DatabaseTasks`
     # to ensure that the sha saved in ar_internal_metadata table
     # is from the original schema.rb file
-    def schema_sha1(file)
-      ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env, name: "primary"))
+    def schema_sha1(_file)
+      super(ActiveRecord::Tasks::DatabaseTasks.schema_dump_path(ActiveRecord::Base.configurations.configs_for(env_name: ActiveRecord::Tasks::DatabaseTasks.env, name: "primary")))
     end
 
     def forward(step = 1)
@@ -223,7 +212,7 @@ module DataMigrate
       seed = false
 
       each_current_configuration(env) do |db_config|
-        next unless primary?(db_config)
+        next unless db_config.primary?
 
         with_temporary_pool(db_config) do |pool|
           connection = pool.respond_to?(:lease_connection) ? pool.lease_connection : pool.connection
@@ -263,28 +252,12 @@ module DataMigrate
       false
     end
 
-    def primary?(db_config)
-      if db_config.respond_to?(:primary?)  # Rails 7.0+
-        db_config.primary?
-      else
-        db_config.name == "primary"
-      end
-    end
-
     def dump_schema_after_migration?
-      if ActiveRecord.respond_to?(:dump_schema_after_migration)
-        ActiveRecord.dump_schema_after_migration
-      else
-        ActiveRecord::Base.dump_schema_after_migration
-      end
+      ActiveRecord.dump_schema_after_migration
     end
 
     def schema_format
-      if ActiveRecord.respond_to?(:schema_format)
-        ActiveRecord.schema_format
-      else
-        ActiveRecord::Base.schema_format
-      end
+      ActiveRecord.schema_format
     end
   end
 end

@@ -2,8 +2,8 @@ PATH
   remote: ..
   specs:
     data_migrate (11.4.0)
-      activerecord (>= 6.1)
-      railties (>= 6.1)
+      activerecord (>= 7.0)
+      railties (>= 7.0)
 
 GEM
   remote: http://rubygems.org/

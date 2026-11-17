@@ -1,6 +1,8 @@
 # Changelog
 
 # Unreleased
+- Drop support for Rails 6.1, whose `db:schema:load:with_data` and `db:prepare:with_data` crashed - Fixes #295 https://github.com/ilyakatz/data-migrate/issues/295 & Fixes #302 https://github.com/ilyakatz/data-migrate/issues/302
+- Store the checksum of `schema.rb` instead of its path when loading `data_schema.rb`
 
 # 11.4.0
 - Make `status` command find migrations in subdirectories https://github.com/ilyakatz/data-migrate/pull/367
