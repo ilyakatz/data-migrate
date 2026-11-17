@@ -83,31 +83,75 @@ describe DataMigrate::DatabaseTasks do
       end
     end
 
-    if DataMigrate::RailsHelper.rails_version_equal_to_or_higher_than_7_0
-      describe :schema_dump_path do
-        before do
-          allow(ActiveRecord::Base).to receive(:configurations)
-            .and_return(ActiveRecord::DatabaseConfigurations.new([db_config]))
+    describe :schema_dump_path do
+      before do
+        allow(ActiveRecord::Base).to receive(:configurations)
+          .and_return(ActiveRecord::DatabaseConfigurations.new([db_config]))
+      end
+
+      context "for primary database" do
+        let(:db_config) do
+          ActiveRecord::DatabaseConfigurations::HashConfig.new("development", "primary", {})
         end
 
-        context "for primary database" do
-          let(:db_config) do
-            ActiveRecord::DatabaseConfigurations::HashConfig.new("development", "primary", {})
+        context "for :ruby db format" do
+          it 'returns the data schema path' do
+            allow(ActiveRecord).to receive(:schema_format).and_return(:ruby)
+            expect(subject.schema_dump_path(db_config)).to eq("db/data_schema.rb")
           end
+        end
 
-          context "for :ruby db format" do
-            it 'returns the data schema path' do
-              allow(ActiveRecord).to receive(:schema_format).and_return(:ruby)
-              expect(subject.schema_dump_path(db_config)).to eq("db/data_schema.rb")
-            end
+        context "for :sql db format" do
+          it 'returns the data schema path' do
+            allow(ActiveRecord).to receive(:schema_format).and_return(:sql)
+            expect(subject.schema_dump_path(db_config, :sql)).to eq("db/data_schema.rb")
           end
+        end
+      end
+    end
 
-          context "for :sql db format" do
-            it 'returns the data schema path' do
-              allow(ActiveRecord).to receive(:schema_format).and_return(:sql)
-              expect(subject.schema_dump_path(db_config, :sql)).to eq("db/data_schema.rb")
-            end
-          end
+    context "with schema.rb and data_schema.rb" do
+      let(:db_config) do
+        ActiveRecord::DatabaseConfigurations::HashConfig.new(
+          "test", "primary", adapter: "sqlite3", database: "spec/db/test.db"
+        )
+      end
+      let(:schema_sha1) { Digest::SHA1.hexdigest(File.read("spec/db/schema.rb")) }
+
+      around do |example|
+        schema_was, ENV["SCHEMA"] = ENV["SCHEMA"], "spec/db/schema.rb"
+        data_schema_was, ENV["DATA_SCHEMA"] = ENV["DATA_SCHEMA"], "spec/db/data/schema/data_schema.rb"
+        example.run
+      ensure
+        ENV["SCHEMA"] = schema_was
+        ENV["DATA_SCHEMA"] = data_schema_was
+      end
+
+      before do
+        allow(ActiveRecord::Base).to receive(:configurations)
+          .and_return(ActiveRecord::DatabaseConfigurations.new([db_config]))
+        allow(ActiveRecord::Tasks::DatabaseTasks).to receive(:env).and_return("test")
+        allow(subject).to receive(:env).and_return("test")
+      end
+
+      after do
+        ActiveRecord::Migration.drop_table("ar_internal_metadata", if_exists: true)
+      end
+
+      describe :schema_sha1 do
+        it "returns the checksum of schema.rb, whichever file is given" do
+          expect(subject.schema_sha1("spec/db/data/schema/data_schema.rb")).to eq(schema_sha1)
+        end
+      end
+
+      # db:schema:load:with_data
+      describe :load_schema_current do
+        it "loads data_schema.rb and records the checksum of schema.rb" do
+          subject.load_schema_current(:ruby, ENV["DATA_SCHEMA"])
+
+          expect(DataMigrate::RailsHelper.data_schema_migration.normalized_versions)
+            .to contain_exactly("20091231235959", "20171231235959")
+          expect(DataMigrate::RailsHelper.internal_metadata[:schema_sha1]).to eq(schema_sha1)
         end
       end
     end
