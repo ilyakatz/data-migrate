@@ -35,6 +35,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rb-readline"
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "timecop"
+  # OpenStruct (spec_helper) left the default gems in Ruby 3.5
+  s.add_development_dependency "ostruct"
   s.add_development_dependency "rubocop"
   s.add_development_dependency "overcommit"
 end

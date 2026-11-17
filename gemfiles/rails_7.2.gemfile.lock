@@ -137,6 +137,7 @@ GEM
       racc (~> 1.4)
     nokogiri (1.18.0-x86_64-linux-gnu)
       racc (~> 1.4)
+    ostruct (0.6.3)
     overcommit (0.63.0)
       childprocess (>= 0.6.3, < 6)
       iniparse (~> 1.4)
@@ -255,6 +256,7 @@ PLATFORMS
 DEPENDENCIES
   appraisal
   data_migrate!
+  ostruct
   overcommit
   pry
   rails (~> 7.2.0)
